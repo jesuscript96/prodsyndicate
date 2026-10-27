@@ -1,0 +1,85 @@
+/* ───────────── LayersExploded: pila de 4 capas en CSS 3D (§8.2) ───────────── */
+.layers {
+  perspective: 1400px;
+  height: clamp(320px, 48vw, 520px);
+  display: grid;
+  place-items: center;
+  margin: 0;
+  overflow: visible;
+}
+.layers__stack {
+  position: relative;
+  width: min(70vw, 460px);
+  aspect-ratio: 1.2;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.layers__layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border-radius: 28px;
+  /* Sin backdrop-filter: en Safari rompe el contexto 3D. Fondo semitransparente sin blur. */
+  background: rgb(255 255 255 / 0.74);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-float);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.layers__layer:last-child {
+  border-color: var(--accent);
+}
+.layers__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.layers__layer .label {
+  color: var(--ink-2);
+}
+.layers__index {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  /* --ink-2: sobre el fondo translúcido de las capas, --ink-3 queda por debajo de 4,5:1 */
+  color: var(--ink-2);
+}
+.layers__layer:last-child .layers__index {
+  color: var(--accent);
+}
+/* Decoración mínima: tres hairlines que sugieren contenido */
+.layers__lines {
+  display: grid;
+  gap: 0.5rem;
+}
+.layers__lines span {
+  display: block;
+  height: 1px;
+  background: var(--line);
+}
+.layers__lines span:nth-child(1) { width: 62%; }
+.layers__lines span:nth-child(2) { width: 44%; }
+.layers__lines span:nth-child(3) { width: 78%; }
+.layers__dot {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+/* Sin JS o con reduce-motion las capas ya aparecen separadas (el componente lo fija con gsap.set,
+   pero garantizamos una composición legible también antes de hidratar). */
+@media (scripting: none) {
+  .layers__stack { transform: rotateX(58deg) rotateZ(-22deg); }
+  .layers__layer:nth-child(1) { transform: translateZ(252px); }
+  .layers__layer:nth-child(2) { transform: translateZ(168px); }
+  .layers__layer:nth-child(3) { transform: translateZ(84px); }
+}

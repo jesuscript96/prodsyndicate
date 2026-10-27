@@ -1,0 +1,236 @@
+/* ───────────── /proyectos y /proyectos/[slug] (§8.4) · CSS co-localizado ─────────────
+   Se importa desde components/projects/*. Tokens y clases globales en app/globals.css. */
+
+/* ── Migas antes del hero: reservan la altura del header; el PageHero reduce su padding superior ── */
+.projects-crumbs {
+  padding-top: calc(var(--header-h) + 16px + clamp(1.5rem, 3vw, 2.5rem));
+}
+.projects-hero {
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* ── Índice: barra de filtros ── */
+.project-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.project-filter__group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.project-filter__list { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
+.project-filter__btn {
+  cursor: pointer;
+  transition: background-color var(--dur-micro), color var(--dur-micro), border-color var(--dur-micro);
+}
+.project-filter__btn:hover { border-color: var(--ink); color: var(--ink); }
+.project-filter__btn[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.project-filter__count { white-space: nowrap; }
+
+/* ── Índice: rejilla asimétrica ──
+   Móvil: 1 columna. Escritorio: 12 columnas; los proyectos visibles ocupan, por turnos,
+   7 / 5 / 5 / 7 columnas (data-slot 0–3): dos columnas de anchos distintos y, por tanto,
+   alturas alternas, con el lado ancho cambiando en cada fila. `position: relative` lo
+   necesita GSAP Flip (`absolute: true`) para reordenar sin saltos. */
+.project-grid {
+  position: relative;
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.project-grid__item { display: grid; min-width: 0; }
+.project-grid__item[data-hidden] { display: none; }
+@media (min-width: 900px) {
+  .project-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: start; }
+  .project-grid__item[data-slot="0"] { grid-column: 1 / span 7; }
+  .project-grid__item[data-slot="1"] { grid-column: 8 / span 5; }
+  .project-grid__item[data-slot="2"] { grid-column: 1 / span 5; }
+  .project-grid__item[data-slot="3"] { grid-column: 6 / span 7; }
+}
+.project-grid-empty { padding-block: 3rem; color: var(--ink-2); }
+
+/* ── Caso: cabecera ── */
+.case-hero {
+  padding-top: calc(var(--header-h) + 16px + clamp(1.5rem, 3vw, 2.5rem));
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.case-hero__inner { display: grid; gap: 1.25rem; max-width: 64rem; }
+.case-hero__title { max-width: 16ch; }
+.case-hero__summary { max-width: 54ch; }
+.case-facts {
+  display: grid;
+  gap: 1rem 2.5rem;
+  margin: 0;
+  padding-top: 1rem;
+}
+@media (min-width: 700px) {
+  .case-facts { grid-template-columns: auto auto minmax(0, 1fr); }
+  .case-facts__wide { grid-column: 1 / -1; }
+}
+.case-facts > div { display: grid; gap: 0.5rem; align-content: start; }
+.case-facts dt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.case-facts dd { margin: 0; color: var(--ink); }
+.case-facts__chips { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
+
+/* Aviso honesto: caso de concepto */
+.concept-notice {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  max-width: 64ch;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper-2);
+}
+.concept-notice__chip { justify-self: start; }
+.concept-notice p { margin: 0; font-size: 1rem; line-height: 1.55; color: var(--ink-2); }
+
+/* Portada grande (ImageReveal + next/image fill). 4:3 en móvil; en escritorio recorta a 16:9
+   (las composiciones están centradas verticalmente, el recorte no toca los dispositivos). */
+.case-cover {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--paper-2);
+  box-shadow: var(--shadow-float);
+}
+.case-cover img { object-fit: cover; }
+@media (min-width: 900px) {
+  .case-cover { aspect-ratio: 16 / 9; }
+}
+
+/* ── Caso: cuerpo MDX ── */
+.case-body { padding-top: clamp(3rem, 6vw, 5rem); padding-bottom: var(--section-y); }
+.case-body > * + * { margin-top: clamp(4rem, 8vw, 7rem); }
+
+/* Resumen en 3 bloques: El reto · Lo que hicimos · El resultado */
+.case-summary { display: grid; counter-reset: block; }
+.case-block {
+  display: grid;
+  gap: 1rem 3rem;
+  padding-block: clamp(1.75rem, 3vw, 2.5rem);
+  border-top: 1px solid var(--line);
+  counter-increment: block;
+}
+.case-block:last-child { border-bottom: 1px solid var(--line); }
+.case-block__head { display: flex; align-items: baseline; gap: 1rem; }
+.case-block__head::before {
+  content: counter(block, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+.prose .case-block__title { margin: 0; font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2rem); line-height: 1.15; letter-spacing: -0.02em; font-weight: 500; color: var(--ink); }
+.case-block__body { max-width: 60ch; }
+.case-block__body > * + * { margin-top: 1.1em; }
+@media (min-width: 900px) {
+  .case-block { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+  .case-block__head { position: sticky; top: calc(var(--header-h) + 40px); align-self: start; }
+}
+
+/* Galería: columnas sticky alternas en escritorio (§8.4).
+   DOM: captura 1, columna derecha (2, 4…), captura 3, 5… La columna derecha ocupa toda la
+   altura de la rejilla y sus capturas son sticky mientras la izquierda sigue desplazándose. */
+.case-gallery {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin: 0;
+}
+.case-gallery__col { display: contents; }
+.case-shot { margin: 0; display: grid; gap: 0.875rem; min-width: 0; }
+.case-shot__media { background: var(--paper-2); box-shadow: var(--shadow-float); }
+.case-shot__media img { display: block; width: 100%; height: auto; }
+.case-shot__caption { display: flex; align-items: baseline; gap: 0.75rem; font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+.case-shot__caption .label { flex: none; }
+@media (min-width: 900px) {
+  .case-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows, 1), auto);
+    align-items: start;
+  }
+  .case-gallery > .case-shot { grid-column: 1; }
+  .case-gallery__col {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: stretch;
+    align-content: start;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding-top: clamp(5rem, 12vw, 10rem);
+  }
+  .case-gallery__col .case-shot { position: sticky; top: calc(var(--header-h) + 40px); }
+}
+
+/* Decisiones clave */
+.case-decisions { display: grid; gap: clamp(2rem, 4vw, 3rem); }
+.case-decisions__head { display: grid; gap: 1rem; }
+.prose .case-decisions__title { margin: 0; color: var(--ink); }
+.case-decisions__list { display: grid; margin: 0; padding: 0; list-style: none; counter-reset: decision; }
+.case-decision {
+  display: grid;
+  gap: 1rem 3rem;
+  padding-block: clamp(1.75rem, 3vw, 2.5rem);
+  border-top: 1px solid var(--line);
+  counter-increment: decision;
+}
+.case-decision:last-child { border-bottom: 1px solid var(--line); }
+.case-decision__head { display: flex; align-items: baseline; gap: 1rem; }
+.case-decision__head::before {
+  content: counter(decision, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.prose .case-decision__title { margin: 0; font-size: 1.25rem; line-height: 1.3; letter-spacing: -0.015em; font-weight: 500; color: var(--ink); }
+.case-decision__body { max-width: 60ch; }
+.case-decision__body > * + * { margin-top: 1.1em; }
+@media (min-width: 900px) {
+  .case-decision { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+}
+
+/* ── Siguiente proyecto: enlace grande ── */
+.next-project {
+  position: relative;
+  display: grid;
+  gap: 1.5rem 3rem;
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--dur-ui) var(--ease-out-expo), border-color var(--dur-micro), box-shadow var(--dur-ui) var(--ease-out-expo);
+}
+.next-project:hover,
+.next-project:has(a:focus-visible) { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--shadow-float); }
+.next-project__text { display: grid; gap: 1rem; }
+.next-project__title { max-width: 18ch; }
+.next-project__title a { color: inherit; text-decoration: none; outline: none; }
+/* Toda la tarjeta es clicable (enlace "estirado"); el foco se muestra en la tarjeta */
+.next-project__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.next-project__summary { max-width: 46ch; }
+.next-project__cta { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); }
+.next-project__cta svg { width: 18px; height: 18px; transition: transform var(--dur-micro) var(--ease-out-expo); }
+.next-project:hover .next-project__cta svg { transform: translateX(4px); }
+.next-project__media { position: relative; aspect-ratio: 4 / 3; background: var(--paper-2); }
+.next-project__media img { object-fit: cover; }
+@media (min-width: 900px) {
+  .next-project { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .next-project, .next-project__cta svg, .project-filter__btn { transition: none; }
+  .next-project:hover { transform: none; }
+}

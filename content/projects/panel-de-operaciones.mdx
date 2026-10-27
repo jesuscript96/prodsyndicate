@@ -1,0 +1,81 @@
+---
+title: 'Un panel de operaciones que ordena el día a día'
+client: 'Caso de concepto'
+year: 2026
+categories: [empresa]
+services: ['Software a medida', 'Diseño de producto']
+stack: ['Next.js', 'TypeScript', 'PostgreSQL', 'Supabase', 'Vercel']
+summary: 'Una empresa de servicios que gestionaba pedidos entre hojas de cálculo, correos y llamadas, con una herramienta interna que muestra en una sola pantalla qué está pasando y qué toca hacer.'
+cover:
+  src: '/projects/panel-de-operaciones/cover.webp'
+  alt: 'Portátil con un panel de operaciones abstracto: barra lateral, cuatro indicadores, tabla de pedidos y gráfico de barras con una barra en azul'
+isConcept: true
+order: 2
+featured: true
+---
+
+<Summary>
+
+<Block title="El reto">
+
+Una empresa de servicios con varios equipos en campo gestiona cada pedido en tres sitios a la vez: una hoja de cálculo compartida, un hilo de correos y la memoria de quien lo lleva. Funciona hasta que deja de funcionar: nadie sabe con certeza en qué estado está un pedido, los retrasos se descubren cuando el cliente llama y cada informe semanal se monta a mano.
+
+El reto no es técnico, es de forma de trabajar: construir una herramienta que encaje con cómo opera la empresa y que el equipo adopte sin que nadie tenga que obligarle.
+
+</Block>
+
+<Block title="Lo que hicimos">
+
+Empezamos observando. Antes de diseñar una sola pantalla, acompañamos al equipo de operaciones durante su jornada para entender qué miran, qué preguntan y qué apuntan en papel. De ahí salió un mapa de estados muy corto, los que de verdad usan, y una lista de las decisiones que toman cada día.
+
+Con eso diseñamos un panel con tres vistas: un tablero por estado para mover pedidos, una ficha con la trazabilidad completa de cada uno y una página de indicadores que sustituye al informe semanal. Lo construimos sobre Next.js con una base de datos relacional, permisos por rol y un historial de cambios en cada pedido.
+
+</Block>
+
+<Block title="El resultado">
+
+Una única fuente de verdad para operaciones: el estado de cada pedido se ve, se cambia y queda registrado en el mismo sitio. Las conversaciones del equipo pasan de "¿esto en qué está?" a "esto está aquí porque…".
+
+Y una base sobre la que seguir: la misma herramienta puede crecer hacia la facturación o la planificación de equipos sin rehacer lo que ya funciona.
+
+</Block>
+
+</Summary>
+
+<Gallery>
+
+<Shot src="/projects/panel-de-operaciones/g1.webp" alt="Portátil con un tablero de cuatro columnas por estado; una tarjeta destacada con borde azul en la segunda columna" caption="Tablero por estado" />
+
+<Shot src="/projects/panel-de-operaciones/g2.webp" alt="Tableta con una página de indicadores: gráfico de líneas con área azul, línea de comparación discontinua y un gráfico circular con leyenda" caption="Indicadores en lugar del informe semanal" />
+
+<Shot src="/projects/panel-de-operaciones/g3.webp" alt="Portátil con la ficha de un pedido: lista lateral con un elemento seleccionado, tres bloques de resumen y una línea de tiempo vertical" caption="Ficha y trazabilidad de cada pedido" />
+
+</Gallery>
+
+<Decisions>
+
+<Decision title="Pocos estados, bien definidos">
+
+La tentación en un panel de operaciones es modelar cada matiz: quince estados, subestados, excepciones. El resultado suele ser que nadie los usa igual y el tablero deja de ser fiable.
+
+Nos quedamos con los estados que el equipo ya nombraba en voz alta y definimos para cada uno quién puede moverlo y qué dato hace falta para avanzar. Si algo no encaja, se anota en el historial del pedido en lugar de inventar un estado nuevo. Un modelo corto se aprende en un día y se respeta durante años.
+
+</Decision>
+
+<Decision title="Permisos por rol desde el primer día">
+
+En una herramienta interna conviven personas con responsabilidades muy distintas: quien crea pedidos, quien los ejecuta en campo y quien necesita solo mirar los indicadores. Dejar los permisos para "más adelante" acaba en una pantalla llena de botones que no todo el mundo debería ver.
+
+Diseñamos tres roles simples y los aplicamos tanto en la interfaz como en la capa de datos. Cada persona ve lo que necesita y nada más, y el historial registra quién cambió qué. Menos ruido en pantalla y más confianza en los datos.
+
+</Decision>
+
+<Decision title="Indicadores calculados, no mantenidos">
+
+El informe semanal se montaba a mano porque los datos vivían en sitios distintos. En lugar de replicar ese informe como una pantalla más que alguien rellena, la página de indicadores se calcula directamente a partir de los pedidos y sus cambios de estado.
+
+Eso tiene una consecuencia práctica: si un indicador no cuadra, la causa está en un pedido concreto que se puede abrir y corregir. El informe deja de ser una foto fija y pasa a ser una vista viva de la operación.
+
+</Decision>
+
+</Decisions>

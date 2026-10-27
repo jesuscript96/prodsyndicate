@@ -1,0 +1,81 @@
+---
+title: 'Una web de lanzamiento que se cuenta al hacer scroll'
+client: 'Caso de concepto'
+year: 2026
+categories: [creativo]
+services: ['Productos creativos e interactivos', 'Diseño de producto']
+stack: ['Next.js', 'TypeScript', 'GSAP', 'Lenis', 'Vercel']
+summary: 'La presentación de un producto físico convertida en una web de un solo recorrido: cada capítulo aparece al hacer scroll, con una animación que explica el producto mejor que cualquier ficha técnica.'
+cover:
+  src: '/projects/web-de-lanzamiento/cover.webp'
+  alt: 'Portátil con una portada de lanzamiento: titular grande en bloques con una palabra en azul, un círculo azul, dos botones y un carril de scroll con puntos'
+isConcept: true
+order: 4
+featured: true
+---
+
+<Summary>
+
+<Block title="El reto">
+
+Una marca prepara el lanzamiento de un producto físico y quiere una web que lo explique en un minuto, sin manual y sin vídeo largo. El producto tiene tres ideas que lo diferencian, y el reto es que quien llegue las entienda en orden, sin perderse y sin que la web se convierta en un catálogo de efectos.
+
+Además tiene que cargar rápido en móvil, que es donde va a verse la mayoría de las veces, y seguir funcionando para quien prefiere no ver animaciones.
+
+</Block>
+
+<Block title="Lo que hicimos">
+
+Antes de diseñar, escribimos el guion: qué se cuenta primero, qué después y qué se enseña en cada momento. Cada idea del producto se convirtió en un capítulo con un titular, una frase y una imagen que cambia según avanza el scroll.
+
+Prototipamos el recorrido en una tarde con bloques grises para comprobar el ritmo, y solo después diseñamos las piezas finales. Lo construimos con Next.js y GSAP, con scroll suave, un carril lateral que indica el capítulo en curso y una versión sin animaciones que respeta las preferencias del sistema.
+
+</Block>
+
+<Block title="El resultado">
+
+Una web que se recorre de arriba abajo como una historia corta: cada capítulo entra cuando toca y el producto se entiende sin leer una ficha técnica. El recorrido completo es un único gesto de scroll, y cada pantalla se puede enlazar y compartir por separado.
+
+El mismo esqueleto sirve para los próximos lanzamientos: cambian los capítulos, no la estructura.
+
+</Block>
+
+</Summary>
+
+<Gallery>
+
+<Shot src="/projects/web-de-lanzamiento/g1.webp" alt="Móvil con tres capítulos apilados: titulares en bloques, imágenes alternas oscuras y claras y un carril de puntos a la derecha con el primero en azul" caption="Capítulos en móvil" />
+
+<Shot src="/projects/web-de-lanzamiento/g2.webp" alt="Portátil con un capítulo partido: texto y lista a la izquierda, y a la derecha un panel con un círculo oscuro y dos tarjetas flotantes" caption="Capítulo partido: texto e imagen" />
+
+<Shot src="/projects/web-de-lanzamiento/g3.webp" alt="Tres móviles a distintas alturas que muestran capítulos consecutivos de la misma historia, con el punto activo del carril avanzando" caption="La secuencia de capítulos" />
+
+</Gallery>
+
+<Decisions>
+
+<Decision title="Primero el guion, después el efecto">
+
+En una web narrativa lo fácil es empezar por la animación y rellenar después con texto. El resultado suele impresionar diez segundos y no explicar nada.
+
+Hicimos lo contrario: escribimos los capítulos como si fueran a leerse sin ninguna animación y comprobamos que, así, ya contaban el producto. Solo entonces decidimos qué merecía movimiento. Cada animación tiene un motivo: mostrar cómo se abre, cómo encaja, qué cambia. Si no explicaba algo, se quedó fuera.
+
+</Decision>
+
+<Decision title="Un solo gesto espectacular por pantalla">
+
+Las webs de lanzamiento tienden a acumular efectos: parallax, texto que vuela, elementos que giran. Juntos compiten entre sí y cansan.
+
+Fijamos una regla simple: en cada capítulo hay un único gesto grande, ligado al scroll, y el resto de la pantalla permanece quieto. El carril lateral, los titulares y los botones entran con transiciones breves y discretas. Esa contención es lo que hace que el gesto principal se note.
+
+</Decision>
+
+<Decision title="Rendimiento y accesibilidad como parte del diseño">
+
+Una web que impresiona en un portátil con buena conexión y se arrastra en un móvil no cumple su función. Las imágenes de cada capítulo se sirven en tamaños adaptados, solo se anima transformación y opacidad, y nada se carga hasta que hace falta.
+
+Para quien tiene activada la preferencia de reducir movimiento, los capítulos se muestran sin animación y con todo el contenido visible desde el principio. La historia es la misma; cambia solo la forma de contarla.
+
+</Decision>
+
+</Decisions>

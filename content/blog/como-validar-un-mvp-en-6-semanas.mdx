@@ -1,0 +1,117 @@
+---
+title: "Cómo validar un MVP en 6 semanas"
+description: "Un método práctico para decidir qué construir primero y cómo comprobar que funciona."
+date: 2026-10-13
+updated: 2026-10-13
+author: "{{AUTOR}}"
+tags: ["mvp", "producto"]
+service: "mvp"
+draft: false
+---
+
+Seis semanas no es una promesa, es un marco. Un MVP real suele tardar entre 4 y 10 semanas según la complejidad, y el número exacto importa menos que la pregunta que lo ordena todo: **¿qué tenemos que aprender antes de seguir invirtiendo?** Si al final de ese plazo sabes, con datos, si tu idea tiene tracción, el MVP ha cumplido. Si solo tienes una aplicación bonita, no.
+
+Este es el método que seguimos cuando alguien llega con una idea y poco más. No tiene truco: consiste en recortar con criterio, construir solo lo que valida la hipótesis y medir desde el primer día.
+
+## Antes de empezar: una hipótesis, no una lista de funciones
+
+Casi todos los proyectos empiezan con una lista de funcionalidades. Es natural, pero es la forma más rápida de gastar el presupuesto en cosas que nadie ha pedido. Nosotros empezamos por escribir una frase:
+
+> Creemos que **un tipo de persona concreto** tiene **un problema concreto** y que **nuestra solución** lo resuelve lo bastante bien como para que **haga una acción medible**.
+
+Si no puedes rellenar los cuatro huecos, todavía no toca construir. Y si los rellenas, ya sabes qué medir: la acción del final. Todo lo que no ayude a provocar esa acción se queda fuera del MVP.
+
+## Semana 1 — Entender y recortar
+
+La primera semana es de conversación, no de diseño. Los objetivos son pocos y claros:
+
+- **Entender el contexto.** Quién tiene el problema hoy, cómo lo resuelve (hojas de cálculo, mensajes, un proceso manual) y qué le cuesta en tiempo o en dinero.
+- **Fijar la métrica de éxito.** Una sola. Por ejemplo: "una de cada tres personas que prueban la herramienta vuelve a usarla en la segunda semana". La cifra la decides tú; lo importante es que exista antes de construir.
+- **Dibujar el flujo principal de principio a fin.** Un solo camino: la persona llega, hace lo que necesita y se va con algo útil.
+- **Recortar.** De cada pantalla del flujo, preguntarse: si no existiera, ¿la hipótesis seguiría siendo comprobable? Si la respuesta es sí, se elimina o se sustituye por un paso manual.
+
+Al final de la semana deberías tener una hoja con tres bloques: imprescindible, después y fuera. Nos gusta dejarla en un archivo de texto dentro del repositorio, para que nadie tenga que buscarla:
+
+```md
+# Alcance del MVP
+
+## Imprescindible (semana 6)
+- Registro con email y enlace mágico
+- Crear un presupuesto desde una plantilla
+- Enviarlo por email al cliente
+- Saber si el cliente lo ha abierto
+
+## Después (si la hipótesis se confirma)
+- Plantillas personalizadas
+- Firma digital
+- Recordatorios automáticos
+
+## Fuera (no se discute hasta tener datos)
+- App nativa
+- Multiempresa y roles
+- Integración con contabilidad
+```
+
+## Semana 2 — Prototipo navegable y cinco conversaciones
+
+Antes de escribir código, un prototipo navegable: pantallas reales, con texto real, que se pueden recorrer en el móvil. No hace falta que sea perfecto; hace falta que se pueda enseñar.
+
+Con ese prototipo buscamos cinco conversaciones con personas que encajen en la hipótesis. Cinco, no cincuenta: con cinco ya aparecen los patrones gordos y todavía queda tiempo para cambiar el rumbo. En cada conversación:
+
+1. Les pedimos que hagan la tarea principal sin ayuda.
+2. Anotamos dónde se atascan y qué preguntan.
+3. Al terminar, una sola pregunta: "¿pagarías por esto o se lo recomendarías a alguien?". Las respuestas tibias cuentan como un no.
+
+Si tres de cinco no entienden para qué sirve, el problema no es el diseño: es la hipótesis. Mejor descubrirlo en la semana 2 que en la 6.
+
+<Callout type="nota" title="Qué validamos en esta fase">
+
+No validamos si la interfaz gusta. Validamos si la persona reconoce el problema, si entiende la solución en menos de un minuto y si haría la acción que hemos definido como éxito.
+
+</Callout>
+
+## Semanas 3 a 5 — Construir solo lo que valida la hipótesis
+
+Tres semanas de desarrollo con entregas cortas y visibles: cada una o dos semanas hay algo publicado en un entorno real que puedes tocar. No esperamos al final para enseñarlo.
+
+### Qué significa "lo mínimo"
+
+Mínimo no es cutre. Significa:
+
+- **Un flujo completo, no cinco a medias.** Si el MVP es "crear y enviar presupuestos", eso tiene que funcionar de principio a fin, con emails que llegan y datos que se guardan.
+- **Partes manuales donde no se note.** Si la revisión del presupuesto la puede hacer una persona a mano durante el MVP, no se automatiza todavía. Un proceso manual que funciona vale más que una automatización que nadie ha probado.
+- **Analítica desde el primer commit.** Tres o cuatro eventos bien puestos (registro, primera acción, acción de éxito, vuelta a la semana siguiente) bastan para responder la pregunta del final.
+- **Cimientos que no haya que tirar.** Autenticación, base de datos, despliegue y copias de seguridad se hacen bien desde el principio, porque cambiarlos después es caro. Lo demás, lo justo.
+
+### Lo que dejamos fuera a propósito
+
+Roles y permisos complejos, panel de administración completo, varios idiomas, modo oscuro, integraciones con terceros que "estaría bien tener". Todo eso tiene su momento, y ese momento es después de que los datos digan que hay algo.
+
+## Semana 6 — Lanzar a un grupo pequeño y medir
+
+El lanzamiento del MVP no es una campaña: es un grupo pequeño de personas, invitadas a mano, usándolo de verdad. Entre diez y treinta suele ser suficiente para ver si la métrica de éxito se mueve.
+
+### Las tres métricas que importan
+
+1. **Activación:** cuántas personas completan la acción principal al menos una vez.
+2. **Retención corta:** cuántas vuelven en la segunda semana sin que nadie les avise.
+3. **La señal de pago:** cuántas dicen que sí cuando les hablas de dinero, aunque todavía no cobres.
+
+Todo lo demás (páginas vistas, tiempo en la aplicación, descargas) es ruido en esta fase.
+
+## Qué hacer con lo que aprendes
+
+Al final de la semana 6 hay tres resultados posibles, y los tres son buenos si llegas con datos:
+
+- **La hipótesis se confirma.** Toca la lista de "después", ahora con prioridades reales basadas en lo que piden las personas que ya lo usan.
+- **Se confirma a medias.** El problema existe pero la solución no engancha. Es el caso más habitual: se ajusta el flujo principal y se repite la medición, normalmente en dos o tres semanas más.
+- **No se confirma.** Has gastado seis semanas, no un año. Es el mejor resultado posible para una idea que no funcionaba.
+
+## Errores que vemos repetirse
+
+- **Construir para inversores en lugar de para usuarios.** Un MVP lleno de pantallas impresionantes y sin un flujo que funcione no valida nada.
+- **Cambiar la hipótesis a mitad de camino sin decirlo.** Si cambia, se escribe y se recalcula el alcance. Si no, al final nadie sabe qué se estaba midiendo.
+- **Esperar a que esté perfecto para enseñarlo.** El MVP se enseña a partir de la semana 2 y se usa a partir de la 6. Antes de lo que resulta cómodo.
+- **Confundir MVP con versión 1.0.** El MVP responde a una pregunta; la 1.0 es un producto. Son proyectos distintos con presupuestos distintos.
+
+Si tienes una idea y quieres saber si aguanta seis semanas de este método, lo hablamos en una llamada corta. Sin compromiso y sin presentación de diapositivas.

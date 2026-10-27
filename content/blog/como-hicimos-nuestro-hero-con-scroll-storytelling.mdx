@@ -1,0 +1,185 @@
+---
+title: "Cómo hicimos nuestro hero con scroll storytelling"
+description: "Making of técnico: una secuencia de frames en canvas, GSAP ScrollTrigger con pin y scrub, Lenis, descarga progresiva, ventana de decodificación y una versión estática para quien prefiere menos movimiento."
+date: 2026-10-20
+updated: 2026-10-20
+author: "{{AUTOR}}"
+tags: ["frontend", "animacion"]
+service: "productos-creativos"
+draft: false
+---
+
+Si has llegado a esta web desde la portada, habrás visto cómo un boceto a lápiz se convierte en una aplicación, se abre en capas y termina como un producto en marcha mientras haces scroll. Es lo que vendemos, contado sin palabras de más. Este artículo explica cómo está hecho: las decisiones técnicas, lo que descartamos y lo que haríamos distinto.
+
+## La idea: del boceto al producto
+
+El hero cuenta una historia en cuatro capítulos: idea, diseño, desarrollo y lanzamiento. Cada capítulo tiene un texto real en HTML (indexable, accesible) y una fase visual: el lápiz dibuja el wireframe, las líneas se pasan a limpio y se rellenan de interfaz, la pantalla se separa en cuatro capas de vidrio (interfaz, lógica, datos, automatización) y, por último, todo se reensambla en un móvil y un portátil con un punto "live" que pulsa.
+
+La sección queda fijada mientras dura la historia: en escritorio ocupa el alto de la pantalla y se mantiene durante un desplazamiento equivalente al 450 % del viewport. El scroll no mueve la página; mueve la narración.
+
+## Por qué una secuencia de frames y no un vídeo
+
+La primera tentación es usar un vídeo y "frotarlo" con el scroll. Lo probamos y lo descartamos por tres razones:
+
+- **No es fiable entre navegadores.** El scrub de vídeo depende de cómo cada navegador busca fotogramas; en Safari e iOS el resultado va a tirones o directamente no responde al ritmo del scroll.
+- **No controlas la decodificación.** Con un vídeo, el navegador decide qué tiene en memoria. Con frames sueltos, decidimos nosotros.
+- **No puedes mapear el tiempo con precisión.** Queríamos que el scroll avanzase despacio en los "reposos" de cada capítulo y rápido en las transformaciones. Con frames, el mapeo es una función; con vídeo, una pelea.
+
+Así que el hero es una **secuencia de imágenes WebP dibujadas en un canvas**: 150 frames cuadrados de 1200 píxeles para escritorio y 90 frames en formato retrato (720 por 900) para móvil, con una cámara propia.
+
+## Las piezas
+
+- **Next.js** con App Router para la web.
+- **GSAP ScrollTrigger** para fijar la sección (`pin`) y leer el progreso del scroll (`scrub`).
+- **Lenis** para el scroll suave en escritorio, sincronizado con ScrollTrigger.
+- Un pequeño gestor de secuencia propio que descarga, decodifica y dibuja los frames.
+
+El corazón es un único ScrollTrigger. Simplificado:
+
+```ts
+const st = ScrollTrigger.create({
+  trigger: section,
+  start: 'top top',
+  end: '+=450%',
+  pin: true,
+  scrub: true, // con Lenis activo no hace falta un segundo suavizado
+  onUpdate: (self) => {
+    const frame = progressToFrame(self.progress, FRAME_COUNT);
+    sequence.draw(frame); // dibuja el frame disponible más cercano
+  },
+});
+```
+
+Mientras la sección está fijada, el hero marca `document.body.dataset.heroPinned = 'true'`. La cabecera flotante lo lee para no esconderse durante la historia, aunque el usuario esté bajando.
+
+## Cómo producimos los frames
+
+Los 150 frames salen de una escena de Blender construida entera con Python: la hoja, el lápiz, la losa, las cuatro capas de vidrio esmerilado, el móvil y el portátil son geometría generada por código, y la coreografía de cada objeto es una función del número de frame. Eso tiene dos ventajas: la misma escena se renderiza con la cámara cuadrada de escritorio y con la retrato de móvil, y cualquier ajuste (un ángulo, una pausa más larga) es un cambio en un fichero, no una tarde de keyframes.
+
+Las pantallas son texturas generadas también por código: el boceto se dibuja trazo a trazo y la punta del lápiz sigue el último punto de cada frame. Todo es interfaz abstracta, sin texto legible ni marcas, para que no envejezca y no se rompa con la compresión.
+
+Renderizamos con Cycles sobre fondo transparente y un *shadow catcher*: el objeto y sus sombras suaves se componen después sobre blanco puro, y un script comprueba que los bordes de cada frame siguen siendo blancos tras pasar a WebP. Así el canvas se funde con la página sin costuras.
+
+## El scroll no se mapea linealmente a los frames
+
+Si el 50 % del scroll fuera el frame 75, el usuario pasaría igual de rápido por un capítulo que por una transición, y no le daría tiempo a leer. En su lugar, el progreso se convierte en frame con una tabla de claves: pendientes bajas en los reposos (pocos frames para mucho scroll) y pendientes altas en las transformaciones.
+
+```ts
+/** [progreso de scroll 0..1, fracción de frames 0..1] */
+const FRAME_KEYS = [
+  [0.0, 0.0],
+  [0.12, 0.09], // fin del dibujo a lápiz
+  [0.2, 0.12], // reposo 01 · boceto completo
+  [0.36, 0.37], // losa de interfaz formada
+  [0.43, 0.4], // reposo 02 · interfaz completa
+  [0.62, 0.64], // capas separadas
+  [0.69, 0.66], // reposo 03 · capas
+  [0.88, 0.9], // reensamblaje y órbita
+  [1.0, 1.0], // composición final
+] as const;
+```
+
+Las claves se expresan como fracción del total de frames, así la misma tabla sirve para los 150 de escritorio y los 90 de móvil. Y obliga a algo importante: la producción del vídeo original tiene que seguir esas fracciones. Si cambia la producción, se recalibran las claves.
+
+<Figure caption="Los cuatro capítulos sobre el progreso del scroll. Las zonas planas son reposos: el frame apenas cambia y el texto se lee.">
+
+```txt
+progreso  0%    12%   20%   36%  43%     62%  69%     88%     100%
+          |-----|=====|-----|====|-------|====|-------|=======|
+frames    lápiz  01   UI    02    capas   03   órbita   04 · live
+```
+
+</Figure>
+
+## Descarga progresiva: nunca un hueco
+
+Con 150 imágenes, esperar a tenerlas todas antes de dejar hacer scroll no era una opción. La secuencia se descarga en un orden pensado para que **siempre haya algo que dibujar**:
+
+1. El primer frame y el último.
+2. Uno de cada 16.
+3. Uno de cada 8, luego de cada 4, de cada 2 y, por fin, todos.
+
+Si el usuario hace scroll antes de que termine la descarga, se dibuja el frame disponible más cercano al que tocaría. Al principio la animación va a saltos grandes; en segundos ya es fluida. Nunca aparece un hueco ni una pantalla de carga.
+
+La descarga arranca después del LCP, con `requestIdleCallback`, para no competir con lo que importa en los primeros segundos, y con una concurrencia limitada (seis peticiones a la vez en escritorio, cuatro en móvil).
+
+## Ventana de decodificación: la memoria manda
+
+Aquí estuvo el problema de verdad. Un frame de 1200 por 1200 píxeles pesa poco comprimido, pero decodificado ocupa ancho por alto por cuatro bytes: unos 5,8 MB. Multiplicado por 150, más de 860 MB. Eso no cabe en un móvil, y en un portátil tampoco debería.
+
+La solución: **guardar los blobs comprimidos y decodificar solo una ventana de frames alrededor del actual**, más unos pocos frames "ancla" permanentes para que los saltos largos no muestren nada raro.
+
+```ts
+async function ensureWindow(center: number) {
+  const from = Math.max(0, center - WINDOW_SIZE);
+  const to = Math.min(COUNT - 1, center + WINDOW_SIZE);
+
+  for (let i = from; i <= to; i++) {
+    const blob = blobs[i];
+    if (blob && !decoded.has(i)) decoded.set(i, await createImageBitmap(blob));
+  }
+  for (const [i, bitmap] of decoded) {
+    if ((i < from || i > to) && !ANCHORS.has(i)) {
+      bitmap.close(); // libera la memoria de inmediato
+      decoded.delete(i);
+    }
+  }
+}
+```
+
+Con una ventana de ocho frames a cada lado, la memoria en uso se mantiene estable y pequeña independientemente de lo larga que sea la secuencia. `createImageBitmap` decodifica fuera del hilo principal y `bitmap.close()` devuelve la memoria sin esperar al recolector.
+
+## El póster es el elemento LCP
+
+El primer frame se exporta también como imagen suelta: el póster. Se precarga en la cabecera del documento con `media` para servir la versión de escritorio o la de móvil, y con `fetchpriority="high"`. Es lo primero que se ve, junto con el titular, y es exactamente igual que el frame 1 del canvas. Cuando el canvas dibuja ese primer frame, el póster se oculta y el cambio es imperceptible.
+
+Esto tiene dos consecuencias prácticas. La primera: el LCP de la portada no depende de la secuencia, sino de una sola imagen pequeña. La segunda: si JavaScript falla o tarda, la portada sigue teniendo sentido: titular, subtítulo, botones y una imagen bonita.
+
+## Móvil: sus propios frames
+
+En pantallas de menos de 900 píxeles de ancho todo cambia un poco:
+
+- Frames en formato retrato (720 por 900), con una cámara distinta que encuadra mejor en vertical. Reutilizar los frames cuadrados y recortarlos habría sido más barato y mucho peor.
+- La sección se fija durante un 320 % del viewport, no un 450 %: en móvil se lee menos y se desliza con el pulgar.
+- Scroll nativo. Lenis no sincroniza el táctil, así que ScrollTrigger lee directamente el scroll del navegador.
+- Sin efecto de paralaje con el puntero y solo dos etiquetas flotantes por capítulo.
+
+## Accesibilidad y `prefers-reduced-motion`
+
+Lo más importante del hero no se ve: todo el texto es HTML real, con un bloque adicional para lectores de pantalla que resume la historia completa, y un enlace para **saltar la animación** e ir directamente al contenido.
+
+Si el sistema tiene activado `prefers-reduced-motion`, no se crea ni ScrollTrigger ni Lenis. El hero se convierte en una versión estática: la composición final (el último frame) con los cuatro capítulos apilados, legibles y completos. Lo mismo ocurre si el navegador indica una conexión lenta o el modo de ahorro de datos. No es una versión recortada: es la misma historia sin movimiento.
+
+```ts
+const mm = gsap.matchMedia();
+
+mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
+  // escritorio: pin, scrub, Lenis y paralaje con el puntero
+});
+mm.add('(max-width: 899px) and (prefers-reduced-motion: no-preference)', () => {
+  // móvil: frames retrato, pin más corto, scroll nativo
+});
+mm.add('(prefers-reduced-motion: reduce)', () => {
+  // versión estática completa: póster final + capítulos apilados
+});
+```
+
+## Lo que medimos
+
+Nos marcamos objetivos antes de empezar y los comprobamos en dispositivos reales, no solo en el ordenador de desarrollo:
+
+- **LCP** por debajo de 2,5 segundos en móvil con conexión 4G, con el póster como elemento LCP.
+- **Secuencia de escritorio** de menos de 7 MB en total, descargada después del LCP.
+- **Sin CLS:** la sección tiene su altura reservada desde el primer render.
+- **Memoria** estable gracias a la ventana de decodificación.
+- **Scroll fluido** a 60 fps en escritorio.
+
+Los frames viven en una carpeta versionada (`/sequence/v2/`) y se sirven con caché inmutable de un año. Si cambia el material, cambia la versión y la URL; nadie ve una mezcla de frames viejos y nuevos.
+
+## Lo que haríamos distinto
+
+- **Producir el vídeo con la hoja de escenas delante desde el primer día.** Las fracciones de frame de cada capítulo tienen que estar decididas antes de renderizar nada; recalibrar después es doloroso.
+- **Reservar una zona segura para el texto en los primeros frames.** El objeto tiene que quedarse en el tercio inferior mientras el titular está en pantalla. Lo aprendimos a la segunda.
+- **Medir los fotogramas por segundo durante el primer segundo de scroll** y degradar a la versión estática si la media cae. Está en la lista para la siguiente iteración.
+
+Si estás pensando en un hero así para tu producto, la pregunta no es si se puede hacer. Es si la historia merece contarse con scroll. Cuando la respuesta es sí, es una de las cosas más bonitas que se pueden construir en una web.

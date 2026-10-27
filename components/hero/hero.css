@@ -1,0 +1,304 @@
+/* ───────────────────────── Hero con storytelling por scroll (§6.6f) ─────────────────────────
+   Co-localizado: se importa desde hero-story.tsx. Tokens y tipografía en app/globals.css.
+   Solo se animan transform y opacity. */
+
+.hero {
+  position: relative;
+  height: 100svh;
+  overflow: clip;
+  background: var(--paper);
+  isolation: isolate; /* el multiply del lienzo se funde solo con el blanco del hero */
+}
+
+/* Saltar la animación: mismo patrón que .skip-link, visible solo al recibir foco */
+.hero__skip {
+  position: absolute;
+  top: calc(var(--header-h) + 32px);
+  left: var(--gutter);
+  z-index: 20;
+  transform: translateY(-400%);
+  background: var(--ink);
+  color: #fff;
+  padding: 0.75rem 1.125rem;
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform var(--dur-micro) var(--ease-out-expo);
+}
+.hero__skip:focus-visible {
+  transform: none;
+  outline-offset: 2px;
+}
+
+/* Texto de apertura (zona segura: 40 % superior del encuadre) */
+.hero__intro {
+  position: absolute;
+  inset-inline: 0;
+  top: clamp(5rem, 11vh, 8rem);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  padding-inline: var(--gutter);
+}
+.hero__intro h1 {
+  max-width: 16ch;
+  /* En pantallas bajas (portátiles de 800 px) el titular también se limita por la altura,
+     para que titular, subtítulo y botones quepan en la zona segura superior. */
+  font-size: min(clamp(3rem, 7.5vw + 1rem, 8rem), 9.5svh);
+}
+.hero__line {
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+}
+.hero__sub {
+  max-width: 46ch;
+  color: var(--ink-2);
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* Escena */
+.hero__stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 60%;
+}
+.hero[data-pinned='true'] .hero__stage {
+  will-change: transform; /* solo durante el pin (§11.2) */
+}
+.hero__box {
+  position: relative;
+  width: min(78vh, 78vw, 920px);
+  aspect-ratio: 1 / 1; /* reserva espacio: sin CLS */
+}
+.hero__box canvas,
+.hero__box picture,
+.hero__box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero__box img {
+  object-fit: contain;
+}
+.hero__box picture,
+.hero__box canvas {
+  mix-blend-mode: multiply; /* disuelve un blanco casi puro en el fondo */
+}
+.hero__box canvas {
+  opacity: 0;
+}
+.hero__box canvas[data-ready='true'] {
+  opacity: 1;
+}
+.hero__poster--last {
+  display: none;
+}
+.hero__chip {
+  left: var(--chip-x);
+  top: var(--chip-y);
+  position: absolute;
+  translate: -50% -50%; /* independiente del transform que anima GSAP */
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: var(--shadow-card);
+  background: #fff;
+}
+
+/* Capítulos: alternan izquierda / derecha del lienzo, con hairline que apunta al objeto */
+.hero__chapters {
+  display: contents;
+}
+.hero__chapter {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  max-width: 22rem;
+  z-index: 3;
+  opacity: 0;
+  visibility: hidden;
+  display: grid;
+  gap: 0.5rem;
+}
+.hero__chapter[data-side='left'] {
+  left: max(var(--gutter), calc((100vw - 1280px) / 2));
+}
+.hero__chapter[data-side='right'] {
+  right: max(calc(var(--gutter) + 3.5rem), calc((100vw - 1280px) / 2));
+  text-align: right;
+}
+.hero__chapter::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: clamp(2rem, 5vw, 5rem);
+  height: 1px;
+  background: var(--line);
+}
+.hero__chapter[data-side='left']::after {
+  left: calc(100% + 1rem);
+}
+.hero__chapter[data-side='right']::after {
+  right: calc(100% + 1rem);
+}
+
+/* Indicador de progreso: barra fina + 4 marcas 01–04 */
+.hero__progress {
+  position: absolute;
+  right: var(--gutter);
+  top: 50%;
+  translate: 0 -50%;
+  height: 40vh;
+  width: 2px;
+  background: var(--line);
+  z-index: 3;
+}
+.hero__progress-bar {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--ink);
+  transform-origin: top;
+  transform: scaleY(0);
+}
+.hero__tick {
+  position: absolute;
+  right: 14px;
+  translate: 0 -50%;
+  opacity: 0.25;
+}
+
+/* CTA final e indicio de scroll */
+.hero__cta {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 8svh;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding-inline: var(--gutter);
+  opacity: 0;
+  visibility: hidden;
+}
+.hero__cue {
+  position: absolute;
+  bottom: 3svh;
+  inset-inline: 0;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+/* Posición inicial del escenario (la misma que el `fromTo` de GSAP): así el póster no salta
+   al hidratar. Solo cuando la versión animada va a ejecutarse. */
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .hero:not([data-static='true']) .hero__stage {
+    transform: translateY(17%) scale(0.82);
+  }
+}
+@media (max-width: 899px) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .hero:not([data-static='true']) .hero__stage {
+    transform: translateY(22%) scale(0.9);
+  }
+}
+
+/* Móvil: frames retrato 4:5, capítulos abajo, 2 chips por capítulo, sin indicador */
+@media (max-width: 899px) {
+  .hero__intro {
+    top: clamp(5rem, 12svh, 7rem);
+  }
+  .hero__box {
+    width: min(92vw, calc(70svh * 0.8));
+    aspect-ratio: 4 / 5;
+  }
+  .hero__chapter {
+    top: auto;
+    bottom: 10svh;
+    translate: 0 0;
+    left: var(--gutter) !important;
+    right: var(--gutter) !important;
+    max-width: none;
+    text-align: left !important;
+  }
+  .hero__chapter::after {
+    display: none;
+  }
+  .hero__progress {
+    display: none;
+  }
+  .hero__chip {
+    left: var(--chip-mx);
+    top: var(--chip-my);
+  }
+  .hero__chip[data-mobile='false'] {
+    display: none;
+  }
+  /* La CTA final ocupa la zona superior, que el titular ya ha dejado libre */
+  .hero__cta {
+    bottom: auto;
+    top: clamp(5rem, 12svh, 7rem);
+  }
+}
+
+/* Versión estática (reduce-motion o conexión lenta): composición final + capítulos apilados */
+.hero[data-static='true'] {
+  height: auto;
+  overflow: visible;
+  padding-block: calc(var(--header-h) + 3rem) var(--section-y);
+}
+.hero[data-static='true'] .hero__intro,
+.hero[data-static='true'] .hero__stage,
+.hero[data-static='true'] .hero__chapter,
+.hero[data-static='true'] .hero__cta {
+  position: static;
+  translate: none;
+  opacity: 1;
+  visibility: visible;
+}
+.hero[data-static='true'] .hero__stage {
+  display: grid;
+  margin-block: 3rem;
+}
+.hero[data-static='true'] .hero__box {
+  width: min(92vw, 640px);
+  aspect-ratio: 1 / 1;
+}
+.hero[data-static='true'] .hero__poster--first,
+.hero[data-static='true'] .hero__box canvas {
+  display: none;
+}
+.hero[data-static='true'] .hero__poster--last {
+  display: block;
+}
+.hero[data-static='true'] .hero__chapters {
+  display: grid;
+  gap: 2rem;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.hero[data-static='true'] .hero__chapter {
+  max-width: none;
+  text-align: left !important;
+}
+.hero[data-static='true'] .hero__chapter::after {
+  display: none;
+}
+.hero[data-static='true'] .hero__cta {
+  margin-top: 3rem;
+}
+.hero[data-static='true'] .hero__progress,
+.hero[data-static='true'] .hero__cue,
+.hero[data-static='true'] .hero__chip {
+  display: none;
+}

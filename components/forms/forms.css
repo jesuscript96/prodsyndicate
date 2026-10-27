@@ -1,0 +1,162 @@
+/*
+ * Página de contacto y asistente de 6 pasos (§8.10, §9.4).
+ * Tokens globales en app/globals.css; aquí solo clases propias del módulo.
+ * Único color añadido: --error (estado de validación), acotado al módulo.
+ */
+
+/* ───────────── Layout de /contacto ───────────── */
+
+.contact-section { padding-bottom: var(--section-y); }
+.contact-grid { display: grid; gap: clamp(2rem, 4vw, 4rem); align-items: start; }
+@media (min-width: 1024px) {
+  .contact-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .contact-aside { position: sticky; top: calc(var(--header-h) + 32px); }
+}
+#agenda { scroll-margin-top: calc(var(--header-h) + 32px); }
+
+.contact-aside__card { display: grid; gap: 1.75rem; padding: clamp(1.5rem, 3vw, 2.25rem); }
+.contact-aside__block { display: grid; gap: 0.75rem; }
+.contact-aside__block + .contact-aside__block { padding-top: 1.75rem; border-top: 1px solid var(--line); }
+
+.after-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.875rem; counter-reset: after; }
+.after-steps li { position: relative; padding-left: 2.5rem; color: var(--ink-2); }
+.after-steps li::before {
+  counter-increment: after;
+  content: counter(after, decimal-leading-zero);
+  position: absolute; left: 0; top: 0.25em;
+  font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+/* ───────────── Asistente ───────────── */
+
+.wizard {
+  --error: #b3261e;
+  display: grid; gap: 2rem;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+}
+.wizard__head { display: grid; gap: 1.25rem; }
+.wizard__progress { height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.wizard__bar {
+  display: block; height: 100%; background: var(--accent);
+  transform-origin: left center;
+  transition: transform var(--dur-ui) var(--ease-out-expo);
+  will-change: transform;
+}
+.wizard__live { display: grid; gap: 0.5rem; }
+.wizard__title { max-width: 22ch; }
+.wizard__title:focus { outline: none; }
+.wizard__panel { display: grid; gap: 1.75rem; }
+.wizard__nav {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem;
+  padding-top: 1.5rem; border-top: 1px solid var(--line);
+}
+.wizard__nav-spacer { flex: 1; }
+.wizard__alert {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  padding: 1rem 1.25rem; border-radius: 16px;
+  border: 1px solid var(--line); background: var(--paper-2); color: var(--ink);
+}
+.wizard__alert svg { flex: none; width: 20px; height: 20px; margin-top: 0.15em; color: var(--error); }
+.wizard__alert a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.wizard__antispam { display: grid; gap: 0.5rem; min-height: 65px; }
+
+/* Opciones (radio / checkbox como tarjetas) */
+.choice-group { display: grid; gap: 0.875rem; min-width: 0; margin: 0; padding: 0; border: 0; }
+.choice-grid { display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) {
+  .choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .choice-grid--1 { grid-template-columns: 1fr; }
+}
+.choice { position: relative; display: block; cursor: pointer; }
+.choice__input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.choice__box {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  min-height: 56px; padding: 0.875rem 1.125rem;
+  border: 1px solid var(--line); border-radius: 16px; background: #fff;
+  transition: border-color var(--dur-micro) ease, background-color var(--dur-micro) ease;
+}
+.choice:hover .choice__box { border-color: var(--ink); }
+.choice__input:focus-visible + .choice__box { outline: 2px solid var(--accent); outline-offset: 3px; }
+.choice__input:checked + .choice__box { border-color: var(--accent); background: var(--accent-soft); }
+.choice__label { font-weight: 500; }
+.choice__check {
+  flex: none; width: 18px; height: 18px; color: var(--accent);
+  opacity: 0; transform: scale(0.6);
+  transition: opacity var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out-expo);
+}
+.choice__input:checked + .choice__box .choice__check { opacity: 1; transform: scale(1); }
+
+/* Campos de texto */
+.field { display: grid; gap: 0.5rem; }
+.field__label { font-weight: 500; }
+.field__optional { color: var(--ink-3); font-weight: 400; }
+.field__hint { margin: 0; color: var(--ink-3); font-size: 0.9375rem; }
+.field__input {
+  width: 100%; height: 52px; padding: 0 1rem;
+  border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink);
+  font: inherit;
+  transition: border-color var(--dur-micro) ease;
+}
+.field__input:hover { border-color: var(--ink-3); }
+.field__input:focus-visible { border-color: var(--accent); outline-offset: 2px; }
+.field__input[aria-invalid="true"] { border-color: var(--error); }
+.field__textarea { height: auto; min-height: 160px; padding: 0.875rem 1rem; line-height: 1.55; resize: vertical; }
+.field__textarea--short { min-height: 96px; }
+.field__meta { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+.field__count { margin-left: auto; color: var(--ink-3); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; }
+.field__error {
+  display: flex; gap: 0.375rem; align-items: flex-start; margin: 0;
+  color: var(--error); font-size: 0.9375rem; font-weight: 500;
+}
+.field__error svg { flex: none; width: 16px; height: 16px; margin-top: 0.2em; }
+.field__row { display: grid; gap: 1.25rem; }
+@media (min-width: 640px) { .field__row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Consentimiento */
+.consent { display: flex; gap: 0.75rem; align-items: flex-start; }
+.consent__input {
+  appearance: none; flex: none; width: 22px; height: 22px; margin: 0.15em 0 0;
+  border: 1px solid var(--line); border-radius: 7px; background: #fff;
+  display: grid; place-content: center; cursor: pointer;
+  transition: border-color var(--dur-micro) ease, background-color var(--dur-micro) ease;
+}
+.consent__input:hover { border-color: var(--ink); }
+.consent__input:checked { background: var(--accent); border-color: var(--accent); }
+.consent__input:checked::after {
+  content: ''; width: 11px; height: 6px;
+  border: 2px solid #fff; border-top: 0; border-right: 0;
+  transform: translateY(-1px) rotate(-45deg);
+}
+.consent__input[aria-invalid="true"] { border-color: var(--error); }
+.consent__label { color: var(--ink-2); cursor: pointer; }
+.consent__label a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Honeypot (§9.4): fuera de pantalla, sin tab, sin lector */
+.hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+/* ───────────── Fachada de agenda ───────────── */
+
+.calendar-facade { display: grid; gap: 0.75rem; justify-items: start; }
+.calendar-facade__frame {
+  position: relative; width: 100%; aspect-ratio: 4 / 5; min-height: 520px;
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--paper-2);
+}
+.calendar-facade__frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.calendar-facade__alt { font-size: 0.9375rem; color: var(--ink-3); }
+.calendar-facade__alt a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ───────────── Éxito ───────────── */
+
+.success { display: grid; gap: 1.5rem; }
+.success__posts { display: grid; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.success__posts ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.75rem; }
+.post-mini {
+  display: grid; gap: 0.25rem; padding: 1rem 1.25rem;
+  border: 1px solid var(--line); border-radius: 16px;
+  color: inherit; text-decoration: none;
+  transition: border-color var(--dur-micro) ease;
+}
+.post-mini:hover { border-color: var(--ink); }
+.post-mini__title { font-weight: 500; }
+.post-mini__meta { color: var(--ink-3); font-size: 0.9375rem; }

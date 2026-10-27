@@ -1,0 +1,96 @@
+---
+title: "Software a medida vs. herramientas no-code: cuándo elegir cada uno"
+description: "Criterios claros para decidir entre construir a medida o apoyarte en herramientas no-code, y cuándo lo sensato es combinar ambos."
+date: 2026-09-15
+updated: 2026-09-15
+author: "{{AUTOR}}"
+tags: ["software-a-medida", "no-code"]
+service: "software-a-medida"
+draft: false
+---
+
+No es una guerra, aunque a veces lo parezca. Quien vende código a medida tiende a despreciar el no-code; quien vende plataformas no-code tiende a prometer que ya no hace falta programar. Las dos posturas son interesadas y las dos se equivocan.
+
+Nuestra regla es sencilla: **código a medida cuando hace falta, plataformas no-code o low-code cuando aceleran sin atarte.** Lo difícil es saber cuándo es cada cosa. Estos son los criterios que usamos.
+
+## Primero, de qué hablamos
+
+- **No-code:** herramientas donde construyes sin escribir código, con interfaces visuales. Webs y CMS como Webflow; bases de datos y aplicaciones ligeras como Airtable, Softr o Glide; automatización como n8n, Make o Power Automate.
+- **Low-code:** plataformas que te dan mucho hecho pero admiten código donde hace falta. Paneles internos tipo Retool, o un backend como Supabase con funciones propias.
+- **A medida:** código escrito para tu caso, con un stack moderno (en nuestro caso, normalmente Next.js y React con Supabase o PostgreSQL), desplegado donde tú decidas y del que eres propietario.
+
+Casi ningún producto real es una sola de estas cosas. Y eso es una buena noticia.
+
+## Cuándo gana el no-code
+
+- **Quieres validar una idea rápido.** Si todavía no sabes si alguien quiere el producto, cada semana cuenta. Una herramienta montada en días que te permite hablar con usuarios vale más que una arquitectura perfecta.
+- **El proceso es interno y sencillo.** Un formulario que alimenta una tabla, un panel para que tres personas vean el estado de los pedidos, un flujo que avisa cuando entra un lead. Esto no necesita código propio.
+- **Es una web de contenido.** Páginas de marketing, blog, landings. Que el equipo las edite sin pedir ayuda a nadie es una ventaja enorme.
+- **No hay perfil técnico en el equipo** y quieres poder tocarlo tú. El no-code bien elegido te da autonomía.
+- **El presupuesto es ajustado y la urgencia alta.** Mejor algo que funciona hoy que algo perfecto dentro de cuatro meses.
+
+## Cuándo gana el código a medida
+
+- **La lógica de negocio es compleja.** Reglas con muchas excepciones, cálculos encadenados, estados que dependen de otros estados. En no-code se puede, pero termina en un laberinto de condiciones que nadie entiende.
+- **Hay volumen o rendimiento en juego.** Miles de registros, muchos usuarios simultáneos, respuestas rápidas. Las plataformas tienen límites, y suelen descubrirse el peor día.
+- **Los datos son sensibles o hay cumplimiento normativo.** Datos de salud, financieros, de menores. Necesitas saber exactamente dónde están, quién accede y cómo se borran.
+- **La experiencia de usuario es parte del producto.** Si lo que te diferencia es cómo se usa, necesitas control total de la interfaz, el rendimiento y las animaciones.
+- **Las integraciones son profundas.** No basta con enviar un dato de A a B; hay que sincronizar, resolver conflictos, reintentar, auditar.
+- **El coste a tres años manda.** Muchas plataformas son baratas al empezar y caras al crecer: por usuario, por registro, por operación. A medida, el coste es más alto al principio y mucho más plano después.
+
+## Las seis preguntas que hacemos
+
+Antes de recomendar nada, repasamos esto con cada cliente:
+
+1. **¿Cuánta gente lo usará y cuántos datos moverá en un año?** No hoy: en un año.
+2. **¿Cuántas reglas de negocio tiene el flujo principal y cuántas excepciones?** Si cabe en una pizarra, no-code es candidato. Si hace falta un documento, probablemente no.
+3. **¿Qué pasa si la herramienta cambia de precio o cierra?** ¿Puedes exportar tus datos y tu lógica? ¿En qué formato?
+4. **¿Quién lo va a mantener?** Si la respuesta es "nadie, tiene que funcionar solo", el no-code juega con ventaja. Si hay equipo técnico, el código propio deja de dar miedo.
+5. **¿Es una ventaja competitiva o una necesidad operativa?** Lo que te diferencia merece código propio. Lo que simplemente tiene que funcionar, no.
+6. **¿Qué coste total tiene en tres años**, sumando licencias, horas de mantenimiento y el precio de migrar si hay que hacerlo?
+
+Las respuestas rara vez apuntan todas en la misma dirección. Por eso casi siempre la solución es mixta.
+
+## La opción híbrida (la más habitual)
+
+En la práctica, la mayoría de los productos que construimos combinan ambas cosas. Un esquema típico:
+
+```txt
+Web pública ............ Webflow (marketing la edita sin tocar código)
+Producto ............... Next.js + Supabase (lógica y datos propios)
+Integraciones .......... n8n (CRM, facturación, avisos al equipo)
+Paneles internos ....... Retool o vistas directas sobre la base de datos
+```
+
+Cada pieza está donde más rinde: el contenido donde el equipo puede editarlo, la lógica de negocio donde se puede probar y versionar, las integraciones donde se cambian sin desplegar nada. Y, sobre todo, los datos viven en una base de datos tuya, no repartidos en cinco herramientas.
+
+<Callout type="nota" title="La clave: dónde viven los datos">
+
+Puedes cambiar la herramienta de automatización o el CMS con relativa facilidad. Cambiar de sitio los datos es lo caro. Si solo tomas una decisión a largo plazo, que sea esa: una base de datos propia, en un proveedor del que puedas salir.
+
+</Callout>
+
+## Señales de que te has pasado de no-code
+
+- Hay "trucos" por todas partes para hacer algo que la herramienta no contempla.
+- El mismo dato está en tres sitios y nadie sabe cuál es el bueno.
+- La factura mensual ha subido con el uso y no sabes muy bien por qué.
+- Solo una persona entiende cómo está montado todo, y es la que lo montó.
+- Las cosas van lentas y la solución de la plataforma es "sube de plan".
+
+## Señales de que te has pasado de código
+
+- Has construido un CMS desde cero para publicar tres páginas al mes.
+- Los formularios internos del equipo se programan a mano uno a uno.
+- Llevas meses con el panel de administración y los usuarios todavía no han visto nada.
+- Cada integración sencilla (un aviso, una sincronización) pasa por un despliegue.
+
+## Cómo decidir sin arrepentirte
+
+Tres hábitos que evitan la mayoría de los disgustos:
+
+1. **Decide por piezas, no por proyecto.** La pregunta no es "¿no-code o a medida?", sino "¿esta parte, dónde rinde más?".
+2. **Planifica la salida antes de entrar.** De cada herramienta, saber cómo se exportan los datos y qué costaría sustituirla. Si no hay respuesta, no es una buena herramienta para algo importante.
+3. **Documenta la arquitectura en una página.** Qué vive dónde, por qué, y quién lo toca. Es lo primero que agradecerá quien venga después, incluido tu yo de dentro de un año.
+
+Si estás en esa decisión ahora mismo, te ayudamos a tomarla con una sesión corta de arquitectura. Sin vender una u otra opción por defecto: la mejor es la que encaja con tu caso.

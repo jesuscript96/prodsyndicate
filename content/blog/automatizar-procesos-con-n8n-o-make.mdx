@@ -1,0 +1,113 @@
+---
+title: "Automatizar procesos con n8n o Make: cuándo merece la pena"
+description: "Cómo detectar qué procesos conviene automatizar, qué herramienta encaja en cada caso y cuándo lo mejor es no automatizar nada."
+date: 2026-10-06
+updated: 2026-10-06
+author: "{{AUTOR}}"
+tags: ["automatizacion", "no-code"]
+service: "automatizacion-ia"
+draft: false
+---
+
+Automatizar suena siempre a ahorro. A veces lo es; otras, se convierte en un sistema que nadie entiende, que falla en silencio y que alguien tiene que vigilar. La diferencia no está en la herramienta, sino en qué decides automatizar y cómo.
+
+Este artículo es la guía que seguimos antes de montar un solo flujo con n8n, Make o Power Automate: cómo detectar candidatos, qué herramienta encaja y qué exigir para que la automatización no se convierta en una deuda.
+
+## Qué significa automatizar un proceso (y qué no)
+
+Un proceso automatizable tiene tres partes: **un disparador** (llega un formulario, se crea una factura, son las 8 de la mañana), **una serie de pasos con reglas claras** (si el presupuesto es mayor que X, avisar a ventas; si no, enviar un email estándar) y **un resultado** (un registro en el CRM, un aviso al equipo, un documento generado).
+
+Lo que no es automatizar: poner una capa de IA sobre un proceso desordenado. Si el proceso no está claro para una persona, tampoco lo estará para una máquina. Primero se ordena, luego se automatiza y, solo si aporta valor real, se añade inteligencia artificial.
+
+## Cómo detectar los candidatos
+
+Puntuamos cada proceso con cuatro criterios. Cuanto más alto, más sentido tiene automatizarlo:
+
+- **Frecuencia.** ¿Ocurre a diario o varias veces por semana? Algo que pasa dos veces al mes y lleva cinco minutos no merece una automatización, por bien que suene.
+- **Reglas claras.** ¿Podrías escribir las decisiones del proceso en una lista de "si esto, entonces aquello"? Si hace falta criterio humano en el medio, la automatización se para ahí.
+- **Datos estructurados.** ¿La información llega en campos (formulario, hoja, API) o en texto libre y adjuntos? Lo primero se automatiza bien; lo segundo requiere un paso de extracción que añade coste y errores.
+- **Coste del error.** ¿Qué pasa si falla y nadie se da cuenta durante dos días? Un aviso interno que no llega es molesto; una factura duplicada a un cliente es un problema.
+
+Candidatos típicos que casi siempre pasan el filtro:
+
+- Un lead entra por el formulario de la web y hay que darlo de alta en el CRM y avisar a quien le toca.
+- Se cierra una venta y hay que crear la factura, enviarla y registrar el cobro.
+- Cada lunes hay que recopilar datos de tres herramientas y mandar un resumen al equipo.
+- Un cliente nuevo necesita una secuencia de emails de bienvenida y accesos a varias herramientas.
+- Dos sistemas tienen que mantener sincronizados contactos o productos.
+
+## n8n o Make: lo que de verdad los diferencia
+
+Las dos herramientas hacen lo mismo en esencia: conectan servicios y encadenan pasos con lógica visual. Las diferencias que importan en la decisión son estas:
+
+- **Dónde se ejecuta.** n8n puede alojarse en tu propio servidor (o en su nube); Make se usa como servicio. Si necesitas que los datos no salgan de una infraestructura concreta, o quieres control total sobre la ejecución, el autoalojamiento de n8n pesa mucho.
+- **Cómo se paga.** Make cobra por operaciones (cada paso de cada ejecución cuenta); n8n en la nube cobra por ejecuciones de flujo, y autoalojado el coste es el del servidor. Con flujos de muchos pasos y mucho volumen, la diferencia puede ser grande.
+- **Código cuando hace falta.** n8n permite escribir JavaScript o Python dentro de un nodo, lo que resuelve casos que en visual serían un enredo. Make tiene funciones y transformaciones, pero con menos margen.
+- **Curva de aprendizaje.** Make es más amable para quien no es técnico. n8n brilla cuando lo mantiene alguien con perfil técnico.
+- **Conectores.** Make tiene una gran biblioteca de integraciones listas; n8n también, y además un nodo HTTP genérico con el que hablas con cualquier API.
+
+Nuestra regla práctica: **Make cuando lo va a mantener el propio equipo sin perfil técnico y los flujos son sencillos; n8n cuando hay volumen, lógica compleja o requisitos sobre dónde viven los datos.** Power Automate, cuando la empresa ya vive en Microsoft 365.
+
+## Un ejemplo de principio a fin
+
+El flujo más habitual que montamos: un lead del formulario de la web acaba en el CRM y el equipo se entera a tiempo.
+
+1. **Disparador:** el formulario envía los datos a un webhook.
+2. **Normalizar:** limpiar el email, unificar el nombre, rellenar valores por defecto.
+3. **Comprobar duplicados:** buscar el email en el CRM. Si existe, actualizar; si no, crear.
+4. **Clasificar:** según el presupuesto indicado y el servicio de interés, asignar a una persona.
+5. **Avisar:** mensaje al canal del equipo con un enlace directo a la ficha.
+6. **Seguimiento:** si en dos días laborables nadie ha cambiado el estado, recordatorio a la persona asignada.
+
+El paso 2, en n8n, es un nodo de código de pocas líneas:
+
+```js
+// Nodo "Code" de n8n: normaliza el lead antes de enviarlo al CRM
+const lead = $input.first().json;
+
+return [{
+  json: {
+    email: String(lead.email ?? '').trim().toLowerCase(),
+    nombre: String(lead.nombre ?? '').trim(),
+    origen: lead.utm_source ?? 'web',
+    presupuesto: lead.presupuesto ?? 'sin-indicar',
+    recibido: new Date().toISOString(),
+  },
+}];
+```
+
+Lo importante no es el código: es que cada paso hace una sola cosa, que el flujo se puede leer de arriba abajo y que, si algo falla en el paso 4, los pasos anteriores no se repiten.
+
+## Cuándo no merece la pena
+
+- **El proceso cambia cada semana.** Automatizar algo inestable es rehacerlo constantemente. Primero que se asiente.
+- **Es poco frecuente y rápido de hacer a mano.** El coste de montar, probar y mantener el flujo no se recupera nunca.
+- **Requiere criterio en el medio.** Si una persona tiene que decidir en el paso 3, automatiza los pasos 1, 2, 4 y 5, y deja el 3 como una tarea clara para esa persona. No intentes sustituir el criterio por reglas improvisadas.
+- **Los datos no están.** Si la información llega en PDF escaneados y mensajes de voz, el problema no es la automatización: es la captura.
+- **Nadie es responsable.** Toda automatización necesita una persona que reciba las alertas y sepa qué hacer. Sin responsable, el flujo muere la primera vez que un servicio cambia su API.
+
+<Callout type="aviso" title="Datos personales">
+
+Si el flujo mueve datos de personas (leads, clientes, empleados), hay que saber por qué servicios pasan, dónde se almacenan y durante cuánto tiempo. Elegir dónde se ejecuta la automatización es también una decisión de privacidad.
+
+</Callout>
+
+## Qué pedir a quien lo construya
+
+Una automatización bien hecha se nota en las partes que no se ven:
+
+- **Idempotencia:** si el mismo evento llega dos veces, el resultado es el mismo (no dos facturas, no dos leads).
+- **Reintentos con cabeza:** si un servicio no responde, se reintenta un número limitado de veces y, si sigue fallando, se avisa.
+- **Alertas útiles:** un mensaje que diga qué flujo, qué paso y qué dato ha fallado. "Error en ejecución" no sirve a nadie.
+- **Registro de ejecuciones:** poder ver qué pasó con un lead concreto hace tres semanas.
+- **Credenciales gestionadas:** nunca en texto plano dentro del flujo; siempre con acceso restringido y rotación posible.
+- **Documentación de una página:** qué hace el flujo, qué lo dispara, qué servicios toca y quién lo mantiene.
+- **Un entorno de pruebas:** probar con datos de ejemplo antes de que toque datos reales.
+
+## Y la IA, ¿dónde entra?
+
+Donde aporta valor real y en ningún otro sitio. Funciona bien para clasificar un texto libre ("¿esta consulta es comercial o de soporte?"), extraer campos de un documento, redactar un primer borrador de respuesta o resumir un hilo largo. Funciona mal para sustituir reglas deterministas (si el importe supera X, no hace falta un modelo para decidirlo) y es peligrosa sin revisión humana cuando el error cuesta dinero.
+
+Nuestra forma de introducirla: empieza con el modelo proponiendo y una persona confirmando. Cuando los datos digan que acierta de forma consistente, se le da más autonomía en ese paso concreto. Nunca al revés.
+
+Si tienes un proceso que te roba horas cada semana y quieres saber si merece la pena automatizarlo, lo revisamos juntos. A veces la respuesta es un flujo de n8n; otras, ordenar el proceso y no tocar nada más.

@@ -1,0 +1,142 @@
+/* ───────────── Páginas de empresa: /proceso, /emprendedores, /empresas, /nosotros (§8.5–§8.8) ───────────── */
+
+/* Migas de pan bajo el hero */
+.co-crumbs { padding-bottom: 1.25rem; border-bottom: 1px solid var(--line); }
+
+/* Cabecera de sección: etiqueta + H2 + intro */
+.co-head { display: grid; gap: 1.25rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.co-head__title { max-width: 20ch; }
+.co-head--row { align-items: end; }
+@media (min-width: 900px) {
+  .co-head--row { grid-template-columns: minmax(0, 1fr) auto; }
+}
+
+/* Rejillas */
+.co-grid { display: grid; gap: 1rem; list-style: none; margin: 0; padding: 0; }
+.co-grid--loose { gap: clamp(1.5rem, 3vw, 2.5rem); }
+@media (min-width: 640px) {
+  .co-grid--2, .co-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  .co-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .co-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Tarjeta pilar */
+.co-pillar { display: grid; gap: 0.75rem; align-content: start; padding: clamp(1.5rem, 3vw, 2rem); height: 100%; }
+.co-pillar__n {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(2.25rem, 3vw, 3rem);
+  line-height: 1;
+  color: var(--accent);
+}
+.co-pillar__title { margin: 0; }
+.co-pillar__text { margin: 0; color: var(--ink-2); }
+
+/* Lista de filas con hairline */
+.co-rows { display: grid; list-style: none; margin: 0; padding: 0; }
+.co-row { display: grid; gap: 0.5rem 2rem; padding-block: clamp(1.25rem, 2.5vw, 2rem); border-top: 1px solid var(--line); }
+.co-row:last-child { border-bottom: 1px solid var(--line); }
+.co-row__n { font-family: var(--font-serif); font-style: italic; font-size: 1.5rem; line-height: 1; color: var(--accent); }
+.co-row__title { margin: 0; }
+.co-row__text { margin: 0; color: var(--ink-2); max-width: 56ch; }
+@media (min-width: 900px) {
+  .co-row { grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 1.3fr); align-items: baseline; }
+  .co-row--plain { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); }
+}
+
+/* Dolores: cita en serif cursiva + respuesta */
+.co-quote { display: grid; gap: 1rem; padding: clamp(1.5rem, 3vw, 2.25rem); height: 100%; }
+.co-quote__q {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.co-quote__q::before { content: "“"; color: var(--accent); }
+.co-quote__q::after { content: "”"; color: var(--accent); }
+.co-quote__a { margin: 0; color: var(--ink-2); }
+
+/* Manifiesto */
+.co-manifesto {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3vw + 0.5rem, 3.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 30ch;
+  text-wrap: balance;
+}
+
+/* Ficha de equipo */
+.co-team { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; padding: clamp(1.5rem, 4vw, 3rem); }
+@media (min-width: 900px) {
+  .co-team { grid-template-columns: minmax(0, 260px) minmax(0, 1fr); }
+}
+.co-avatar {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  border-radius: var(--radius-card);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+}
+
+/* ───────────── Timeline ampliada (/proceso) ───────────── */
+.ptl { display: grid; gap: clamp(2rem, 5vw, 4rem); }
+.ptl__head { display: grid; gap: 1.25rem; align-content: start; }
+.ptl__head .h2 { max-width: 16ch; }
+@media (min-width: 900px) {
+  .ptl { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+  .ptl__head { position: sticky; top: calc(var(--header-h) + 48px); }
+}
+
+.ptl__list { position: relative; list-style: none; margin: 0; padding: 0 0 0 2rem; }
+.ptl__track { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--line); }
+.ptl__fill { position: absolute; inset: 0; background: var(--accent); transform-origin: top center; will-change: transform; }
+
+.ptl__phase { position: relative; display: grid; gap: 1.25rem; padding-block: clamp(2rem, 4vw, 3rem); }
+.ptl__phase:first-child { padding-top: 0; }
+.ptl__phase + .ptl__phase { border-top: 1px solid var(--line); }
+.ptl__phase::before {
+  content: "";
+  position: absolute;
+  left: calc(-2rem - 5px);
+  top: calc(clamp(2rem, 4vw, 3rem) + 0.9rem);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line);
+  transition: border-color var(--dur-micro) ease, background-color var(--dur-micro) ease;
+}
+.ptl__phase:first-child::before { top: 0.9rem; }
+.ptl__phase.is-active::before { border-color: var(--accent); background: var(--accent); }
+
+.ptl__top { display: grid; gap: 0.75rem; }
+.ptl__n {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--ink-3);
+  transition: color var(--dur-ui) ease;
+}
+.ptl__phase.is-active .ptl__n { color: var(--accent); }
+.ptl__title { margin: 0; }
+.ptl__text { margin: 0; color: var(--ink-2); max-width: 52ch; }
+
+.ptl__details { display: grid; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
+@media (min-width: 640px) {
+  .ptl__details { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2rem; }
+}
+.ptl__detail { display: grid; gap: 0.375rem; align-content: start; }
+.ptl__detail p { margin: 0; color: var(--ink-2); }

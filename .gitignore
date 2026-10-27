@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# keep the example env file
+!.env.example
+
+# playwright
+/test-results/
+/playwright-report/
+
+# hero source frames (renders): heavy, regenerable
+/assets/frames_src/
+
+# hero: render log and generated textures (regenerable with npm run hero:textures)
+/assets/*.log
+/assets/hero/textures/

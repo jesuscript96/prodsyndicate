@@ -1,0 +1,111 @@
+---
+title: "Qué incluye (y qué no) un MVP"
+description: "Una guía para separar lo imprescindible de lo que puede esperar, y evitar que el MVP se convierta sin querer en el producto completo."
+date: 2026-09-29
+updated: 2026-09-29
+author: "{{AUTOR}}"
+tags: ["mvp", "producto"]
+service: "mvp"
+draft: false
+---
+
+"MVP" es, probablemente, la palabra más usada y peor entendida del mundo del producto digital. Para unos es una demo; para otros, una versión barata del producto completo; para muchos, una excusa para lanzar algo a medias. Ninguna de las tres cosas es un MVP.
+
+Un producto mínimo viable es **la versión más pequeña de tu producto que permite aprender algo real con usuarios reales**. Mínimo porque recorta todo lo que no sirve para aprender. Viable porque funciona de verdad: alguien puede usarlo de principio a fin y sacar algo útil. Si falta cualquiera de las dos mitades, no es un MVP.
+
+Esta es la lista que usamos para decidir qué entra y qué no.
+
+## Tres cosas que un MVP no es
+
+- **No es un prototipo.** El prototipo se navega pero no funciona: no guarda datos, no envía emails, no cobra. Sirve para validar la comprensión, no el uso.
+- **No es una demo para inversores.** Una demo optimiza la impresión en diez minutos; un MVP optimiza el aprendizaje durante semanas. Pueden compartir pantallas, pero no objetivos.
+- **No es "el producto completo pero más barato".** Si la lista de funcionalidades es la misma y solo cambia la calidad, lo que tienes es un producto completo mal hecho.
+
+## Lo que sí incluye
+
+### Un flujo principal completo
+
+El camino que recorre la persona para resolver su problema, de principio a fin, sin pasos rotos. Si el producto sirve para reservar citas, tiene que poder reservarse una cita, confirmarse y aparecer en algún sitio. Un solo flujo, pero entero.
+
+### Acceso y datos reales
+
+Registro o acceso (aunque sea con un enlace mágico por email), una base de datos de verdad y copias de seguridad. Lo que la gente haga en el MVP tiene que persistir; de lo contrario no se puede medir retención ni se puede volver a hablar con nadie.
+
+### Lo legal mínimo
+
+Política de privacidad, aviso de cookies si hay analítica que lo requiera y un aviso legal. No es glamuroso, pero si el MVP recoge emails de personas reales, no es opcional.
+
+<Callout type="aviso" title="Revisa los textos legales">
+
+Las plantillas genéricas no sustituyen a una revisión según tu jurisdicción y el tipo de datos que trates. Si el MVP guarda datos personales, cuenta con ello desde el presupuesto.
+
+</Callout>
+
+### Medición
+
+Tres o cuatro eventos bien elegidos: registro, primera acción, acción de éxito y vuelta a la semana siguiente. Sin esto el MVP no responde a nada, y responder a algo era el motivo de hacerlo.
+
+### Despliegue y operación básica
+
+Dominio propio, HTTPS, un entorno de producción estable, registro de errores y alguien que recibe un aviso si algo se cae. Un MVP que se cae el día que lo prueba la gente adecuada no da una segunda oportunidad.
+
+### Diseño cuidado donde importa
+
+No hace falta que todas las pantallas sean perfectas, pero la primera impresión y el flujo principal sí. Si la persona no entiende qué hace el producto en el primer minuto, el resto no se llega a probar.
+
+## Lo que normalmente no incluye
+
+- **Roles y permisos elaborados.** Un tipo de usuario, dos como mucho. Las jerarquías de administradores, editores y lectores llegan cuando hay equipos que las pidan.
+- **Panel de administración completo.** Durante el MVP, la administración se hace desde la base de datos o con una herramienta interna sencilla. Construir un panel bonito para ti antes que para los usuarios es un clásico.
+- **Integraciones secundarias.** Facturación, CRM, calendarios, redes sociales. Cada integración es una fuente de errores y de mantenimiento. Se añaden cuando el flujo principal demuestra que vale la pena.
+- **Aplicaciones nativas.** Una web que funcione bien en el móvil llega a todo el mundo sin pasar por las tiendas. Las apps nativas tienen sentido cuando el producto necesita algo que la web no da.
+- **Varios idiomas.** Un idioma, el de las personas con las que vas a validar.
+- **Automatizaciones tempranas.** Si una tarea la puede hacer una persona a mano durante el MVP, se hace a mano. Automatizar algo que nadie ha probado es construir dos veces.
+- **Preparación para millones de usuarios.** El MVP lo usarán decenas de personas. Se construye con cimientos sanos, no con la arquitectura de una gran plataforma.
+
+## La prueba del "y si no está"
+
+Para cada funcionalidad que alguien quiera meter, hacemos la misma pregunta: **si no estuviera, ¿la hipótesis seguiría siendo comprobable?** Si la respuesta es sí, sale. Si la respuesta es "sí, pero habría que hacer algo a mano", también sale y se apunta el proceso manual.
+
+Para que la decisión quede escrita y no se reabra cada semana, cada funcionalidad discutida se documenta con cuatro líneas:
+
+```yaml
+funcionalidad: Recordatorios automáticos al cliente
+si-no-esta: Una persona envía el recordatorio a mano con una plantilla (10 min al día)
+coste-estimado: 3 días de desarrollo
+decision: después
+```
+
+Esta hoja vive junto al código y se revisa al final del MVP, con los datos en la mano. Muchas cosas que parecían urgentes en la semana 1 dejan de serlo en la semana 6.
+
+## Cómo lo dejamos por escrito
+
+Un MVP sin alcance escrito termina siendo lo que cada uno recuerda haber hablado. Por eso toda propuesta lleva, como mínimo:
+
+- El flujo principal descrito paso a paso.
+- La lista de imprescindibles, con el criterio de "hecho" de cada uno.
+- La lista de lo que queda fuera, también por escrito. Es la parte que más conflictos evita.
+- La métrica de éxito y cómo se va a medir.
+- Entregables, plazos y presupuesto. Si hay que ajustar el alcance, se habla antes, no después.
+
+## Cuándo un MVP deja de serlo
+
+Hay señales claras de que el MVP se ha convertido en otra cosa:
+
+- El plazo supera con holgura las 10 semanas y sigue creciendo.
+- Hay más de un flujo principal.
+- Aparecen funcionalidades justificadas con un "ya que estamos".
+- Nadie sabe decir qué métrica tiene que moverse para considerarlo un éxito.
+- Se habla más de cómo escalará que de quién lo usará la semana que viene.
+
+Cuando pasa, lo más sano es parar, volver a la hipótesis y recortar otra vez. Duele menos que lanzar tarde algo que no responde a nada.
+
+## Un ejemplo para aterrizarlo
+
+Imagina una herramienta para que academias pequeñas gestionen inscripciones. La hipótesis: las academias pierden alumnos porque el proceso de inscripción va por mensajes sueltos y nadie hace seguimiento.
+
+El MVP incluiría: una página pública por curso, un formulario de inscripción, un listado de inscritos para la academia y un email automático de confirmación. Nada más. Fuera quedarían los pagos online (se cobran como hasta ahora), la gestión de horarios, la app para alumnos y las plantillas de email personalizadas.
+
+Con eso, en seis semanas la academia puede responder a la pregunta importante: ¿se inscriben más alumnos cuando el proceso está ordenado? Si la respuesta es sí, el resto de la lista tiene sentido. Si es no, mejor saberlo ahora.
+
+Si estás decidiendo qué entra en tu MVP y qué no, podemos ayudarte a recortar. Es la parte del trabajo que más dinero ahorra y la que menos se ve.

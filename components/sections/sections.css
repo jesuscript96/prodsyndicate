@@ -1,0 +1,207 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Secciones de la home (§6.9). CSS co-localizado: se importa desde los
+   componentes de components/sections (nunca desde globals.css). Usa los tokens
+   de app/globals.css. Solo se animan transform y opacity; los estados iniciales
+   de animación solo se aplican con JS y sin prefers-reduced-motion.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ───────────── Cabecera de sección: etiqueta + H2 (+ texto) ───────────── */
+.sec-head { display: grid; gap: 1.25rem; margin-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+.sec-head .h2 { max-width: 20ch; }
+.sec-head__text { max-width: 46ch; }
+.sec-head--flush { margin-bottom: 0; }
+.sec-head__row { display: grid; gap: 0 3rem; align-items: end; }
+.sec-head__side { max-width: 46ch; margin-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+.sec-head__aside { justify-self: start; margin-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+@media (min-width: 900px) {
+  .sec-head__row { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .sec-head__aside { justify-self: end; }
+}
+
+/* ───────────── 2 · Para quién construimos ───────────── */
+.audience-grid { display: grid; gap: 1.5rem; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 900px) {
+  .audience-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; }
+}
+.audience-card {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  height: 100%;
+  padding: clamp(0.75rem, 1.5vw, 1.25rem);
+  transition:
+    transform var(--dur-ui) var(--ease-out-expo),
+    box-shadow var(--dur-ui) var(--ease-out-expo),
+    border-color var(--dur-micro);
+}
+.audience-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--shadow-float); }
+.audience-card__media { aspect-ratio: 4 / 3; }
+.audience-card__canvas {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+.audience-card__canvas svg { width: 100%; height: 100%; }
+.audience-card__body { display: grid; gap: 0.75rem; padding: 0 clamp(0.5rem, 1vw, 1rem) clamp(0.75rem, 1.5vw, 1.25rem); }
+.audience-card__link { color: inherit; text-decoration: none; }
+/* Toda la tarjeta es clicable sin anidar interactivos: el enlace extiende su área con ::after */
+.audience-card__link::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-card); }
+.audience-card__text { max-width: 40ch; color: var(--ink-2); }
+.audience-card__more {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--ink);
+  transition: background-color var(--dur-micro), color var(--dur-micro), border-color var(--dur-micro);
+}
+.audience-card__more svg { width: 18px; height: 18px; transition: transform var(--dur-micro) var(--ease-out-expo); }
+.audience-card:hover .audience-card__more { background: var(--ink); color: #fff; border-color: var(--ink); }
+.audience-card:hover .audience-card__more svg { transform: translate(2px, -2px); }
+
+/* Ilustración de línea: trazos a lápiz que se dibujan (stroke-dashoffset con pathLength normalizado a 100) */
+.line-illo { display: block; overflow: visible; }
+.line-illo [data-draw] { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .line-illo [data-draw] { stroke-dasharray: 100; stroke-dashoffset: 100; }
+}
+
+/* ───────────── 3 · Manifiesto ───────────── */
+.manifesto__text { max-width: 24ch; margin: 0; }
+
+/* ───────────── 4 · Servicios: tarjetas sticky apiladas ───────────── */
+.svc-stack { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.svc-card {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-areas: "top" "body" "foot";
+  padding: clamp(1.5rem, 3.5vw, 3rem);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.svc-card__top { grid-area: top; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.svc-card__body { grid-area: body; display: grid; gap: 1rem; align-content: start; }
+.svc-card__foot { grid-area: foot; }
+.svc-card__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.svc-card__title {
+  max-width: 14ch;
+  font-size: clamp(1.75rem, 2.4vw + 0.6rem, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+.svc-card__text { max-width: 44ch; color: var(--ink-2); }
+@media (min-width: 900px) {
+  .svc-stack { gap: 24px; }
+  .svc-stack__item {
+    position: sticky;
+    top: calc(96px + var(--i, 0) * 24px);
+    transform-origin: center top;
+    will-change: transform;
+  }
+  .svc-card {
+    min-height: clamp(400px, 56vh, 600px);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "top body" "foot body";
+    column-gap: 3rem;
+  }
+  .svc-card__top { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 1.5rem; }
+  .svc-card__foot { align-self: end; }
+}
+
+/* ───────────── 5 · Proyectos: rail horizontal ───────────── */
+.rail-section { position: relative; overflow: hidden; }
+/* .is-rail lo añade el cliente solo en escritorio sin reduce-motion (pin + scrub) */
+.rail-section.is-rail {
+  display: grid;
+  align-content: center;
+  min-height: 100svh;
+  padding-block: calc(var(--header-h) + 16px + 2.5rem) 2.5rem;
+}
+.rail-scroller {
+  --rail-gutter: max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter)));
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-inline: var(--rail-gutter);
+  padding-bottom: 1rem;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--rail-gutter);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.rail-scroller.is-rail { overflow: visible; padding-bottom: 0; scroll-snap-type: none; }
+.rail { display: flex; gap: clamp(1rem, 2vw, 2rem); width: max-content; margin: 0; padding: 0; list-style: none; }
+.rail-scroller.is-rail .rail { will-change: transform; }
+.rail__item { flex: none; width: min(80vw, 360px); scroll-snap-align: start; }
+@media (min-width: 900px) {
+  .rail__item { width: clamp(300px, 27vw, 420px); }
+}
+
+/* ───────────── 6 · Proceso: línea que se rellena + números en serif ───────────── */
+.timeline { position: relative; padding-left: clamp(1.5rem, 4vw, 3.5rem); }
+.timeline__line { position: absolute; top: 0; bottom: 0; left: 0; width: 1px; background: var(--line); }
+.timeline__fill { position: absolute; inset: 0; display: block; background: var(--ink); transform-origin: top center; }
+.timeline__steps { display: grid; gap: clamp(3rem, 7vw, 6rem); margin: 0; padding: 0; list-style: none; }
+.timeline__step { display: grid; gap: 1rem; transition: opacity var(--dur-reveal) var(--ease-out-expo); }
+.timeline__n {
+  display: block;
+  font-size: clamp(3.5rem, 6vw + 1rem, 7rem);
+  line-height: 0.85;
+  color: var(--ink-3);
+  transition: color var(--dur-ui) ease;
+}
+.timeline__body { display: grid; gap: 0.75rem; }
+.timeline__text { max-width: 46ch; color: var(--ink-2); }
+.timeline__step.is-active .timeline__n { color: var(--accent); }
+@media (min-width: 900px) {
+  .timeline__step { grid-template-columns: 200px minmax(0, 1fr); gap: 3rem; align-items: start; }
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .timeline__fill { transform: scaleY(0); }
+  .timeline__step { opacity: 0.35; }
+  .timeline__step.is-active { opacity: 1; }
+}
+
+/* ───────────── 7 · Tecnología: marquesina ───────────── */
+.tech-marquee {
+  margin-top: clamp(1rem, 3vw, 2rem);
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+/* ───────────── 9 · Laboratorio: tarjetas tipográficas ───────────── */
+.lab-grid { display: grid; gap: 1.5rem; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 900px) {
+  .lab-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+}
+.lab-card { display: grid; gap: 1rem; align-content: start; height: 100%; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.lab-card__meta { display: flex; flex-wrap: wrap; gap: 0.375rem; min-height: 28px; }
+.lab-card__title { font-size: clamp(1.375rem, 1.2vw + 0.9rem, 1.75rem); line-height: 1.2; letter-spacing: -0.02em; font-weight: 500; }
+.lab-card__title a { color: inherit; text-decoration: none; }
+.lab-card__title a:hover { color: var(--accent); }
+
+/* ───────────── 10 · FAQ ───────────── */
+.faq-grid { display: grid; gap: 2rem; }
+@media (min-width: 900px) {
+  .faq-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 4rem; align-items: start; }
+  .faq-grid .sec-head { position: sticky; top: calc(var(--header-h) + 16px + 2rem); margin-bottom: 0; }
+}

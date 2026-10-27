@@ -1,0 +1,81 @@
+---
+title: 'Alta de clientes y facturación sin pasos manuales'
+client: 'Caso de concepto'
+year: 2026
+categories: [automatizacion]
+services: ['Automatización e IA', 'Integraciones']
+stack: ['n8n', 'Next.js', 'TypeScript', 'Supabase', 'Webhooks']
+summary: 'Un proceso que pasaba por cuatro herramientas y varias personas, convertido en un flujo automatizado con n8n: desde que un cliente firma hasta que recibe su primera factura, sin copiar datos a mano.'
+cover:
+  src: '/projects/alta-de-clientes-y-facturacion/cover.webp'
+  alt: 'Portátil con un diagrama de nodos conectados por líneas azules, de un disparador a un nodo final, y móvil con una pila de notificaciones'
+isConcept: true
+order: 3
+featured: true
+---
+
+<Summary>
+
+<Block title="El reto">
+
+Cada vez que una empresa de servicios cierra un cliente nuevo, alguien tiene que darlo de alta en el CRM, crear su carpeta, copiar sus datos al programa de facturación, enviar un correo de bienvenida y avisar al equipo que lo va a atender. Son pasos pequeños, pero se repiten con cada cliente, se hacen en momentos distintos y, cuando uno falla, nadie se entera hasta que llega una factura con el nombre mal escrito.
+
+El reto es quitar ese trabajo de en medio sin sustituir las herramientas que el equipo ya conoce y sin perder el control de lo que ocurre en cada paso.
+
+</Block>
+
+<Block title="Lo que hicimos">
+
+Dibujamos el proceso completo con las personas que lo hacían, paso a paso, incluyendo los casos raros: el cliente que firma pero cambia de plan, el que tiene varios centros, el que paga por adelantado. Con ese mapa decidimos qué se automatiza y qué se queda con una persona.
+
+Construimos el flujo en n8n, con un formulario de alta como punto de entrada único y webhooks hacia el resto de herramientas. Cada paso valida los datos antes de avanzar, deja un registro de lo que hizo y avisa por mensaje solo cuando algo necesita una decisión humana. La primera factura se genera y se envía desde el mismo flujo.
+
+</Block>
+
+<Block title="El resultado">
+
+El alta de un cliente pasa de ser una lista mental a un proceso que ocurre solo, siempre en el mismo orden y con los mismos datos en todas las herramientas. El equipo recibe avisos claros, no tareas pendientes, y puede ver en cualquier momento en qué punto está cada alta.
+
+Lo más valioso es lo que no se nota: los errores de copia desaparecen y la primera factura llega cuando toca.
+
+</Block>
+
+</Summary>
+
+<Gallery>
+
+<Shot src="/projects/alta-de-clientes-y-facturacion/g1.webp" alt="Portátil con un diagrama de ocho nodos conectados por curvas azules sobre un fondo de puntos; un nodo con borde azul destacado" caption="El flujo completo en n8n" />
+
+<Shot src="/projects/alta-de-clientes-y-facturacion/g2.webp" alt="Portátil con un formulario de alta de varios campos, uno con borde azul, dos interruptores y un panel lateral con pasos completados y pendientes" caption="Formulario de alta y seguimiento por pasos" />
+
+<Shot src="/projects/alta-de-clientes-y-facturacion/g3.webp" alt="Portátil con un documento de factura generado, barra de herramientas y panel lateral de comprobaciones, junto a un móvil que muestra la misma factura resumida" caption="Primera factura generada desde el flujo" />
+
+</Gallery>
+
+<Decisions>
+
+<Decision title="Un único punto de entrada">
+
+Antes, un cliente nuevo podía empezar en el CRM, en un correo o en una conversación. Cada origen dejaba datos distintos y el resto del proceso heredaba esas diferencias.
+
+Decidimos que todo alta empieza en el mismo formulario, con los campos obligatorios validados antes de disparar nada. Parece una restricción, pero es lo que permite que el flujo sea predecible: si el dato entra bien una vez, entra bien en todas las herramientas. Las excepciones se gestionan dentro del flujo, no saltándoselo.
+
+</Decision>
+
+<Decision title="Automatizar el trámite, no la decisión">
+
+No todo debe hacerse solo. Hay momentos en los que alguien tiene que decidir: un plan que no encaja con la tarifa, un cliente con condiciones especiales, un pago que no llega.
+
+Para esos casos el flujo se detiene, avisa a la persona adecuada con el contexto necesario y espera su respuesta antes de continuar. Automatizamos el trámite repetitivo y dejamos la decisión donde aporta valor. Es la diferencia entre un proceso rápido y uno que nadie se fía de dejar funcionando solo.
+
+</Decision>
+
+<Decision title="Cada paso deja rastro y se puede repetir">
+
+Los flujos conectados a varias herramientas fallan de vez en cuando: una API no responde, un dato llega vacío, una sesión caduca. Lo peligroso no es el fallo, es no enterarse.
+
+Cada nodo del flujo registra qué hizo, con qué datos y cuándo. Si un paso falla, el flujo lo reintenta y, si sigue fallando, avisa con un enlace para relanzarlo desde ese punto exacto sin repetir los anteriores. Así el equipo no necesita entender n8n para saber que todo va bien.
+
+</Decision>
+
+</Decisions>

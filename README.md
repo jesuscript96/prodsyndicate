@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Producto-Digital
 
-## Getting Started
+Web de un estudio que diseña y construye productos digitales a medida (MVPs, software a medida, automatización e IA, productos creativos). Construida siguiendo `docs/guia-web-productos-digitales.md`.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript estricto · Tailwind CSS v4 · GSAP (ScrollTrigger, SplitText, Flip) · Lenis · Radix UI · MDX (`next-mdx-remote`) · react-hook-form + zod · Supabase · Resend · Cloudflare Turnstile · Playwright.
+
+## Puesta en marcha
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local        # rellena lo que tengas; sin claves, el formulario funciona en modo desarrollo
+npm run hero:render               # render del hero en Blender (≈ 40 min en un M4; requiere Blender ≥ 4.2)
+npm run sequence:build            # PNG → WebP + pósters + imagen OG
+npm run dev                       # http://localhost:3000 (o `npm run dev -- -p 3200`)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Script | Qué hace |
+|---|---|
+| `npm run dev` / `build` / `start` | Desarrollo, build de producción, servidor de producción |
+| `npm run lint` · `npm run typecheck` | ESLint · `tsc --noEmit` |
+| `npm run test:e2e` | Playwright (arranca el dev server en el puerto 3200 si no hay uno) |
+| `npm run hero:textures` | Genera las texturas del hero (boceto a lápiz, UI, capas, pantallas) en `assets/hero/textures/` |
+| `npm run hero:render [samples]` | Renderiza en Blender (Cycles, GPU Metal) los 150 frames de escritorio y los 150 de móvil en `assets/frames_src/` |
+| `npm run sequence:placeholders` | Alternativa sin Blender: frames de prueba en SVG (sobrescribe `assets/frames_src/`) |
+| `npm run sequence:build` | PNG → WebP optimizados en `public/sequence/v2/` + pósters + `public/og/poster-last.png` |
+| `npm run sequence:check` | Verifica que los bordes de todos los frames son blanco puro |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Despliegue en Vercel
 
-## Learn More
+1. Importa el repositorio en Vercel (framework: Next.js; comandos por defecto: `npm install` y `next build`).
+2. Variables de entorno (ver `.env.example`), en *Production* y *Preview*:
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Obligatoria | Para qué |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | No, hasta tener dominio | URL canónica, sitemap, OG y JSON-LD. Sin ella se usa el dominio de Vercel |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Sí, para el formulario | Guardar los leads (ejecuta antes `supabase/schema.sql`) |
+| `TURNSTILE_SECRET_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Sí, para el formulario | Antispam |
+| `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Recomendadas | Aviso por email de cada lead |
+| `NEXT_PUBLIC_CAL_URL` | No | Agenda embebida en `/contacto` |
+| `NEXT_PUBLIC_ANALYTICS_DOMAIN` | No | Analítica sin cookies (Plausible) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+En producción, sin Supabase ni Turnstile, `/api/contact` responde con error de configuración en lugar de perder leads en silencio. El resto de la web funciona sin ninguna variable.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Los frames del hero (`public/sequence/v2/`) ya están en el repositorio: Vercel no necesita Blender. Se sirven con caché inmutable; si cambia el material, sube `SEQUENCE_VERSION` (§7.7).
 
-## Deploy on Vercel
+## Estructura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/            rutas (App Router), layout raíz, sitemap, robots, OG, API
+components/     layout · hero · sections · ui · forms · providers
+content/        datos tipados (servicios, FAQ, proceso) y MDX (blog, proyectos, legales)
+lib/            gsap, seo, analytics, content loaders, validators
+public/sequence frames del hero versionados (v1)
+scripts/        hero (Blender + texturas), secuencia, portadas de proyectos, enlaces rotos
+tests/e2e/      Playwright + axe
+docs/           la guía maestra
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pendientes de negocio y validación: ver `TODO.md`.

@@ -1,0 +1,79 @@
+---
+title: 'Un marketplace de reservas que nace ligero'
+client: 'Caso de concepto'
+year: 2026
+categories: [mvp]
+services: ['MVP para emprendedores', 'Diseño de producto']
+stack: ['Next.js', 'TypeScript', 'Supabase', 'Stripe', 'Vercel']
+summary: 'Una idea de negocio con dos lados, profesionales y clientes, convertida en un primer producto que valida lo esencial: buscar, reservar y pagar.'
+cover:
+  src: '/projects/marketplace-de-reservas/cover.webp'
+  alt: 'Portátil y móvil con una interfaz abstracta de marketplace: fichas en rejilla, mapa con puntos azules y lista de resultados'
+isConcept: true
+order: 1
+featured: true
+---
+
+<Summary>
+
+<Block title="El reto">
+
+Un emprendedor quiere lanzar un marketplace donde profesionales de servicios locales publiquen su disponibilidad y los clientes reserven y paguen desde el móvil. La tentación es construirlo todo desde el primer día: perfiles, valoraciones, chat, suscripciones.
+
+El reto real es otro: comprobar cuanto antes si profesionales y clientes están dispuestos a usarlo, sin gastar meses en funciones que quizá nadie necesite.
+
+</Block>
+
+<Block title="Lo que hicimos">
+
+Reducimos el alcance a un único flujo completo de extremo a extremo: alta de profesional con calendario, búsqueda por zona y servicio, reserva con pago y confirmación por correo.
+
+Diseñamos primero un prototipo navegable para validar ese flujo con personas reales y después lo construimos sobre Next.js y Supabase, con la pasarela de pago integrada desde el principio. Todo lo demás quedó en una lista de siguientes versiones, ordenada por lo que se aprenda tras el lanzamiento.
+
+</Block>
+
+<Block title="El resultado">
+
+Un producto pequeño pero completo, listo para ponerlo delante de profesionales reales y empezar a medir. La base técnica está preparada para crecer sin rehacer: autenticación, datos y pagos son los mismos que usaría la versión madura.
+
+Y, sobre todo, cada funcionalidad descartada es una decisión informada, no una pérdida.
+
+</Block>
+
+</Summary>
+
+<Gallery>
+
+<Shot src="/projects/marketplace-de-reservas/g1.webp" alt="Móvil con un calendario de disponibilidad y franjas horarias; una franja destacada en azul y dos tarjetas flotantes alrededor" caption="Disponibilidad y franjas" />
+
+<Shot src="/projects/marketplace-de-reservas/g2.webp" alt="Portátil con la ficha de un servicio: imagen grande, descripción y tarjeta lateral de reserva con calendario y botón" caption="Ficha y reserva" />
+
+<Shot src="/projects/marketplace-de-reservas/g3.webp" alt="Dos móviles con el flujo de pago: formulario con campos y resumen, y pantalla de confirmación con un círculo azul" caption="Pago y confirmación" />
+
+</Gallery>
+
+<Decisions>
+
+<Decision title="Un solo flujo completo antes que diez a medias">
+
+Preferimos que una persona pueda buscar, reservar y pagar sin fricción a tener perfiles elaborados y un chat que todavía nadie usa. Un flujo cerrado permite medir conversión real y aprender de cada reserva; diez pantallas inconexas solo permiten enseñar capturas.
+
+Esta regla también simplifica las conversaciones: cualquier petición nueva se contrasta con una pregunta, ¿ayuda a que alguien complete su primera reserva? Si no, espera a la siguiente versión.
+
+</Decision>
+
+<Decision title="Calendario propio, pagos de terceros">
+
+El calendario de disponibilidad es el corazón del producto y lo diseñamos a medida: franjas, bloqueos, duración de cada servicio y zonas horarias. Es donde el marketplace se diferencia y donde más vale la pena invertir.
+
+El cobro, en cambio, lo delegamos en una pasarela consolidada. Pagar bien es un problema resuelto; asumirlo en un MVP solo añade riesgo, responsabilidad legal y tiempo que no se recupera.
+
+</Decision>
+
+<Decision title="Modelo de datos pensado para la versión dos">
+
+Aunque el MVP es pequeño, el modelo de datos separa desde el inicio usuarios, perfiles profesionales, servicios, disponibilidad y reservas. Cuesta lo mismo hacerlo bien ahora y evita una migración dolorosa cuando lleguen las valoraciones, los equipos con varios profesionales o las suscripciones.
+
+</Decision>
+
+</Decisions>
