@@ -18,6 +18,7 @@ const ROUTES = [
   '/',
   '/servicios',
   '/servicios/mvp',
+  '/servicios/productos-creativos',
   '/proyectos',
   '/proceso',
   '/emprendedores',

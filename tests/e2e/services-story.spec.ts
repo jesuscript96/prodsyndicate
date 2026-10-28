@@ -10,7 +10,7 @@ const SERVICES = [
   { slug: 'mvp', h1: /MVP/, first: 'descubrimiento', last: 'lanzamiento' },
   { slug: 'software-a-medida', h1: /encaja/, first: 'analisis', last: 'en-uso' },
   { slug: 'automatizacion-ia', h1: /se hacen solos/, first: 'mapa', last: 'monitorizacion' },
-  { slug: 'productos-creativos', h1: /identidad propia/, first: 'lienzo', last: 'publicacion' },
+  { slug: 'productos-creativos', h1: /identidad propia/, first: 'boceto', last: 'punto-de-vista' },
 ] as const;
 
 for (const s of SERVICES) {
@@ -41,3 +41,17 @@ for (const s of SERVICES) {
     });
   });
 }
+
+test('productos-creativos: la demo «Haz que encaje» se controla con el teclado', async ({ page }) => {
+  await page.goto('/servicios/productos-creativos#pruebalo');
+  const stage = page.getByRole('group', { name: /cambia el punto de vista/ });
+  await stage.scrollIntoViewIfNeeded();
+  await expect(stage).toHaveAttribute('data-aligned', 'false');
+  // La vista inicial está desplazada: con las flechas se llega a la central, la única que encaja
+  await stage.focus();
+  for (const key of ['ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowRight', 'ArrowRight']) await page.keyboard.press(key);
+  await expect(stage).toHaveAttribute('data-aligned', 'true');
+  await expect(page.getByText('Las piezas encajan: este es el punto de vista.')).toBeAttached();
+  await page.keyboard.press('ArrowLeft');
+  await expect(stage).toHaveAttribute('data-aligned', 'false');
+});

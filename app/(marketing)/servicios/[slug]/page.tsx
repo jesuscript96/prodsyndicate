@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { getServiceSummary, serviceSlugs } from '@/content/services';
 import { getServiceDetail } from '@/content/services-detail';
@@ -15,7 +16,9 @@ import { ProjectCard } from '@/components/ui/project-card';
 import { Reveal } from '@/components/ui/reveal';
 import { SectionLabel } from '@/components/ui/section-label';
 import { SplitReveal } from '@/components/ui/split-reveal';
-import { CreativeDemo } from '@/components/services/creative-demo';
+import { AnamorphDemo } from '@/components/services/anamorph-demo';
+import { PieceSprite } from '@/components/services/piece-sprite';
+import { DepthField } from '@/components/props/depth-field';
 import { DeliverableIcon } from '@/components/services/deliverable-icon';
 import { PostTeaser } from '@/components/services/post-teaser';
 import { ServiceStory } from '@/components/services/service-story';
@@ -23,6 +26,24 @@ import { SERVICE_STORIES } from '@/content/service-stories';
 import '@/components/services/services.css';
 
 type Params = { slug: string };
+
+/**
+ * Productos creativos: piezas sueltas del «&» de su hero (scripts/hero/scenes/productos-creativos.py
+ * --mode frag) que acompañan a las secciones. La naranja se queda en el hero y en la demo.
+ */
+const FORWHO_PIECES = ['frag-9', 'frag-16', 'frag-10'] as const;
+const FLOATING_PIECES = ['frag-12', 'frag-7', 'frag-9', 'frag-10', 'frag-16'] as const;
+
+/** Envuelve las secciones centrales en el campo de profundidad solo en productos creativos. */
+function CreativeDepth({ on, children }: { on: boolean; children: ReactNode }) {
+  return on ? (
+    <DepthField count={7} seed={2} props={FLOATING_PIECES} scale={0.52}>
+      {children}
+    </DepthField>
+  ) : (
+    <>{children}</>
+  );
+}
 
 export function generateStaticParams(): Params[] {
   return serviceSlugs.map((slug) => ({ slug }));
@@ -88,94 +109,101 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
                   0{i + 1}
                 </span>
                 <span>{who}</span>
+                {/* Productos creativos: en cada tarjeta se posa una pieza del «&» del hero */}
+                {isCreative && FORWHO_PIECES[i] && (
+                  <PieceSprite name={FORWHO_PIECES[i]} className="forwho__piece" phase={i * 0.27} turns={0.9} />
+                )}
               </Reveal>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* Productos creativos: demostración interactiva con el puntero (§8.3.4) */}
+      {/* Productos creativos: demostración interactiva (§8.3.4) con la escultura del hero */}
       {isCreative && (
         <section id="pruebalo" className="section hairline" aria-labelledby="pruebalo-title">
           <div className="wrap grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
             <div className="sec-head mb-0">
               <SectionLabel>Pruébalo</SectionLabel>
               <SplitReveal as="h2" id="pruebalo-title" className="h2">
-                Mueve el <em className="accent-word">puntero</em>.
+                Haz que <em className="accent-word">encaje</em>.
               </SplitReveal>
               <Reveal as="p" className="body-l text-ink-2">
-                Una losa con capas en profundidad que responde al ratón y al scroll. Con movimiento reducido se queda quieta.
+                Es la escultura del principio: piezas a distintas profundidades que solo forman el «&» desde un
+                punto de vista. Búscalo.
               </Reveal>
             </div>
-            <CreativeDemo />
+            <AnamorphDemo />
           </div>
         </section>
       )}
 
-      {/* (3) Qué entregamos */}
-      <section id="entregamos" className="section hairline" aria-labelledby="entregamos-title">
-        <div className="wrap">
-          <div className="sec-head">
-            <SectionLabel n="02">Qué entregamos</SectionLabel>
-            <SplitReveal as="h2" id="entregamos-title" className="h2">
-              Qué <em className="accent-word">entregamos</em>.
-            </SplitReveal>
+      <CreativeDepth on={isCreative}>
+        {/* (3) Qué entregamos */}
+        <section id="entregamos" className="section hairline" aria-labelledby="entregamos-title">
+          <div className="wrap">
+            <div className="sec-head">
+              <SectionLabel n="02">Qué entregamos</SectionLabel>
+              <SplitReveal as="h2" id="entregamos-title" className="h2">
+                Qué <em className="accent-word">entregamos</em>.
+              </SplitReveal>
+            </div>
+            <ul className="deliverables">
+              {detail.deliverables.map((d, i) => (
+                <Reveal key={d.text} as="li" delay={(i % 3) * 0.06}>
+                  <span className="deliverables__icon">
+                    <DeliverableIcon name={d.icon} />
+                  </span>
+                  <span>{d.text}</span>
+                </Reveal>
+              ))}
+            </ul>
           </div>
-          <ul className="deliverables">
-            {detail.deliverables.map((d, i) => (
-              <Reveal key={d.text} as="li" delay={(i % 3) * 0.06}>
-                <span className="deliverables__icon">
-                  <DeliverableIcon name={d.icon} />
-                </span>
-                <span>{d.text}</span>
-              </Reveal>
-            ))}
-          </ul>
-        </div>
-      </section>
+        </section>
 
-      {/* (4) Cómo lo hacemos */}
-      <section id="como" className="section hairline" aria-labelledby="como-title">
-        <div className="wrap">
-          <div className="sec-head">
-            <SectionLabel n="03">Cómo lo hacemos</SectionLabel>
-            <SplitReveal as="h2" id="como-title" className="h2">
-              Cómo lo <em className="accent-word">hacemos</em>.
-            </SplitReveal>
+        {/* (4) Cómo lo hacemos */}
+        <section id="como" className="section hairline" aria-labelledby="como-title">
+          <div className="wrap">
+            <div className="sec-head">
+              <SectionLabel n="03">Cómo lo hacemos</SectionLabel>
+              <SplitReveal as="h2" id="como-title" className="h2">
+                Cómo lo <em className="accent-word">hacemos</em>.
+              </SplitReveal>
+            </div>
+            <ol className="steps">
+              {detail.steps.map((step, i) => (
+                <Reveal key={step.title} as="li" delay={0.04}>
+                  <span className="steps__n">0{i + 1}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </Reveal>
+              ))}
+            </ol>
+            <Reveal className="pt-8">
+              <LinkArrow href="/proceso">Ver el proceso completo</LinkArrow>
+            </Reveal>
           </div>
-          <ol className="steps">
-            {detail.steps.map((step, i) => (
-              <Reveal key={step.title} as="li" delay={0.04}>
-                <span className="steps__n">0{i + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </Reveal>
-            ))}
-          </ol>
-          <Reveal className="pt-8">
-            <LinkArrow href="/proceso">Ver el proceso completo</LinkArrow>
-          </Reveal>
-        </div>
-      </section>
+        </section>
 
-      {/* (5) Casos de uso */}
-      <section id="casos-de-uso" className="section hairline" aria-labelledby="casos-de-uso-title">
-        <div className="wrap">
-          <div className="sec-head">
-            <SectionLabel n="04">Casos de uso</SectionLabel>
-            <SplitReveal as="h2" id="casos-de-uso-title" className="h2">
-              Casos de <em className="accent-word">uso</em>.
-            </SplitReveal>
+        {/* (5) Casos de uso */}
+        <section id="casos-de-uso" className="section hairline" aria-labelledby="casos-de-uso-title">
+          <div className="wrap">
+            <div className="sec-head">
+              <SectionLabel n="04">Casos de uso</SectionLabel>
+              <SplitReveal as="h2" id="casos-de-uso-title" className="h2">
+                Casos de <em className="accent-word">uso</em>.
+              </SplitReveal>
+            </div>
+            <ul className="usecases">
+              {detail.useCases.map((u, i) => (
+                <Reveal key={u} as="li" delay={(i % 3) * 0.05}>
+                  {u}
+                </Reveal>
+              ))}
+            </ul>
           </div>
-          <ul className="usecases">
-            {detail.useCases.map((u, i) => (
-              <Reveal key={u} as="li" delay={(i % 3) * 0.05}>
-                {u}
-              </Reveal>
-            ))}
-          </ul>
-        </div>
-      </section>
+        </section>
+      </CreativeDepth>
 
       {/* (6) Tecnología */}
       <section id="tecnologia" className="section--tight section hairline" aria-labelledby="tecnologia-title">

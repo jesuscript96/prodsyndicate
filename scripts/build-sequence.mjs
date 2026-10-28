@@ -8,7 +8,8 @@
  *   node scripts/build-sequence.mjs --services       # las cuatro páginas de servicio que tengan render
  *
  * Home:      assets/frames_src/{desktop,mobile}/NNNN.png        → public/sequence/v2/…  (150 / 90 frames)
- * Servicio:  assets/frames_src/<slug>/{desktop,mobile}/NNNN.png → public/sequence/<slug>/v1/… (120 / 72)
+ * Servicio:  assets/frames_src/<slug>/{desktop,mobile}/NNNN.png → public/sequence/<slug>/<versión>/… (120 / 72)
+ *            (+ grid/r<fila>_c<col>.png → grid/*.webp si la escena renderiza la rejilla de puntos de vista)
  * En cada destino: desktop/f_NNNN.webp (1200², q72), mobile/f_NNNN.webp (720×900, q70, submuestreado),
  * poster-first.webp, poster-first-mobile.webp, poster-last.webp. La home genera además public/og/poster-last.png.
  *
@@ -22,10 +23,15 @@ import { readdir, mkdir, rm, copyFile, stat, access } from 'node:fs/promises';
 import path from 'node:path';
 
 const SERVICES = ['mvp', 'software-a-medida', 'automatizacion-ia', 'productos-creativos'];
+/** Versión publicada de cada secuencia de servicio (la caché es inmutable: un render nuevo, versión nueva). */
+const VERSIONS = { 'productos-creativos': 'v2' };
 const SCENES = {
   home: { src: 'assets/frames_src', out: 'public/sequence/v2', desktop: 150, mobile: 90, og: true },
   ...Object.fromEntries(
-    SERVICES.map((slug) => [slug, { src: `assets/frames_src/${slug}`, out: `public/sequence/${slug}/v1`, desktop: 120, mobile: 72 }]),
+    SERVICES.map((slug) => [
+      slug,
+      { src: `assets/frames_src/${slug}`, out: `public/sequence/${slug}/${VERSIONS[slug] ?? 'v1'}`, desktop: 120, mobile: 72 },
+    ]),
   ),
 };
 
@@ -112,6 +118,24 @@ async function buildScene(name) {
     await (await prepared(path.join(`${sc.src}/desktop`, lastSrc))).resize(1200, 1200).png({ compressionLevel: 9 }).toFile('public/og/poster-last.png');
   }
   console.log(`${name}: pósters generados${sc.og ? ' + public/og/poster-last.png' : ''}.`);
+
+  // Rejilla de puntos de vista (demo interactiva de la página), si la escena la renderiza
+  const gridSrc = `${sc.src}/grid`;
+  if (await exists(`${gridSrc}/meta.json`)) {
+    const gridOut = `${sc.out}/grid`;
+    await rm(gridOut, { recursive: true, force: true });
+    await mkdir(gridOut, { recursive: true });
+    const cells = (await readdir(gridSrc)).filter((f) => f.endsWith('.png'));
+    await pool(cells, async (f) =>
+      (await prepared(path.join(gridSrc, f)))
+        .webp({ quality: 74, effort: 6, smartSubsample: true })
+        .toFile(path.join(gridOut, f.replace(/\.png$/, '.webp'))),
+    );
+    await copyFile(`${gridSrc}/meta.json`, `${gridOut}/meta.json`);
+    let total = 0;
+    for (const f of await readdir(gridOut)) total += (await stat(path.join(gridOut, f))).size;
+    console.log(`${name} · rejilla: ${cells.length} vistas → ${gridOut} (${(total / 1024 / 1024).toFixed(2)} MB)`);
+  }
 }
 
 const argv = process.argv.slice(2);

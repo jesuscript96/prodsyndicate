@@ -1,279 +1,433 @@
 """
-Escena «Identidad que se mueve» — página de servicio «Productos creativos e interactivos» (§8.3.4).
+Escena «Punto de vista» — página de servicio «Productos creativos e interactivos» (§8.3.4).
 
-Guion (N = 120, misma partitura que la home):
-  01 Lienzo (reposo 11–15)      ventana de navegador vacía, inclinada, en la mitad inferior.
-  02 Identidad (reposo 45–49)   dentro de la ventana surgen la marca: anillo ultramar, barras
-                                tipográficas de tinta, muestras de color y una retícula.
-  03 Movimiento (reposo 77–80)  el anillo rompe el plano hacia la cámara, una cinta lo atraviesa y
-                                las tarjetas de contenido se separan en profundidad (parallax).
-  04 Publicación (reposo 108–120) la ventana publicada + móvil con la misma experiencia; el anillo
-                                flota delante, medio fuera del marco; punto «live» en el móvil.
+Una anamorfosis tipográfica: un «&» en la serif cursiva de la web (Instrument Serif Italic) se
+dibuja a lápiz, se recorta en piezas que se levantan del papel con su material, y la cámara
+recorre la escultura hasta el único punto de vista desde el que todas encajan.
 
-Uso (desde la raíz del proyecto):
-  node scripts/hero/textures/productos-creativos.mjs
+Cada pieza i se aleja o se acerca a lo largo de su rayo desde ese punto P y se escala por el
+mismo factor k_i (homotecia de centro P): vista desde P su proyección no cambia; desde cualquier
+otro punto, las piezas aparecen dispersas en profundidad. Su sombra nunca forma el «&».
+
+Guion (N = 120, partitura común):
+  01 Boceto (reposo 11–15)          hoja con el «&» a lápiz, líneas guía y el lápiz.
+  02 Piezas (reposo 45–49)          el boceto se recorta: las piezas se levantan, ganan grosor y material.
+  03 Movimiento (reposo 77–80)      la cámara rodea la escultura; las piezas giran sobre sí mismas.
+  04 Punto de vista (104–120)       la cámara llega a P, los giros se deshacen y el «&» encaja.
+
+Modos (desde la raíz del proyecto):
   blender -b --factory-startup --python scripts/hero/scenes/productos-creativos.py -- \
-      --cam desktop|mobile --frames all|1,47,120 [--out assets/frames_src/productos-creativos] \
-      [--samples 48] [--scale 1.0]
+      [--mode story] --cam desktop|mobile --frames all|1,47,120 [--samples 48] [--scale 1.0]
+  ... -- --mode grid [--samples 32]      rejilla de puntos de vista alrededor de P (demo «Pruébalo»)
+                                         → assets/frames_src/productos-creativos/grid/r<fila>_c<col>.png
+  ... -- --mode frag --frag <i>          una pieza aislada girando (48 frames) para las secciones
+                                         → assets/props_src/frag-<i>/NNNN.png + meta.json
+  ... -- --mode pieces                   lista las piezas (índice, material, tamaño)
 """
-import os, sys
+import os, sys, math, json, time
 sys.path.insert(0, os.path.join(os.getcwd(), 'scripts/hero'))
 import studio as S
-import bpy, math
-from mathutils import Vector, Matrix, Euler, Quaternion
+import bpy, bmesh
+from mathutils import Vector, Matrix, Quaternion
 
+MODE = S.arg('mode', 'story')
 A = S.parse_args(default_frames=120, default_out='assets/frames_src/productos-creativos')
 S.reset_scene(A.n)
-S.set_texture_dir('assets/hero/textures/productos-creativos')
 
 seg, ease_io, ease_out, lerp, norm, clamp = S.seg, S.ease_io, S.ease_out, S.lerp, S.norm, S.clamp
 rad = math.radians
+FONT = os.path.join(os.getcwd(), 'scripts/hero/fonts/InstrumentSerif-Italic.woff2')
 
-# ───────────────────────── Helpers propios ─────────────────────────
-
-def mat4(pos, rot):
-    """Matriz mundo a partir de posición y Euler XYZ (grados)."""
-    return Matrix.Translation(Vector(pos)) @ Euler((rad(rot[0]), rad(rot[1]), rad(rot[2])), 'XYZ').to_matrix().to_4x4()
-
-
-def place(o, m):
-    o.matrix_world = m
+# ───────────────────────── Punto de vista final ─────────────────────────
+# (az°, el°, dist, tx, ty, tz, shift_y, lens). P = posición de la cámara = centro de la homotecia.
+FINAL = (0.0, 8.0, 4.6, 0.0, 0.0, 1.15, -0.02, 62.0)  # focal larga: la hoja queda por debajo del CTA final
+ALIGN_AT = 104  # desde este frame la cámara está exactamente en P y el «&» encaja
 
 
-def quat_from_axis(n):
-    """Cuaternión que lleva el eje local +Z al vector n (para anillo y discos)."""
-    return Vector(n).normalized().to_track_quat('Z', 'Y')
+def cam_loc(az, el, dist, tx, ty, tz):
+    a, e = rad(az), rad(el)
+    return Vector((tx, ty, tz)) + Vector((math.sin(a) * math.cos(e), -math.cos(a) * math.cos(e), math.sin(e))) * dist
 
 
-def cr3(points, samples=90):
-    """Catmull-Rom 3D por una lista de puntos → polilínea densa."""
-    keys = [(i, tuple(p)) for i, p in enumerate(points)]
-    n = len(points) - 1
-    return [S.catmull(keys, n * i / samples) for i in range(samples + 1)]
-
-
-def vis(o, on):
-    S.set_hidden(o, not on)
+G = Vector(FINAL[3:6])
+P = cam_loc(*FINAL[:6])
 
 # ───────────────────────── Materiales ─────────────────────────
 
-M = {}
-M['win_body'] = S.principled_mat('win_body', '#E8E8E3', rough=0.36, coat=0.45)
-M['canvas'] = S.screen_mat('canvas', ['canvas_blank.png', 'canvas_grid.png', 'canvas_ui.png'], lit=0.35, rough=0.42)
-M['dot'] = S.principled_mat('dot', '#6B6B76', rough=0.5)
-M['ultra'] = S.principled_mat('ultra', '#2B3BFF', rough=0.32, coat=0.65)          # ultramar satinado con coat
-M['ink'] = [S.principled_mat(f'ink_{i}', '#0B0B0F', rough=0.55) for i in range(3)]  # tinta mate (uno por barra)
-M['sw'] = [S.principled_mat(f'sw_{i}', c, rough=0.38, coat=0.5) for i, c in enumerate(['#2B3BFF', '#0B0B0F', '#6B6B76', '#E8E8E3'])]
-M['ribbon'] = S.principled_mat('ribbon', '#0B0B0F', rough=0.5)
-M['card_body'] = [S.principled_mat(f'card_body_{i}', '#FFFFFF', rough=0.4, coat=0.35) for i in (0, 2)]
-M['frost'] = S.glass_mat('frost', rough=0.34)                                     # único vidrio esmerilado
-M['card_face'] = {
-    'a': S.screen_mat('card_face_a', ['card_a.png'], lit=0.85, rough=0.35),
-    'b': S.screen_mat('card_face_b', ['card_b.png'], lit=0.9, rough=0.3, alpha_from_image=True),
-    'c': S.screen_mat('card_face_c', ['card_c.png'], lit=0.85, rough=0.35),
+PAPER = dict(color='#F7F6F2', rough=0.92, transmission=0.0, coat=0.0)
+LOOKS = {
+    'ultra': dict(color='#2B3BFF', rough=0.2, transmission=0.0, coat=0.7),
+    'white': dict(color='#ECECE8', rough=0.42, transmission=0.0, coat=0.25),
+    'soft': dict(color='#AEB8FF', rough=0.34, transmission=0.0, coat=0.4),
+    'glass': dict(color='#FFFFFF', rough=0.16, transmission=1.0, coat=0.0),
+    'ink': dict(color='#0F0F13', rough=0.28, transmission=0.0, coat=0.6),
+    'signal': dict(color='#FF5A1F', rough=0.3, transmission=0.0, coat=0.5),
 }
-M['phone_screen'] = S.screen_mat('phone_screen', ['phone_ui.png'], lit=0.97, rough=0.15)
-M['live'] = S.principled_mat('live', '#FF5A1F', rough=0.3, emission='#FF5A1F', emit=1.6)
-M['live_halo'] = S.principled_mat('live_halo', '#FF5A1F', rough=0.5, emission='#FF5A1F', emit=1.0)
 
-# ───────────────────────── Objetos ─────────────────────────
 
-S.studio_world()
-S.studio_lights(target=(0, 0, 0.8))
-S.shadow_floor()
+def bsdf(mat):
+    return next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
 
-# Ventana de navegador: losa + lienzo + tres puntos
-WW, WH, WT = 1.4, 1.0, 0.03
-win = S.empty('win')
-S.rr_box('win_body', WW, WH, WT, 0.06, M['win_body'], win, edge=0.006)
-canvas = S.rr_plane('canvas', 1.36, 0.86, 0.045, M['canvas'], win, z=WT / 2 + 0.0008)
-canvas.location.y = -0.05
-dots = []
-for i in range(3):
-    d = S.cylinder(f'dot_{i}', 0.017, 0.006, M['dot'], win, verts=32, z0=WT / 2)
-    d.location = (-0.62 + i * 0.052, 0.445, 0)
-    dots.append(d)
 
-# Marca: anillo (protagonista), barras tipográficas, muestras de color
-ring = S.torus('ring', 0.2, 0.07, M['ultra'], segs=128, rings=40)
-ring.rotation_mode = 'QUATERNION'
-BAR_L = [0.56, 0.42, 0.30]
-bars = [S.rr_box(f'bar_{i}', L, 0.08, 0.05, 0.04, M['ink'][i], edge=0.004) for i, L in enumerate(BAR_L)]
-swatches = [S.cylinder(f'sw_{i}', 0.056, 0.028, M['sw'][i], verts=48) for i in range(4)]
+def set_look(mat, a, b, t):
+    """Mezcla dos «looks» (color en lineal, rugosidad, transmisión, barniz)."""
+    n = bsdf(mat)
+    ca, cb = S.lin(a['color']), S.lin(b['color'])
+    n.inputs['Base Color'].default_value = tuple(lerp(x, y, t) for x, y in zip(ca, cb))
+    n.inputs['Roughness'].default_value = lerp(a['rough'], b['rough'], t)
+    n.inputs['Transmission Weight'].default_value = lerp(a['transmission'], b['transmission'], t)
+    n.inputs['Coat Weight'].default_value = lerp(a['coat'], b['coat'], t)
 
-# Tarjetas de contenido (parallax). B es vidrio esmerilado con impresión RGBA.
-card_a = S.card('card_a', 0.72, 0.50, 0.024, 0.036, M['card_body'][0], M['card_face']['a'], edge=0.005)
-card_b = S.card('card_b', 0.52, 0.36, 0.02, 0.03, M['frost'], M['card_face']['b'], edge=0.004, inset=0.03)
-card_c = S.card('card_c', 0.44, 0.30, 0.024, 0.03, M['card_body'][1], M['card_face']['c'], edge=0.005)
-cards = [card_a, card_b, card_c]
 
-# Móvil (pantalla mirando a -Y tras rotar X 90°)
-phone = S.build_phone('phone', M['phone_screen'])
-live_dot = S.sphere('live_dot', 0.017, M['live'], phone['live'], segs=24, rings=12)
-halo = S.rr_plane('live_halo', 0.07, 0.07, 0.035, M['live_halo'], phone['live'], z=-0.004)
+M_PAPER = S.principled_mat('paper', PAPER['color'], rough=PAPER['rough'])
+M_GRAPHITE = S.principled_mat('graphite', '#4A4A52', rough=0.65, metal=0.15)
+M_GUIDE = S.principled_mat('guide', '#9A9AA3', rough=0.7)
+S.set_alpha(M_GUIDE, 0.75)
 
-# ───────────────────────── Posiciones clave ─────────────────────────
-# Ventana por capítulo: (pos, rot XYZ°). Rot X 90 = de pie mirando a la cámara (-Y).
-WIN_00 = ((0.0, 0.0, 0.5), (46, 0, -9))   # frame 1: algo más tumbada y baja
-WIN_01 = ((0.0, 0.0, 0.56), (52, 0, -7))
-WIN_02 = ((0.0, 0.0, 0.88), (90, 0, 0))
-WIN_03 = ((0.15, 0.55, 0.92), (90, 0, 0))
-WIN_04 = ((0.05, 0.35, 0.86), (90, 0, 0))
+# ───────────────────────── El «&» y sus piezas ─────────────────────────
 
-# Elementos de marca en coordenadas locales de la ventana (x derecha, y arriba, z hacia la cámara)
-RING_LOCAL = Vector((0.27, -0.02, 0.22))
-RING_AXIS_LOCAL = Vector((0.5, -0.18, 1.0)).normalized()
-BAR_LOCAL = [Vector((-0.63 + BAR_L[i] / 2, 0.25 - i * 0.12, 0.07 + i * 0.015)) for i in range(3)]
-SW_LOCAL = [Vector((-0.52 + i * 0.145, -0.24, 0.06)) for i in range(4)]
-CARD_LOCAL = [Vector((-0.3, 0.05, 0.03)), Vector((0.32, 0.1, 0.03)), Vector((0.25, -0.22, 0.03))]
+GLYPH_H = 1.3        # alto del «&» montado (unidades de escena)
+EXTRUDE = 0.06       # medio grosor (la fuente extruye hacia ambos lados)
+BEVEL = 0.012
 
-# Capítulo 03 (mundo): anillo delante, tarjetas a distintas profundidades
-RING_03 = Vector((-0.12, -1.0, 0.6))
-RING_AXIS_03 = Vector((0.45, -0.82, 0.2)).normalized()
-CARD_03 = [((-0.62, 0.0, 1.1), (90, 0, -8)), ((0.45, -0.1, 1.18), (90, 0, 6)), ((0.7, -0.3, 0.45), (90, 0, -3))]
 
-# Capítulo 04 (mundo)
-RING_04 = Vector((-0.66, -0.55, 0.42))
-RING_AXIS_04 = Vector((-0.3, -0.85, 0.42)).normalized()
-PHONE_04 = ((0.86, -0.2, 0.5), (90, 0, -10))
-PHONE_SCALE = 0.8
+def font_curve(name, size, extrude=0.0, bevel=0.0, fill='BOTH'):
+    font = bpy.data.fonts.load(FONT, check_existing=True)
+    cu = bpy.data.curves.new(name, 'FONT')
+    cu.font = font; cu.body = '&'; cu.size = size
+    cu.extrude = extrude; cu.bevel_depth = bevel; cu.bevel_resolution = 3
+    cu.resolution_u = 20; cu.fill_mode = fill
+    return cu
 
-# Cinta: Catmull-Rom que atraviesa el anillo del cap. 03 a lo largo de su eje
-_n = RING_AXIS_03
-RIBBON_PTS = cr3([
-    Vector((-0.6, 0.25, 0.95)),                # nace oculta tras la tarjeta A
-    Vector((-0.82, -0.12, 0.84)),              # asoma bajo su esquina izquierda
-    RING_03 - _n * 0.5 + Vector((0, 0, 0.03)),
-    RING_03,                                   # atraviesa el anillo por su eje
-    RING_03 + _n * 0.5,
-    RING_03 + _n * 0.64 + Vector((0.03, 0.0, 0.1)),    # sale corta, hacia la derecha
-], samples=100)
-ribbon = S.polyline('ribbon', RIBBON_PTS, M['ribbon'], thick=0.0095)
-ribbon.data.bevel_factor_mapping_start = 'SPLINE'
-ribbon.data.bevel_factor_mapping_end = 'SPLINE'
-ribbon.data.bevel_resolution = 4
 
-# ───────────────────────── Coreografía ─────────────────────────
+def eval_mesh(cu):
+    ob = bpy.data.objects.new('_tmp', cu); S.scene.collection.objects.link(ob)
+    dg = bpy.context.evaluated_depsgraph_get()
+    me = bpy.data.meshes.new_from_object(ob.evaluated_get(dg))
+    bpy.data.objects.remove(ob)
+    return me
 
-def win_matrix(f):
-    bob = 0.004 * math.sin(f * 0.21)
-    t01 = seg(f, 1, 11, ease_out)
-    t12 = seg(f, 15, 42)
-    t23 = seg(f, 49, 70)
-    t34 = seg(f, 84, 104)
-    pos = Vector(WIN_00[0]).lerp(Vector(WIN_01[0]), t01).lerp(Vector(WIN_02[0]), t12)
-    pos = pos.lerp(Vector(WIN_03[0]), t23)
-    pos = pos.lerp(Vector(WIN_04[0]), t34)
-    rot = Vector(WIN_00[1]).lerp(Vector(WIN_01[1]), t01).lerp(Vector(WIN_02[1]), t12)
-    rot = rot.lerp(Vector(WIN_03[1]), t23)
-    rot = rot.lerp(Vector(WIN_04[1]), t34)
-    return mat4(pos + Vector((0, 0, bob)), rot)
+
+def glyph():
+    """Malla cerrada del «&» en el plano XY local, centrada en su caja. Devuelve (bmesh, tamaño, centro)."""
+    probe = eval_mesh(font_curve('probe', 1.0))
+    ys = [v.co.y for v in probe.vertices]
+    size = GLYPH_H / (max(ys) - min(ys))
+    me = eval_mesh(font_curve('amp', size, EXTRUDE, BEVEL))
+    bm = bmesh.new(); bm.from_mesh(me)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    xs = [v.co.x for v in bm.verts]; ys = [v.co.y for v in bm.verts]
+    c = Vector(((max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2, 0))
+    bmesh.ops.translate(bm, verts=bm.verts, vec=-c)
+    return bm, size, c
+
+
+def seeds_for(bm):
+    """Semillas de Voronoi en una rejilla con jitter determinista sobre la caja del glifo."""
+    xs = [v.co.x for v in bm.verts]; ys = [v.co.y for v in bm.verts]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    out, cols, rows = [], 4, 5
+    for r in range(rows):
+        for c in range(cols):
+            i = r * cols + c
+            jx = math.sin(i * 12.9898 + 1.3) * 0.32
+            jy = math.sin(i * 78.233 + 0.7) * 0.32
+            out.append(Vector((x0 + (x1 - x0) * (c + 0.5 + jx) / cols, y0 + (y1 - y0) * (r + 0.5 + jy) / rows, 0)))
+    return out
+
+
+def voronoi(bm_src, seeds):
+    """Corta el glifo en celdas de Voronoi; cada corte se tapa con una cara plana."""
+    pieces = []
+    for i, si in enumerate(seeds):
+        bm = bm_src.copy()
+        for j, sj in enumerate(seeds):
+            if i == j or not bm.verts:
+                continue
+            n = (sj - si).normalized()
+            bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], dist=1e-6,
+                                   plane_co=(si + sj) / 2, plane_no=n, clear_outer=True)
+            edges = [e for e in bm.edges if e.is_boundary]
+            if edges:
+                bmesh.ops.holes_fill(bm, edges=edges, sides=0)
+        if len(bm.faces) < 8:
+            bm.free(); continue
+        pieces.append(bm)
+    return pieces
+
+
+def face_basis(n):
+    """Rotación que lleva el plano XY local a mirar en la dirección n (eje Z local = n, Y local ≈ arriba)."""
+    n = n.normalized()
+    up = (Vector((0, 0, 1)) - n * n.z).normalized()
+    x = up.cross(n)
+    return Matrix((x, up, n)).transposed().to_4x4()
+
+
+GLYPH_ROT = face_basis(P - G)
+GLYPH_M = Matrix.Translation(G) @ GLYPH_ROT
+
+bm_glyph, GLYPH_SIZE, GLYPH_C = glyph()
+GX = [v.co.x for v in bm_glyph.verts]; GY = [v.co.y for v in bm_glyph.verts]
+GBOX = (min(GX), max(GX), min(GY), max(GY))
+
+pieces = []
+for i, bm in enumerate(voronoi(bm_glyph, seeds_for(bm_glyph))):
+    xs = [v.co.x for v in bm.verts]; ys = [v.co.y for v in bm.verts]
+    c = Vector(((max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2, 0))
+    area = (max(xs) - min(xs)) * (max(ys) - min(ys))
+    bmesh.ops.translate(bm, verts=bm.verts, vec=-c)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    for f in bm.faces:
+        f.smooth = True
+    for e in bm.edges:
+        if e.is_manifold and e.calc_face_angle(0) > rad(32):
+            e.smooth = False
+    me = bpy.data.meshes.new(f'piece_{i}'); bm.to_mesh(me); bm.free()
+    pieces.append(dict(mesh=me, c=c, area=area))
+
+# Material de cada pieza: una pequeña es la única naranja; el resto, reparto espacial alterno
+order = sorted(range(len(pieces)), key=lambda i: (pieces[i]['c'].y * 3 + pieces[i]['c'].x))
+CYCLE = ['ultra', 'glass', 'soft', 'ultra', 'ink', 'white', 'ultra', 'glass', 'soft', 'ultra', 'ink', 'ultra']
+# (la menor de las que se ven: las astillas de los cortes no cuentan)
+smallest = min((i for i in range(len(pieces)) if pieces[i]['area'] > 0.012), key=lambda i: pieces[i]['area'])
+k = 0
+for i in order:
+    if i == smallest:
+        pieces[i]['look'] = 'signal'
+    else:
+        pieces[i]['look'] = CYCLE[k % len(CYCLE)]; k += 1
+
+# Profundidad de cada pieza (factor de la homotecia), giro propio y orden de despegue
+for n, i in enumerate(order):
+    p = pieces[i]
+    p['k'] = 0.72 + 0.53 * ((i * 0.618034 + 0.31) % 1.0)  # 0.72–1.25: la más lejana no toca el suelo
+    ax = Vector((math.sin(i * 2.1 + 0.4), math.cos(i * 1.7 + 0.9), math.sin(i * 0.9 + 2.0) * 0.6)).normalized()
+    p['axis'] = ax
+    p['spin0'] = rad(28 + 36 * ((i * 0.41 + 0.2) % 1.0)) * (1 if i % 2 else -1)
+    p['spin_extra'] = rad(40 + 30 * ((i * 0.73) % 1.0)) * (1 if i % 3 else -1)
+    p['lift_at'] = 16 + 14 * n / max(1, len(pieces) - 1)
+    p['asm'] = GLYPH_M @ Matrix.Translation(p['c'])           # pieza montada (en el plano del «&»)
+    kk = p['k']
+    p['sc'] = Matrix.Translation(P) @ Matrix.Scale(kk, 4) @ Matrix.Translation(-P) @ p['asm']  # dispersa en profundidad
+
+
+def build_pieces():
+    for i, p in enumerate(pieces):
+        mat = S.principled_mat(f'm_piece_{i}', PAPER['color'], rough=PAPER['rough'])
+        p['mesh'].materials.append(mat)
+        p['mat'] = mat
+        p['obj'] = S.link(bpy.data.objects.new(f'piece_{i}', p['mesh']))
+        p['obj'].rotation_mode = 'QUATERNION'
+
+# ───────────────────────── Hoja, boceto y lápiz ─────────────────────────
+
+PAPER_C = Vector((0.08, -0.3, 0.0))
+PAPER_ROT = rad(-5)
+PAPER_W, PAPER_H = 1.62, 1.16
+FLAT_S = 0.6  # escala del «&» dibujado sobre la hoja respecto al montado
+FLAT_M = (Matrix.Translation(PAPER_C + Vector((0, 0.02, 0.0045))) @ Matrix.Rotation(PAPER_ROT, 4, 'Z')
+          @ Matrix.Scale(FLAT_S, 4))
+
+
+def build_paper():
+    sheet = S.rr_plane('sheet', PAPER_W, PAPER_H, 0.012, M_PAPER)
+    sheet.matrix_world = Matrix.Translation(PAPER_C + Vector((0, 0, 0.002))) @ Matrix.Rotation(PAPER_ROT, 4, 'Z')
+    root = S.empty('sketch_root'); root.matrix_world = FLAT_M
+    # Contorno del «&» a lápiz (dos pasadas ligeramente desplazadas, como un trazo real)
+    for k, (dx, dy, rot, mat) in enumerate([(0, 0, 0, M_GRAPHITE), (0.006, -0.004, 0.5, M_GUIDE)]):
+        cu = font_curve(f'sketch_{k}', GLYPH_SIZE, 0.0, 0.0028 / FLAT_S, fill='NONE')
+        ob = S.link(bpy.data.objects.new(f'sketch_{k}', cu), root)
+        ob.location = (-GLYPH_C.x + dx, -GLYPH_C.y + dy, 0)
+        ob.rotation_euler = (0, 0, rad(rot))
+        cu.materials.append(mat)
+    # Líneas guía: base, altura, inclinación de la cursiva y el círculo del ojal superior
+    x0, x1, y0, y1 = GBOX
+    t = 0.0018 / FLAT_S
+    for name, pts in [
+        ('base', [(x0 - 0.3, y0 + 0.01, 0), (x1 + 0.34, y0 + 0.01, 0)]),
+        ('cap', [(x0 - 0.22, y1 - 0.01, 0), (x1 + 0.28, y1 - 0.01, 0)]),
+        ('slant', [(x0 + 0.05, y0 - 0.12, 0), (x0 + 0.05 + (y1 - y0 + 0.24) * math.tan(rad(13)), y1 + 0.12, 0)]),
+    ]:
+        S.polyline(f'guide_{name}', pts, M_GUIDE, root, t)
+    cx, cy, r = x0 + (x1 - x0) * 0.58, y0 + (y1 - y0) * 0.74, (y1 - y0) * 0.2
+    S.polyline('guide_bowl', [(cx + r * math.cos(a * math.tau / 64), cy + r * math.sin(a * math.tau / 64), 0) for a in range(65)],
+               M_GUIDE, root, t)
+    # Lápiz apoyado en la hoja, en diagonal a la derecha del boceto
+    pen = S.empty('pencil')
+    body = S.cylinder('pen_body', 0.017, 0.5, S.principled_mat('pen_body', '#121216', rough=0.35, coat=0.5), pen, verts=6, smooth_shade=False)
+    S.cylinder('pen_wood', 0.017, 0.07, S.principled_mat('pen_wood', '#E6D3B0', rough=0.8), pen, verts=6, r2=0.0045, z0=0.5, smooth_shade=False)
+    S.cylinder('pen_lead', 0.0045, 0.016, M_GRAPHITE, pen, verts=12, r2=0.0006, z0=0.57)
+    S.cylinder('pen_cap', 0.0172, 0.03, S.principled_mat('pen_cap', '#D9D9DE', rough=0.25, metal=0.8), pen, verts=24, z0=-0.03)
+    # Tumbado (eje +Z del lápiz → horizontal) y apoyado en una cara del hexágono
+    pen.matrix_world = (Matrix.Translation(PAPER_C + Vector((0.6, -0.36, 0.017))) @ Matrix.Rotation(rad(118), 4, 'Z')
+                        @ Matrix.Rotation(rad(90), 4, 'Y') @ Matrix.Rotation(rad(30), 4, 'Z'))
+    return body
+
+# ───────────────────────── Pose por frame ─────────────────────────
+
+
+def decompose(m):
+    loc, q, sc = m.decompose()
+    return loc, q, sc
+
+
+def piece_pose(p, f, i):
+    """Matriz mundo y mezcla de material de una pieza en el frame f."""
+    unwind = seg(f, 82, ALIGN_AT - 2)
+    spin = (p['spin0'] + p['spin_extra'] * seg(f, 49, 79)) * (1 - unwind)
+    target = p['sc'] @ Quaternion(p['axis'], spin).to_matrix().to_4x4()
+    t = clamp((f - p['lift_at']) / 14.0)
+    if t <= 0:
+        return None, 0.0
+    e = ease_io(t)
+    l0, q0, s0 = decompose(FLAT_M @ Matrix.Translation(p['c']))
+    s0 = Vector((s0.x, s0.y, s0.z * 0.1))        # recorte de papel: casi sin grosor
+    l1, q1, s1 = decompose(target)
+    loc = l0.lerp(l1, e) + Vector((0, 0, 0.28 * math.sin(math.pi * e)))
+    bob = 0.022 * math.sin(f * 0.13 + i * 1.7) * seg(f, 40, 50) * (1 - unwind)
+    loc.z += bob
+    q = q0.slerp(q1, e)
+    sc = s0.lerp(s1, ease_out(t))
+    m = Matrix.Translation(loc) @ q.to_matrix().to_4x4() @ Matrix.Diagonal((sc.x, sc.y, sc.z, 1))
+    return m, ease_io(clamp((t - 0.15) / 0.6))
 
 
 def pose(f):
-    t = f
-    W = win_matrix(f)
-    Wrot = W.to_3x3()
-    place(win, W)
+    for i, p in enumerate(pieces):
+        m, look = piece_pose(p, f, i)
+        o = p['obj']
+        if m is None:
+            S.set_hidden(o, True); continue
+        S.set_hidden(o, False)
+        loc, q, sc = m.decompose()
+        o.location = loc; o.rotation_quaternion = q; o.scale = sc
+        set_look(p['mat'], PAPER, LOOKS[p['look']], look)
 
-    # ── Ventana: puntos que nacen uno a uno, lienzo (blanco → retícula → UI publicada) ──
-    for i, d in enumerate(dots):
-        s = ease_out(norm(f, 2 + i * 2.5, 8 + i * 2.5))
-        S.set_scale(d, s)
-    S.set_mix(M['canvas'], 1, seg(f, 24, 36))                      # retícula
-    S.set_mix(M['canvas'], 2, seg(f, 94, 104))                     # experiencia publicada
-    S.set_lit(M['canvas'], lerp(0.35, 0.93, seg(f, 96, 108)))
+# ───────────────────────── Cámara ─────────────────────────
 
-    # ── Barras tipográficas: entran desde la izquierda (cap. 02), se funden en el cap. 03 ──
-    for i, b in enumerate(bars):
-        a_in = seg(f, 26 + i * 3, 36 + i * 3, ease_out)
-        a_out = 1 - seg(f, 52, 62)
-        a = a_in * a_out
-        S.set_alpha(M['ink'][i], a)
-        vis(b, a > 0.002)
-        loc = BAR_LOCAL[i] + Vector((-0.35 * (1 - a_in), 0, 0.12 * (1 - a_in))) + Vector((0, 0, 0.1 * (1 - a_out)))
-        place(b, W @ Matrix.Translation(loc))
-
-    # ── Muestras de color: aparecen con escala (cap. 02), se funden en el cap. 03 ──
-    for i, sw in enumerate(swatches):
-        s_in = ease_out(norm(f, 33 + i * 2.5, 42 + i * 2.5))
-        s_out = 1 - seg(f, 53, 61)
-        s = s_in * s_out
-        vis(sw, s > 0.002)
-        place(sw, W @ Matrix.Translation(SW_LOCAL[i] + Vector((0, 0, 0.08 * (1 - s_in)))))
-        S.set_scale(sw, s)
-
-    # ── Anillo: nace dentro de la ventana, rompe el plano (cap. 03) y se posa delante (cap. 04) ──
-    r_in = ease_out(norm(f, 28, 44))
-    t23 = seg(f, 49, 67)
-    t34 = seg(f, 86, 106)
-    p_local = W @ RING_LOCAL
-    p = p_local.lerp(RING_03, t23).lerp(RING_04, t34)
-    p.z += 0.008 * math.sin(t * 0.19 + 1.0)
-    q_local = quat_from_axis(Wrot @ RING_AXIS_LOCAL)
-    # giro de entrada: el eje se endereza mientras crece
-    q_spin = Quaternion(Wrot @ Vector((0, 1, 0)), rad(70) * (1 - r_in))
-    q = (q_spin @ q_local).slerp(quat_from_axis(RING_AXIS_03), t23).slerp(quat_from_axis(RING_AXIS_04), t34)
-    ring.location = p
-    ring.rotation_quaternion = q
-    S.set_scale(ring, r_in)
-    vis(ring, r_in > 0.002)
-
-    # ── Cinta: se dibuja atravesando el anillo (cap. 03) y recoge la cola al publicar ──
-    end = seg(f, 62, 77)
-    start = seg(f, 82, 96)
-    ribbon.data.bevel_factor_end = end
-    ribbon.data.bevel_factor_start = min(start, end)
-    vis(ribbon, end > 0.002 and start < 0.998)
-
-    # ── Tarjetas: salen del lienzo en profundidad (cap. 03) y vuelven a él al publicar (cap. 04) ──
-    for i, (root, body, face) in enumerate(cards):
-        o_in = seg(f, 54 + i * 4, 70 + i * 4)
-        o_out = seg(f, 84 + i * 3, 98 + i * 3)
-        a = seg(f, 54 + i * 4, 60 + i * 4) * (1 - seg(f, 92 + i * 2, 100 + i * 2))
-        m_local = W @ Matrix.Translation(CARD_LOCAL[i])
-        m_world = mat4(*CARD_03[i])
-        pos = m_local.to_translation().lerp(m_world.to_translation(), o_in)
-        pos = pos.lerp(m_local.to_translation() + Vector((0, 0, 0.02)), o_out)
-        pos.z += 0.006 * math.sin(t * 0.23 + i)
-        q0 = m_local.to_quaternion(); q1 = m_world.to_quaternion()
-        q = q0.slerp(q1, o_in).slerp(q0, o_out)
-        root.matrix_world = Matrix.Translation(pos) @ q.to_matrix().to_4x4()
-        s = lerp(0.78, 1.0, o_in) * lerp(1.0, 0.9, o_out)
-        S.set_scale(root, s)
-        bm = M['frost'] if i == 1 else M['card_body'][0 if i == 0 else 1]
-        S.set_alpha(bm, a)
-        S.set_alpha(M['card_face']['abc'[i]], a)
-        vis(root, a > 0.002)
-
-    # ── Móvil: entra desde la derecha y abajo al publicar; punto live ──
-    ph = ease_out(norm(f, 94, 110))
-    pm = mat4(Vector(PHONE_04[0]) + Vector((0.5 * (1 - ph), -0.2 * (1 - ph), -0.3 * (1 - ph))), PHONE_04[1])
-    phone['root'].matrix_world = pm
-    S.set_scale(phone['root'], ph * PHONE_SCALE)
-    vis(phone['root'], ph > 0.002)
-    pulse = 0.5 + 0.5 * math.sin(t * 0.55)
-    live_on = seg(f, 110, 116)
-    S.set_scale(live_dot, live_on * (1 + 0.25 * pulse))
-    S.set_scale(halo, live_on * (1 + 1.0 * pulse))
-    S.set_alpha(M['live_halo'], 0.28 * (1 - pulse) * live_on)
-    vis(live_dot, live_on > 0.002); vis(halo, live_on > 0.002)
-
-
-# (frame, (az°, el°, dist, tx, ty, tz, shift_y, lens))
 CAM_KEYS = {
     'desktop': [
-        (1, (5, 31, 4.4, 0.0, 0.0, 0.5, 0.22, 50)),
-        (13, (6, 30, 4.3, 0.0, 0.0, 0.5, 0.22, 50)),
-        (20, (6, 29, 4.28, 0.0, 0.0, 0.52, 0.215, 50)),
-        (45, (-14, 12, 3.9, 0.0, 0.0, 0.88, 0.0, 50)),
-        (49, (-15, 12, 3.9, 0.0, 0.0, 0.88, 0.0, 50)),
-        (77, (-30, 15, 4.7, 0.0, -0.15, 0.85, 0.0, 50)),
-        (80, (-30, 15, 4.7, 0.0, -0.15, 0.85, 0.0, 50)),
-        (108, (0, 9, 4.35, 0.12, 0.0, 0.76, 0.0, 50)),
-        (120, (0, 9, 4.35, 0.12, 0.0, 0.76, 0.0, 50)),
+        # Las piezas se apartan del lado del texto de cada capítulo (izquierda, derecha, izquierda, derecha)
+        (1, (12, 57, 4.0, -0.27, -0.33, 0.0, 0.0, 50)),
+        (13, (10, 56, 3.95, -0.27, -0.33, 0.0, 0.0, 50)),
+        (22, (2, 46, 3.6, -0.05, -0.2, 0.2, 0.0, 50)),
+        (45, (-36, 19, 5.2, 0.3, -0.15, 1.0, 0.0, 50)),
+        (49, (-37, 19, 5.2, 0.3, -0.15, 1.0, 0.0, 50)),
+        (77, (54, 13, 5.6, -0.25, -0.25, 1.0, 0.0, 50)),
+        (80, (55, 13, 5.6, -0.25, -0.25, 1.0, 0.0, 50)),
+        (ALIGN_AT, FINAL),
+        (120, FINAL),
     ],
 }
-CAM_KEYS['mobile'] = S.mobile_keys(CAM_KEYS['desktop'], lens_k=1.0, shift_k=0.85, dist_k=1.12)
+MOBILE_LENS_K = 0.84         # retrato: más campo para la escultura dispersa
+MOBILE_FINAL_LENS_K = 1.1    # el «&» montado es alto: algo más cerca, y la hoja queda bajo el texto
+# Desde ALIGN_AT, la misma focal que usa camera(): sin salto de zoom en el momento del encaje
+CAM_KEYS['mobile'] = [
+    (f, (az, el, d, tx, ty, tz, sy, lens * (MOBILE_FINAL_LENS_K if f >= ALIGN_AT else MOBILE_LENS_K)))
+    for f, (az, el, d, tx, ty, tz, sy, lens) in CAM_KEYS['desktop']
+]
 
-S.run(A, pose, CAM_KEYS, label='productos-creativos')
+
+def camera(cam_profile, f):
+    """Recorrido por claves; desde ALIGN_AT, exactamente en P (solo cambia la focal: el «&» sigue encajado)."""
+    if f < ALIGN_AT:
+        S.pose_camera(CAM_KEYS[cam_profile], f)
+        return
+    cam, cd = S._cam['obj'], S._cam['data']
+    cam.location = P
+    cam.rotation_euler = (G - P).to_track_quat('-Z', 'Y').to_euler()
+    lens = FINAL[7] * (MOBILE_FINAL_LENS_K if cam_profile == 'mobile' else 1.0)
+    cd.lens = lens * (1 + 0.04 * ease_out(norm(f, ALIGN_AT, 120)))
+    cd.shift_y = FINAL[6]
+
+
+def render_to(path):
+    S.scene.render.filepath = path
+    bpy.ops.render.render(write_still=True)
+
+# ───────────────────────── Modos ─────────────────────────
+
+
+def setup_studio(shadow=True):
+    S.studio_world(0.44)
+    S.studio_lights(target=(0, 0, 0.7))
+    if shadow:
+        S.shadow_floor(0)
+
+
+if MODE == 'pieces':
+    for i, p in enumerate(pieces):
+        print(f"[pieces] {i:2d} look={p['look']:6s} area={p['area']:.3f} k={p['k']:.2f} c=({p['c'].x:+.2f},{p['c'].y:+.2f})")
+    print(f'[pieces] total {len(pieces)}')
+
+elif MODE == 'story':
+    setup_studio()
+    build_pieces(); build_paper()
+    S.make_camera(A.cam, A.scale)
+    S.setup_render(A.samples, A.engine)
+    out_dir = os.path.join(A.out, A.cam); os.makedirs(out_dir, exist_ok=True)
+    t0 = time.time()
+    for n, f in enumerate(A.frames):
+        S.scene.frame_set(f)
+        pose(f); camera(A.cam, f)
+        ts = time.time()
+        render_to(os.path.join(out_dir, f'{f:04d}.png'))
+        print(f'[productos-creativos] {A.cam} frame {f:03d} ({n + 1}/{len(A.frames)}) {time.time() - ts:.1f}s', flush=True)
+    print(f'[productos-creativos] done {len(A.frames)} frames in {time.time() - t0:.1f}s', flush=True)
+
+elif MODE == 'grid':
+    # Rejilla de 11 × 7 puntos de vista alrededor del «&» montado (la celda central es P)
+    setup_studio()
+    build_pieces(); build_paper()
+    pose(120)
+    S.make_camera('desktop', A.scale)
+    S.scene.render.resolution_x = S.scene.render.resolution_y = 720
+    S.setup_render(A.samples, A.engine)
+    cam, cd = S._cam['obj'], S._cam['data']
+    out_dir = os.path.join(A.out, 'grid'); os.makedirs(out_dir, exist_ok=True)
+    COLS, ROWS, DAZ, DEL = 11, 7, 5.0, 4.0
+    for r in range(ROWS):
+        for c in range(COLS):
+            az = FINAL[0] + (c - COLS // 2) * DAZ
+            el = FINAL[1] + (ROWS // 2 - r) * DEL
+            cam.location = cam_loc(az, el, *FINAL[2:6])
+            cam.rotation_euler = (G - cam.location).to_track_quat('-Z', 'Y').to_euler()
+            cd.lens = 46; cd.shift_y = 0
+            render_to(os.path.join(out_dir, f'r{r}_c{c:02d}.png'))
+            print(f'[productos-creativos] grid r{r} c{c}', flush=True)
+    with open(os.path.join(out_dir, 'meta.json'), 'w') as fh:
+        json.dump({'cols': COLS, 'rows': ROWS, 'dAz': DAZ, 'dEl': DEL, 'size': 720}, fh)
+    print('[productos-creativos] grid DONE', flush=True)
+
+elif MODE == 'frag':
+    # Una pieza aislada, sin suelo, girando sobre sí misma (hoja de sprites para las secciones)
+    idx = int(S.arg('frag', '0'))
+    p = pieces[idx]
+    S.scene.frame_start, S.scene.frame_end = 1, 48
+    setup_studio(shadow=False)
+    build_pieces()
+    for j, q in enumerate(pieces):
+        S.set_hidden(q['obj'], j != idx)
+    o = p['obj']
+    set_look(p['mat'], PAPER, LOOKS[p['look']], 1.0)
+    radius = max((v.co.length for v in p['mesh'].vertices), default=0.3)
+    S.make_camera('desktop', A.scale)
+    S.scene.render.resolution_x = S.scene.render.resolution_y = int(S.arg('res', '512'))
+    S.setup_render(A.samples, A.engine)
+    cam, cd = S._cam['obj'], S._cam['data']
+    cd.lens = 50
+    dist = radius / math.tan(math.atan(18 / 50)) * 1.25
+    cam.location = Vector((0, -dist, 0.0)); cam.rotation_euler = (rad(90), 0, 0)
+    out_dir = os.path.join(os.getcwd(), 'assets/props_src', f'frag-{idx}'); os.makedirs(out_dir, exist_ok=True)
+    for f in range(1, 49):
+        t = (f - 1) / 48
+        o.location = (0, 0, 0)
+        o.rotation_quaternion = (Matrix.Rotation(rad(360 * t), 4, 'Z') @ Matrix.Rotation(rad(18 + 14 * math.sin(math.tau * t)), 4, 'X')
+                                 @ Matrix.Rotation(rad(90), 4, 'X')).to_quaternion()
+        o.scale = (1, 1, 1)
+        render_to(os.path.join(out_dir, f'{f:04d}.png'))
+        print(f'[props] frag-{idx} {f}/48', flush=True)
+    with open(os.path.join(out_dir, 'meta.json'), 'w') as fh:
+        json.dump({'name': f'frag-{idx}', 'frames': 48, 'size': S.scene.render.resolution_x, 'look': p['look']}, fh)
+    print(f'[props] frag-{idx} DONE', flush=True)

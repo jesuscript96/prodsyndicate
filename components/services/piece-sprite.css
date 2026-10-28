@@ -1,0 +1,8 @@
+/* Pieza del «&» (productos creativos) posada en la esquina de una tarjeta */
+.piece-sprite { display: block; background-repeat: no-repeat; background-size: 800% 600%; pointer-events: none; }
+.forwho li:has(.forwho__piece) { position: relative; padding-right: 7.5rem; }
+.forwho__piece { position: absolute; top: 50%; right: 0.5rem; width: 112px; height: 112px; margin-top: -68px; }
+@media (max-width: 719px) {
+  .forwho li:has(.forwho__piece) { padding-right: 6rem; }
+  .forwho__piece { width: 92px; height: 92px; margin-top: -56px; }
+}

@@ -197,21 +197,22 @@ export const SERVICE_STORIES: Record<ServiceSlug, StoryConfig> = {
   'productos-creativos': {
     ...base,
     id: 'productos-creativos',
-    ...serviceSequence('productos-creativos', 'v1'),
+    // Escena «Punto de vista» (scripts/hero/scenes/productos-creativos.py): anamorfosis de un «&»
+    ...serviceSequence('productos-creativos', 'v2'),
     chapters: withWindows([
       {
-        id: 'lienzo',
+        id: 'boceto',
         n: '01',
-        title: 'Lienzo',
-        lead: 'Una idea en blanco.',
-        text: 'Dirección creativa y prototipo: definimos qué tiene que sentir quien llegue a tu web.',
+        title: 'Boceto',
+        lead: 'Todo empieza en papel.',
+        text: 'Dirección creativa y prototipo: decidimos qué tiene que sentir quien llegue a tu web.',
       },
       {
-        id: 'identidad',
+        id: 'piezas',
         n: '02',
-        title: 'Identidad',
+        title: 'Piezas',
         lead: 'Forma, color y tipografía.',
-        text: 'Un lenguaje visual propio, coherente en cada pantalla.',
+        text: 'Un lenguaje visual propio: cada pieza con su material y su lugar.',
       },
       {
         id: 'movimiento',
@@ -221,26 +222,30 @@ export const SERVICE_STORIES: Record<ServiceSlug, StoryConfig> = {
         text: 'Interacción, animación y 3D cuando explican algo, no como adorno.',
       },
       {
-        id: 'publicacion',
+        id: 'punto-de-vista',
         n: '04',
-        title: 'Publicación',
-        lead: 'Espectacular, y también rápida.',
+        title: 'Punto de vista',
+        lead: 'Todo encaja para quien mira.',
         text: 'Optimizada para móvil y accesible, con una versión estática para quien prefiere menos movimiento.',
       },
     ]),
     chips: [
-      { id: 'direccion', label: 'Dirección creativa', at: 0.11, until: 0.2, x: '79%', y: '58%', mx: '76%', my: '68%' },
-      { id: 'tipografia', label: 'Tipografía', at: 0.3, until: 0.46, x: '33%', y: '76%', mx: '34%', my: '70%' },
-      { id: 'forma', label: 'Forma y color', at: 0.32, until: 0.46, x: '62%', y: '76%', mx: '64%', my: '70%' },
-      { id: 'motion', label: 'Motion', at: 0.54, until: 0.7, x: '84%', y: '70%', mx: '80%', my: '70%' },
-      { id: '3d', label: '3D', at: 0.56, until: 0.7, x: '62%', y: '82%', mx: '60%', my: '74%' },
-      { id: 'accesible', label: 'Accesible y rápida', at: 0.9, until: 1, x: '48%', y: '24%', mx: '50%', my: '88%' },
+      { id: 'direccion', label: 'Dirección creativa', at: 0.11, until: 0.2, x: '44%', y: '27%', mx: '50%', my: '30%' },
+      { id: 'tipografia', label: 'Tipografía', at: 0.3, until: 0.46, x: '50%', y: '90%', mx: '50%', my: '74%' },
+      { id: 'forma', label: 'Forma y color', at: 0.32, until: 0.46, x: '28%', y: '24%', mx: '44%', my: '30%' },
+      { id: 'motion', label: 'Motion', at: 0.54, until: 0.7, x: '78%', y: '24%', mx: '56%', my: '31%' },
+      { id: '3d', label: '3D', at: 0.56, until: 0.7, x: '40%', y: '72%', mx: '50%', my: '66%' },
+      { id: 'accesible', label: 'Accesible y rápida', at: 0.9, until: 1, x: '50%', y: '14%', mx: '50%', my: '22%' },
     ],
     mobileChips: ['direccion', 'forma', 'motion'],
     canvasLabel:
-      'Animación: una ventana de navegador en blanco se llena con la identidad de una marca, con forma, color y tipografía; los elementos cobran movimiento y profundidad, y la experiencia se publica en escritorio y móvil.',
-    lastAlt: 'Ventana de navegador y móvil mostrando la misma experiencia digital, con un anillo ultramar flotando delante.',
-    // Lanzamiento con el texto a la derecha: la composición final se aparta un poco a la izquierda
-    stageShifts: [{ at: 0.7, xPercent: -6 }],
+      'Animación: un «&» dibujado a lápiz sobre una hoja se recorta en piezas de distintos colores y materiales que se elevan y flotan dispersas a diferentes profundidades; la cámara las rodea y, al llegar al único punto de vista correcto, todas encajan y forman el «&» completo.',
+    lastAlt: 'Un «&» tridimensional formado por piezas ultramar, tinta, vidrio y una naranja, flotando sobre la hoja con su boceto a lápiz.',
+    // Las piezas se apartan del texto: el capítulo 2 y el 4 llevan el texto a la derecha
+    stageShifts: [
+      { at: 0.2, xPercent: -4 },
+      { at: 0.45, xPercent: 4 },
+      { at: 0.7, xPercent: -4 },
+    ],
   },
 };

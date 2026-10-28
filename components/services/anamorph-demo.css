@@ -1,0 +1,45 @@
+/* «Haz que encaje»: demo de anamorfosis de la página de productos creativos */
+.anamorph { display: grid; gap: 0.875rem; margin: 0; }
+.anamorph__stage {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 640px;
+  justify-self: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card, 24px);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  cursor: crosshair;
+  touch-action: pan-y; /* en táctil, el arrastre vertical sigue desplazando la página */
+  transition: border-color var(--dur-ui) var(--ease-out-expo), box-shadow var(--dur-ui) var(--ease-out-expo);
+}
+.anamorph__stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.anamorph__stage[data-aligned='true'] { border-color: var(--accent); box-shadow: var(--shadow-float); }
+.anamorph__canvas { display: block; width: 100%; height: 100%; }
+.anamorph__chip {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--dur-ui) var(--ease-out-expo), transform var(--dur-ui) var(--ease-out-expo);
+  pointer-events: none;
+}
+.anamorph__stage[data-aligned='true'] .anamorph__chip { opacity: 1; transform: none; }
+.anamorph__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  width: 100%;
+  max-width: 640px;
+  justify-self: center;
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+}
+.anamorph__readout { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  .anamorph__stage, .anamorph__chip { transition: none; }
+}
