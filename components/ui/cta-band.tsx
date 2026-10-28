@@ -15,6 +15,8 @@ type Props = {
   secondary?: Cta | null;
   /** Eco visual: último frame del hero (poster-last) con ImageReveal */
   echo?: boolean;
+  /** Imagen del eco (por defecto, la composición final del hero de la home) */
+  echoSrc?: string;
   className?: string;
   id?: string;
 };
@@ -32,6 +34,7 @@ export function CtaBand({
   primary = primaryCta,
   secondary = defaultSecondary,
   echo = true,
+  echoSrc = '/sequence/v2/poster-last.webp',
   className,
   id,
 }: Props) {
@@ -61,7 +64,7 @@ export function CtaBand({
         {echo && (
           <ImageReveal className="cta-band__echo" radius={28}>
             <Image
-              src="/sequence/v2/poster-last.webp"
+              src={echoSrc}
               alt=""
               width={1200}
               height={1200}

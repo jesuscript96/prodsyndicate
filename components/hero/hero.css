@@ -209,6 +209,9 @@
 @media (max-width: 899px) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   .hero:not([data-static='true']) .hero__stage {
     transform: translateY(22%) scale(0.9);
+    /* Móvil: la escena entra con un fundido al empezar el scroll (mismo estado inicial que GSAP) */
+    opacity: 0;
+    visibility: hidden;
   }
 }
 

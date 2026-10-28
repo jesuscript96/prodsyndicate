@@ -23,6 +23,7 @@ npm run dev                       # http://localhost:3000 (o `npm run dev -- -p 
 | `npm run test:e2e` | Playwright (arranca el dev server en el puerto 3200 si no hay uno) |
 | `npm run hero:textures` | Genera las texturas del hero (boceto a lápiz, UI, capas, pantallas) en `assets/hero/textures/` |
 | `npm run hero:render [samples]` | Renderiza en Blender (Cycles, GPU Metal) los 150 frames de escritorio y los 150 de móvil en `assets/frames_src/` |
+| `npm run hero:render:service -- <slug>` | Renderiza la escena de una página de servicio (`mvp`, `software-a-medida`, `automatizacion-ia`, `productos-creativos`) y la empaqueta en `public/sequence/<slug>/v1/` |
 | `npm run sequence:placeholders` | Alternativa sin Blender: frames de prueba en SVG (sobrescribe `assets/frames_src/`) |
 | `npm run sequence:build` | PNG → WebP optimizados en `public/sequence/v2/` + pósters + `public/og/poster-last.png` |
 | `npm run sequence:check` | Verifica que los bordes de todos los frames son blanco puro |
@@ -43,7 +44,7 @@ npm run dev                       # http://localhost:3000 (o `npm run dev -- -p 
 
 En producción, sin Supabase ni Turnstile, `/api/contact` responde con error de configuración en lugar de perder leads en silencio. El resto de la web funciona sin ninguna variable.
 
-Los frames del hero (`public/sequence/v2/`) ya están en el repositorio: Vercel no necesita Blender. Se sirven con caché inmutable; si cambia el material, sube `SEQUENCE_VERSION` (§7.7).
+Los frames de las historias (`public/sequence/`) ya están en el repositorio: Vercel no necesita Blender. Se sirven con caché inmutable; si cambia el material, sube `SEQUENCE_VERSION` (§7.7).
 
 ## Estructura
 

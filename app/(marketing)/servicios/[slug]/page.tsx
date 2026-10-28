@@ -11,16 +11,15 @@ import { FaqAccordion } from '@/components/ui/faq-accordion';
 import { JsonLd } from '@/components/ui/json-ld';
 import { LinkArrow } from '@/components/ui/link-arrow';
 import { Marquee } from '@/components/ui/marquee';
-import { PageHero } from '@/components/ui/page-hero';
 import { ProjectCard } from '@/components/ui/project-card';
 import { Reveal } from '@/components/ui/reveal';
 import { SectionLabel } from '@/components/ui/section-label';
 import { SplitReveal } from '@/components/ui/split-reveal';
-import { AccentTitle } from '@/components/services/accent-title';
 import { CreativeDemo } from '@/components/services/creative-demo';
 import { DeliverableIcon } from '@/components/services/deliverable-icon';
 import { PostTeaser } from '@/components/services/post-teaser';
-import { ServiceIllustration } from '@/components/services/service-illustration';
+import { ServiceStory } from '@/components/services/service-story';
+import { SERVICE_STORIES } from '@/content/service-stories';
 import '@/components/services/services.css';
 
 type Params = { slug: string };
@@ -41,7 +40,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 const contactCta: Cta = { label: 'Cuéntanos tu idea', href: '/contacto' };
-const agendaCta: Cta = { label: 'Agenda una llamada', href: '/contacto#agenda' };
 
 /** §8.3 — Plantilla de página de servicio. Secciones (1)–(9). */
 export default async function ServicePage({ params }: { params: Promise<Params> }) {
@@ -52,7 +50,6 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
 
   const path = `/servicios/${detail.slug}`;
   const isAgenda = detail.cta.href.includes('#agenda');
-  const heroSecondary: Cta = isAgenda ? contactCta : agendaCta;
   const bandSecondary: Cta = isAgenda ? contactCta : { label: 'Agenda una llamada de 15 min', href: '/contacto#agenda' };
 
   // Los MDX de proyectos y blog los crea otro módulo: estas secciones se renderizan solo si hay contenido.
@@ -63,7 +60,10 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
 
   return (
     <>
-      <div className="wrap services-crumbs">
+      {/* (1) Hero: historia por scroll con la escena 3D propia del servicio */}
+      <ServiceStory detail={detail} />
+
+      <div className="wrap services-crumbs pt-10">
         <Breadcrumbs
           items={[
             { name: 'Servicios', href: '/servicios' },
@@ -71,26 +71,6 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
           ]}
         />
       </div>
-
-      {/* (1) Hero interior */}
-      <PageHero
-        className="services-hero"
-        label="Servicios"
-        title={<AccentTitle text={detail.h1} />}
-        intro={detail.intro}
-        cta={detail.cta}
-        secondary={heroSecondary}
-        analyticsLocation={`service-hero-${detail.slug}`}
-        visual={
-          isCreative ? (
-            <CreativeDemo />
-          ) : (
-            <div className="service-hero-art">
-              <ServiceIllustration slug={detail.slug} />
-            </div>
-          )
-        }
-      />
 
       {/* (2) Para quién es */}
       <section id="para-quien" className="section" aria-labelledby="para-quien-title">
@@ -113,6 +93,24 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
           </ul>
         </div>
       </section>
+
+      {/* Productos creativos: demostración interactiva con el puntero (§8.3.4) */}
+      {isCreative && (
+        <section id="pruebalo" className="section hairline" aria-labelledby="pruebalo-title">
+          <div className="wrap grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+            <div className="sec-head mb-0">
+              <SectionLabel>Pruébalo</SectionLabel>
+              <SplitReveal as="h2" id="pruebalo-title" className="h2">
+                Mueve el <em className="accent-word">puntero</em>.
+              </SplitReveal>
+              <Reveal as="p" className="body-l text-ink-2">
+                Una losa con capas en profundidad que responde al ratón y al scroll. Con movimiento reducido se queda quieta.
+              </Reveal>
+            </div>
+            <CreativeDemo />
+          </div>
+        </section>
+      )}
 
       {/* (3) Qué entregamos */}
       <section id="entregamos" className="section hairline" aria-labelledby="entregamos-title">
@@ -253,7 +251,7 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
       </section>
 
       {/* (9) CTA */}
-      <CtaBand primary={detail.cta} secondary={bandSecondary} />
+      <CtaBand primary={detail.cta} secondary={bandSecondary} echoSrc={SERVICE_STORIES[detail.slug].posters.last} />
 
       <JsonLd
         data={serviceJsonLd({

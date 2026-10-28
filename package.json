@@ -13,9 +13,11 @@
     "test:e2e": "playwright test",
     "sequence:placeholders": "node scripts/make-placeholders.mjs",
     "sequence:build": "node scripts/build-sequence.mjs",
-    "sequence:check": "node scripts/check-white.mjs public/sequence/v2/desktop && node scripts/check-white.mjs public/sequence/v2/mobile",
+    "sequence:check": "node scripts/check-white.mjs public/sequence/v2/desktop public/sequence/v2/mobile public/sequence/mvp/v1/desktop public/sequence/mvp/v1/mobile public/sequence/software-a-medida/v1/desktop public/sequence/software-a-medida/v1/mobile public/sequence/automatizacion-ia/v1/desktop public/sequence/automatizacion-ia/v1/mobile public/sequence/productos-creativos/v1/desktop public/sequence/productos-creativos/v1/mobile",
     "hero:textures": "node scripts/hero/make-textures.mjs",
-    "hero:render": "bash scripts/hero/render-all.sh"
+    "hero:render": "bash scripts/hero/render-all.sh",
+    "sequence:build:services": "node scripts/build-sequence.mjs --services",
+    "hero:render:service": "bash scripts/hero/render-service.sh"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

@@ -27,11 +27,16 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      {
-        // Frames del hero versionados: caché inmutable (§7.7)
-        source: '/sequence/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
+      // Frames de las historias, versionados: caché inmutable en producción (§7.7). En desarrollo
+      // no, porque se regeneran a menudo sin cambiar la versión.
+      ...(process.env.NODE_ENV === 'production'
+        ? [
+            {
+              source: '/sequence/:path*',
+              headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+            },
+          ]
+        : []),
       { source: '/(.*)', headers: securityHeaders },
     ];
   },

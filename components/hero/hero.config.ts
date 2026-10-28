@@ -1,9 +1,18 @@
 /**
- * Partitura del hero (§6.6c). Todo lo ajustable en un solo sitio.
+ * Partitura del hero de la home (§6.6c). Todo lo ajustable en un solo sitio.
  *
  * FRAME_KEYS, CHAPTERS y CHIPS son la partitura compartida con la producción
  * del vídeo (§7.3): si cambia el material, se recalibran aquí (§6.8).
+ * El motor es común a las páginas de servicio: components/story/scroll-story.tsx.
  */
+import {
+  DEFAULT_FRAME_KEYS,
+  progressToFrame as progressToFrameWith,
+  type SequenceVariant,
+  type StoryChapter,
+  type StoryChip,
+  type StoryConfig,
+} from '@/lib/story';
 
 export const SEQUENCE_VERSION = 'v2';
 
@@ -28,9 +37,9 @@ export const HERO_SEQUENCE = {
     windowSize: 6,
     concurrency: 4,
   },
-} as const;
+} as const satisfies { desktop: SequenceVariant; mobile: SequenceVariant };
 
-export type HeroSequenceVariant = (typeof HERO_SEQUENCE)[keyof typeof HERO_SEQUENCE];
+export type HeroSequenceVariant = SequenceVariant;
 
 /** Pósters (contrato en CLAUDE.md). El primero es idéntico al frame 1; el último, a la composición final. */
 export const HERO_POSTERS = {
@@ -42,67 +51,16 @@ export const HERO_POSTERS = {
 /** Cada cuántos frames se conserva un bitmap ancla permanente (saltos rápidos). */
 export const KEY_STRIDE = 30;
 
-/**
- * [progresoDeScroll 0..1, fracciónDeFrames 0..1]
- * Pendiente baja = "reposo" (se lee el capítulo). Pendiente alta = transformación.
- */
-export const FRAME_KEYS: ReadonlyArray<readonly [number, number]> = [
-  [0.0, 0.0],
-  [0.12, 0.09], // fin del dibujo a lápiz
-  [0.2, 0.12], // reposo 01 · boceto completo
-  [0.36, 0.37], // losa de UI formada
-  [0.43, 0.4], // reposo 02 · UI completa
-  [0.62, 0.64], // capas separadas
-  [0.69, 0.66], // reposo 03 · capas
-  [0.88, 0.9], // reensamblaje + órbita
-  [0.95, 0.985],
-  [1.0, 1.0], // composición final
-];
+/** Partitura común (lib/story): reposos de los 4 capítulos. */
+export const FRAME_KEYS = DEFAULT_FRAME_KEYS;
 
-/**
- * Función pura: progreso de scroll (0..1) → índice de frame (0-based, con decimales).
- * Interpolación lineal por tramos entre FRAME_KEYS; sirve igual para 150 o 90 frames.
- */
+/** Progreso de scroll (0..1) → índice de frame (0-based, con decimales). */
 export function progressToFrame(p: number, count: number): number {
-  const k = FRAME_KEYS;
-  const first = k[0];
-  const last = k[k.length - 1];
-  if (!first || !last || count <= 1) return 0;
-
-  const clamped = Number.isFinite(p) ? Math.min(1, Math.max(0, p)) : 0;
-  let f = last[1];
-
-  if (clamped <= first[0]) {
-    f = first[1];
-  } else {
-    for (let i = 1; i < k.length; i++) {
-      const prev = k[i - 1];
-      const curr = k[i];
-      if (!prev || !curr) break;
-      if (clamped <= curr[0]) {
-        const [p0, f0] = prev;
-        const [p1, f1] = curr;
-        f = p1 === p0 ? f1 : f0 + ((clamped - p0) / (p1 - p0)) * (f1 - f0);
-        break;
-      }
-    }
-  }
-  return f * (count - 1);
+  return progressToFrameWith(p, count, FRAME_KEYS);
 }
 
-export type ChapterSide = 'left' | 'right';
-
-export type HeroChapter = {
-  id: string;
-  n: string;
-  title: string;
-  lead: string;
-  text: string;
-  /** Progreso de scroll en el que entra / sale el capítulo */
-  from: number;
-  to: number;
-  side: ChapterSide;
-};
+export type { ChapterSide } from '@/lib/story';
+export type HeroChapter = StoryChapter;
 
 export const CHAPTERS = [
   {
@@ -149,19 +107,7 @@ export const CHAPTERS = [
 
 export type ChapterId = (typeof CHAPTERS)[number]['id'];
 
-export type HeroChip = {
-  id: string;
-  label: string;
-  /** Progreso en el que aparece / desaparece (1 = se queda hasta el final) */
-  at: number;
-  until: number;
-  /** Posición relativa al lienzo (% del ancho / alto), centro de la etiqueta */
-  x: string;
-  y: string;
-  /** Posición en el lienzo retrato de móvil (4:5); si falta, se usa x/y */
-  mx?: string;
-  my?: string;
-};
+export type HeroChip = StoryChip;
 
 /** Posiciones (% del lienzo) calibradas sobre el render v1 de Blender (§6.8): junto a la pieza que nombran. */
 export const CHIPS = [
@@ -183,3 +129,23 @@ export const FINAL_CTA_AT = 0.9;
 
 /** Ancla a la que lleva el enlace "Saltar la animación" (§12). La home la define en su primera sección. */
 export const HERO_SKIP_TARGET = '#inicio-contenido';
+
+/** Configuración completa de la historia de la home para el motor común. */
+export const HOME_STORY: StoryConfig = {
+  id: 'home',
+  sequence: HERO_SEQUENCE,
+  posters: HERO_POSTERS,
+  frameKeys: FRAME_KEYS,
+  chapters: CHAPTERS,
+  chips: CHIPS,
+  mobileChips: MOBILE_CHIPS,
+  finalCtaAt: FINAL_CTA_AT,
+  keyStride: KEY_STRIDE,
+  canvasLabel:
+    'Animación: un boceto a lápiz se transforma en una aplicación, se abre en capas de interfaz, lógica, datos y automatización, y termina como producto lanzado.',
+  lastAlt: 'Composición final: la aplicación terminada en un móvil y un portátil, en producción.',
+  srTitle: 'Cómo trabajamos, en cuatro pasos',
+  skipTarget: HERO_SKIP_TARGET,
+  // En el lanzamiento (texto a la derecha) la composición de portátil + móvil se aparta a la izquierda
+  stageShifts: [{ at: 0.7, xPercent: -7 }],
+};

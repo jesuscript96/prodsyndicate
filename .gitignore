@@ -53,3 +53,9 @@ next-env.d.ts
 # hero: render log and generated textures (regenerable with npm run hero:textures)
 /assets/*.log
 /assets/hero/textures/
+
+# borrador interno del portfolio (capturas de proyectos y referencias externas): no publicar
+/portfolio-borrador/
+
+# caché de Python al importar scripts/hero/studio.py
+__pycache__/
