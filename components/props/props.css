@@ -1,0 +1,75 @@
+/* ───────────── Objetos 3D de las secciones de la home (tras el hero) ───────────── */
+
+/* Trazo del lápiz (Para quién + Manifiesto · Proceso + Tecnología) */
+.trail { position: relative; z-index: 0; }
+.trail__svg { position: absolute; top: 0; left: 0; z-index: -1; overflow: visible; pointer-events: none; }
+.trail__path {
+  fill: none;
+  stroke: #45454d;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+}
+.trail__beads { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.trail__bead {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  margin: -20px 0 0 -17px; /* la esfera queda sobre la línea; la sombra, debajo */
+  transform: scale(0);
+  transition: transform 520ms var(--ease-out-expo);
+}
+.trail__bead.is-on { transform: scale(1); }
+.trail__bead img { width: 100%; height: 100%; }
+.trail__pencil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 210px;
+  height: 210px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+  will-change: transform;
+}
+.trail__pencil-canvas { width: 100%; height: 100%; }
+@media (max-width: 899px) {
+  .trail__pencil { width: 120px; height: 120px; }
+  .trail__bead { width: 26px; height: 26px; margin: -15px 0 0 -13px; }
+}
+
+/* 01 — Servicios: el objeto 3D sustituye al icono de cada tarjeta */
+.svc-props .svc-card__icon { position: relative; width: 112px; height: 112px; background: transparent; }
+.svc-props .svc-card__icon > svg { opacity: 0; }
+.sprop { position: absolute; left: 50%; top: 50%; width: 240px; height: 240px; margin: -120px 0 0 -120px; pointer-events: none; }
+.sprop__canvas { width: 100%; height: 100%; }
+
+/* Profundidad (02 — Proyectos · 05 — Laboratorio + 06 — Preguntas) */
+.depth { position: relative; z-index: 0; }
+.depth__layer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+  /* Las piezas entran y salen del bloque con un fundido, sin cortes rectos en los bordes */
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+}
+.depth__layer--back { z-index: -1; }
+.depth__layer--front { z-index: 2; }
+.depth__item {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  background-repeat: no-repeat;
+  background-size: 800% 600%;
+  opacity: var(--fade);
+  filter: blur(var(--blur));
+  will-change: transform;
+}
+@media (max-width: 899px) {
+  .depth__item { width: calc(var(--size) * 0.6); height: calc(var(--size) * 0.6); margin: calc(var(--size) * -0.3) 0 0 calc(var(--size) * -0.3); }
+  .depth__item[data-mobile='false'] { display: none; }
+}
