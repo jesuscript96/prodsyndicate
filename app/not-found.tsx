@@ -14,7 +14,7 @@ const LINKS = [
 ] as const;
 
 /**
- * Trazo a lápiz coherente con el logo y el hero: sube desde abajo a la izquierda,
+ * Trazo a lápiz coherente con el hero: sube desde abajo a la izquierda,
  * empieza a cerrar un bucle y se detiene antes de llegar al punto ultramar.
  * `pathLength=1` normaliza el dash: la fracción final de `stroke-dashoffset`
  * es la parte que queda sin dibujar.

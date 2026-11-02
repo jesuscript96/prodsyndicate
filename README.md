@@ -1,6 +1,6 @@
-# Producto-Digital
+# Producto-Digital · AUTOMATO
 
-Web de un estudio que diseña y construye productos digitales a medida (MVPs, software a medida, automatización e IA, productos creativos). Construida siguiendo `docs/guia-web-productos-digitales.md`.
+Web de AUTOMATO ([automatoagency.art](https://www.automatoagency.art)), un estudio que diseña y construye productos digitales a medida (MVPs, software a medida, automatización e IA, productos creativos). Construida siguiendo `docs/guia-web-productos-digitales.md`.
 
 **Stack:** Next.js 16 (App Router) · React 19 · TypeScript estricto · Tailwind CSS v4 · GSAP (ScrollTrigger, SplitText, Flip) · Lenis · Radix UI · MDX (`next-mdx-remote`) · react-hook-form + zod · Supabase · Resend · Cloudflare Turnstile · Playwright.
 
@@ -22,6 +22,7 @@ npm run dev                       # http://localhost:3000 (o `npm run dev -- -p 
 | `npm run lint` · `npm run typecheck` | ESLint · `tsc --noEmit` |
 | `npm run test:e2e` | Playwright (arranca el dev server en el puerto 3200 si no hay uno) |
 | `npm run hero:textures` | Genera las texturas del hero (boceto a lápiz, UI, capas, pantallas) en `assets/hero/textures/` |
+| `npm run brand:icons` | Regenera el isotipo (tomate cortado): `components/layout/brand-mark.data.ts`, `app/icon.svg`, `app/apple-icon.png` y `public/brand/automato-mark.svg` |
 | `npm run hero:render [samples]` | Renderiza en Blender (Cycles, GPU Metal) los 150 frames de escritorio y los 150 de móvil en `assets/frames_src/` |
 | `npm run hero:render:service -- <slug>` | Renderiza la escena de una página de servicio (`mvp`, `software-a-medida`, `automatizacion-ia`, `productos-creativos`) y la empaqueta en `public/sequence/<slug>/v1/` |
 | `npm run sequence:placeholders` | Alternativa sin Blender: frames de prueba en SVG (sobrescribe `assets/frames_src/`) |
