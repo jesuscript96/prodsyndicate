@@ -3,10 +3,11 @@ import path from 'node:path';
 import { ImageResponse } from 'next/og';
 import { site } from '@/site.config';
 import { services } from '@/content/services';
+import { BRAND_MARK } from '@/components/layout/brand-mark.data';
 
 /**
- * OG por defecto (§10.4): fondo blanco, titular grande, nombre del sitio en mono
- * con el punto ultramar y, a la derecha, el último frame del hero
+ * OG por defecto (§10.4): fondo blanco, titular grande, isotipo + nombre del sitio
+ * en mono y, a la derecha, el último frame del hero
  * (`public/og/poster-last.png`) solo si existe. Sin fuentes externas.
  */
 export const alt = `${site.name} · Productos digitales a medida`;
@@ -67,7 +68,24 @@ export default async function OgImage() {
               color: INK_3,
             }}
           >
-            <div style={{ width: 16, height: 16, borderRadius: 999, background: ACCENT }} />
+            {/* Isotipo: Satori rasteriza el <svg> inline como imagen */}
+            <svg width="44" height="44" viewBox={BRAND_MARK.viewBox}>
+              {BRAND_MARK.cavities.map((d) => (
+                <path key={d} d={d} fill={ACCENT} stroke={ACCENT} strokeWidth={BRAND_MARK.round} strokeLinejoin="round" />
+              ))}
+              {BRAND_MARK.seeds.map((s) => (
+                <ellipse
+                  key={`${s.cx}-${s.cy}`}
+                  cx={s.cx}
+                  cy={s.cy}
+                  rx={s.rx}
+                  ry={s.ry}
+                  transform={`rotate(${s.rot} ${s.cx} ${s.cy})`}
+                  fill="#ffffff"
+                />
+              ))}
+              <path d={BRAND_MARK.outline} fill="none" stroke={INK} strokeWidth={BRAND_MARK.strokeSkin} strokeLinejoin="round" />
+            </svg>
             <span>{site.name}</span>
           </div>
 

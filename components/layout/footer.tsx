@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { site } from '@/site.config';
 import { services } from '@/content/services';
 import { audienceNav, companyNav, legalNav } from '@/content/nav';
+import { BrandMark } from './brand-mark';
 
 const socials = [
   { label: 'LinkedIn', href: site.social.linkedin },
@@ -16,11 +17,12 @@ export function Footer() {
     <footer className="hairline bg-paper">
       <div className="wrap grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:py-20">
         <div className="grid content-start gap-4">
-          <Link href="/" className="inline-flex items-center gap-2 font-medium" aria-label={`${site.name}, inicio`}>
-            <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-              <path d="M3 15.5C5.5 9 9 5 15 4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-              <circle cx="16.5" cy="15.5" r="3.5" fill="var(--accent)" />
-            </svg>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold tracking-[0.08em]"
+            aria-label={`${site.name}, inicio`}
+          >
+            <BrandMark size={22} />
             {site.name}
           </Link>
           <p className="max-w-[32ch] text-ink-2">{site.tagline}</p>

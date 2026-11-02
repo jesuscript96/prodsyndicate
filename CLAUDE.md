@@ -6,7 +6,7 @@ Léela por secciones con `sed -n 'A,Bp'`; la línea de cada sección: §5 → 31
 
 ## Reglas de oro
 
-1. **No inventes datos.** Nada de métricas, clientes, logos, testimonios ni cifras. Usa el copy exacto de la guía. Lo pendiente de negocio se deja con `{{LLAVES}}` (p. ej. `site.name` es `{{MARCA}}`) y se anota en `TODO.md` con ⚠️.
+1. **No inventes datos.** Nada de métricas, clientes, logos, testimonios ni cifras. Usa el copy exacto de la guía. Lo pendiente de negocio se deja con `{{LLAVES}}` (p. ej. `site.legalName` es `{{RAZÓN_SOCIAL}}`) y se anota en `TODO.md` con ⚠️. La marca ya está fijada: `site.name` es `AUTOMATO`, dominio `automatoagency.art`, isotipo = tomate cortado por la mitad (`components/layout/brand-mark.tsx`).
 2. **Un gesto espectacular por pantalla**; el resto, silencio y precisión. Blanco `#FFFFFF` real, hairlines 1 px, radios 24 px, sombras `--shadow-card` / `--shadow-float`. Un único acento ultramar; `--signal` naranja solo decorativo (nunca texto).
 3. **Un solo `<h1>` por página.** Titulares con 1–2 palabras en serif cursiva: `<em className="accent-word text-accent">palabra</em>` (o sin `text-accent`).
 4. **Accesibilidad AA:** texto real en HTML, foco visible, teclado, `prefers-reduced-motion` respetado (usa `gsap.matchMedia`), `aria-*` correctos, alt descriptivo (vacío si decorativo).
@@ -62,6 +62,7 @@ Léela por secciones con `sed -n 'A,Bp'`; la línea de cada sección: §5 → 31
 | `StatCounter` | `ui/stat-counter` | Solo con datos reales |
 | `PageHero` | `ui/page-hero` | Hero interior: `<PageHero label="Servicios" title={<>Todo lo necesario para <em className="accent-word text-accent">construir</em>…</>} intro="…" cta={{label, href}} secondary={…} visual={<Componente/>} />` |
 | `CtaBand` | `ui/cta-band` | Banda final de TODA página: `<CtaBand />` (defaults de la guía) o con `title`, `text`, `primary`, `secondary`, `echo={false}` |
+| `BrandMark` | `layout/brand-mark` | Isotipo (tomate cortado por la mitad): `<BrandMark size={22} />` · `detailed` dibuja las semillas (por defecto si `size ≥ 32`). Geometría generada en `brand-mark.data.ts` por `npm run brand:icons` |
 
 Layout ya montado en `app/layout.tsx`: skip-link, `SmoothScrollProvider` (Lenis), `RouteFocus`, `Header`, `<main id="contenido">`, `Footer`, JSON-LD Organization/WebSite. Las páginas solo devuelven su contenido (secciones).
 

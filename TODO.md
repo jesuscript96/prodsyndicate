@@ -4,8 +4,9 @@ Convención de la guía: `{{LLAVES}}` = dato que hay que rellenar · ⚠️ = va
 
 ## Decisiones previas (§1.3)
 
-- [ ] `{{MARCA}}` → nombre de marca en `site.config.ts` (`site.name`). Hoy se muestra literalmente en header, footer, títulos y metadatos.
-- [ ] `{{DOMINIO}}` → `NEXT_PUBLIC_SITE_URL` en `.env.local` / Vercel y email `hola@{{DOMINIO}}` (`site.email`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`).
+- [x] `{{MARCA}}` → **AUTOMATO** (`site.name`). Isotipo: tomate cortado por la mitad visto desde el corte (`components/layout/brand-mark.tsx`, `app/icon.svg`, `app/apple-icon.png`; se regeneran con `npm run brand:icons`).
+- [x] `{{DOMINIO}}` → **automatoagency.art** (canónica `https://www.automatoagency.art`, fijada en `site.config.ts`; `NEXT_PUBLIC_SITE_URL` solo hace falta para sobrescribirla). Email `hola@automatoagency.art` en `site.email`, legales y `.env.example`.
+- [ ] ⚠️ Confirmar que el buzón `hola@automatoagency.art` existe y recibe correo (y `no-reply@` en Resend) antes de activar el aviso por email del formulario.
 - [ ] `{{RAZÓN_SOCIAL}}` y jurisdicción → `site.legalName` y páginas legales.
 - [ ] Herramienta de agenda (Cal.com o Calendly) → `NEXT_PUBLIC_CAL_URL`.
 - [ ] Analítica (Plausible o Umami) → script en `app/layout.tsx` + `NEXT_PUBLIC_ANALYTICS_DOMAIN`.

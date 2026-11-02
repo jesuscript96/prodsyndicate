@@ -41,6 +41,11 @@
   color: var(--ink);
   white-space: nowrap;
 }
+.nav__wordmark {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
 .nav__links { display: none; align-items: center; gap: 0.125rem; margin: 0; padding: 0; list-style: none; }
 .nav__item { position: relative; }
 .nav__link {
