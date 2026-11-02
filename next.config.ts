@@ -40,6 +40,12 @@ const nextConfig: NextConfig = {
       { source: '/(.*)', headers: securityHeaders },
     ];
   },
+  // Landings que publica Valme OS por pull request en public/lp/<slug>/index.html. Next sirve
+  // public sólo por ruta exacta, así que sin esto /lp/<slug> daría 404. La barra final la
+  // redirige Next sola a /lp/<slug> y conserva la query de los anuncios.
+  async rewrites() {
+    return [{ source: '/lp/:slug', destination: '/lp/:slug/index.html' }];
+  },
 };
 
 export default nextConfig;
