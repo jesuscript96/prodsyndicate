@@ -18,6 +18,9 @@ function updateConsent(value: Choice) {
   };
   // window.gtag lo define el script de consentimiento del <head> (app/layout.tsx).
   w.gtag?.('consent', 'update', consent);
+  // Evento para GTM: las etiquetas que piden consentimiento (el píxel de Meta) se disparan
+  // en esta misma página, no en la siguiente.
+  w.dataLayer?.push({ event: 'valme_consentimiento', valme_cookies: value });
 }
 
 /** Aviso de cookies (Valme): sólo aparece si no hay elección guardada en localStorage. */
