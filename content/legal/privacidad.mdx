@@ -1,27 +1,26 @@
 ---
 title: Política de privacidad
 description: Quién es responsable de tus datos cuando nos escribes, con qué finalidad los tratamos, quién nos ayuda a hacerlo y cómo ejercer tus derechos.
-updated: '2026-10-26'
+updated: '2026-11-02'
 ---
-
-> **Borrador pendiente de revisión.** Este texto es una base de trabajo y debe revisarse con asesoría legal según la jurisdicción de \{\{RAZÓN_SOCIAL\}\} antes de publicar la web.
 
 ## 1. Responsable del tratamiento
 
-- **Titular:** \{\{RAZÓN_SOCIAL\}\}
-- **NIF:** \{\{NIF\}\}
-- **Domicilio:** \{\{DOMICILIO\}\}
+- **Titular:** Jesús Valenzuela Chuliá (AUTOMATO)
+- **NIF:** 53759792Y
+- **Domicilio:** Calle Federico García Sánchez, 20, 46901 Torrent (Valencia), España
 - **Sitio web:** automatoagency.art
 - **Contacto para protección de datos:** hola@automatoagency.art
 
 ## 2. Qué datos tratamos y de dónde proceden
 
-Solo tratamos los datos que tú nos facilitas o los estrictamente necesarios para que la web funcione:
+Tratamos los datos que tú nos facilitas, los estrictamente necesarios para que la web funcione y, solo si lo aceptas, los de analítica y publicidad:
 
 - **Formulario de contacto:** nombre, email, empresa y teléfono (estos dos últimos son opcionales), el mensaje y los enlaces de referencia que decidas incluir, y tus respuestas sobre el proyecto (perfil, necesidad, punto de partida, plazos y presupuesto).
 - **Origen de la visita:** si llegas desde una campaña, guardamos en tu navegador los parámetros `utm_*` de la URL y el dominio de procedencia durante la sesión, para saber por dónde nos has encontrado. No permiten identificarte.
 - **Protección antispam:** al enviar el formulario, Cloudflare Turnstile verifica que no eres un robot. Para esa verificación se transmite a Cloudflare información técnica de tu navegador y tu dirección IP. No la guardamos en nuestra base de datos.
-- **Estadísticas de uso:** medimos el tráfico de la web con una herramienta de analítica sin cookies que trabaja con datos agregados y anonimizados (más detalle en la [Política de cookies](/legal/cookies)).
+- **Formularios de las páginas de campaña** (`/lp/…`): los mismos datos de contacto que escribas en ellos, junto con la página y la campaña de la que vienes. Se registran en Valme OS, la herramienta con la que gestionamos nuestras campañas.
+- **Analítica y publicidad, solo si las aceptas:** con tu consentimiento en el aviso de cookies, Google Analytics y el píxel de Meta registran cómo navegas por la web y si llegas desde un anuncio. Si no aceptas, no se instalan sus cookies (más detalle en la [Política de cookies](/legal/cookies)).
 
 No tratamos categorías especiales de datos ni tomamos decisiones automatizadas que produzcan efectos jurídicos sobre ti.
 
@@ -32,13 +31,13 @@ No tratamos categorías especiales de datos ni tomamos decisiones automatizadas 
 - **Gestionar la relación comercial** si finalmente trabajamos juntos.
 - **Enviarte el boletín**, solo si te suscribes expresamente (con confirmación por doble opt-in). Podrás darte de baja en cada envío.
 - **Proteger la web** frente al spam y los abusos, y garantizar su seguridad.
-- **Conocer cómo se usa la web** mediante estadísticas agregadas, sin identificar a ninguna persona.
+- **Conocer cómo se usa la web y medir nuestras campañas de publicidad** (qué anuncios traen visitas y contactos), solo si aceptas las cookies de analítica y publicidad.
 
 ## 4. Base jurídica
 
-- **Consentimiento** (art. 6.1.a RGPD): cuando nos escribes a través del formulario y aceptas esta política, y cuando te suscribes al boletín.
+- **Consentimiento** (art. 6.1.a RGPD): cuando nos escribes a través de un formulario y aceptas esta política, cuando te suscribes al boletín y cuando aceptas las cookies de analítica y publicidad.
 - **Medidas precontractuales y ejecución de un contrato** (art. 6.1.b RGPD): para preparar propuestas y gestionar los proyectos que contratas.
-- **Interés legítimo** (art. 6.1.f RGPD): para la seguridad de la web, la prevención del spam y las estadísticas de uso agregadas, que no permiten identificarte.
+- **Interés legítimo** (art. 6.1.f RGPD): para la seguridad de la web y la prevención del spam.
 - **Obligación legal** (art. 6.1.c RGPD): para conservar la documentación contable, fiscal o contractual que exija la normativa.
 
 Puedes retirar tu consentimiento en cualquier momento, sin que ello afecte a la licitud del tratamiento anterior.
@@ -51,7 +50,9 @@ No vendemos ni cedemos tus datos a terceros. Para prestar el servicio nos apoyam
 - **Supabase** — base de datos donde se guardan las solicitudes de contacto.
 - **Resend** — envío de los emails transaccionales relacionados con tu solicitud (por ejemplo, el aviso interno de que has escrito).
 - **Cloudflare Turnstile** — protección antispam del formulario.
-- **Proveedor de analítica sin cookies** (Plausible o Umami) — estadísticas de uso agregadas.
+- **Valme OS** — gestión de nuestras campañas y de los contactos que llegan por las páginas de campaña (alojado también en Vercel y Supabase).
+- **Google** (Tag Manager y Analytics), solo si aceptas las cookies — estadísticas de uso y medición de campañas.
+- **Meta Platforms** (píxel y API de conversiones), solo si aceptas las cookies — medición de las campañas en Facebook e Instagram. Cuando nos escribes desde una página de campaña habiendo aceptado las cookies, se le comunica a Meta que ha habido un contacto, con tu email y tu teléfono cifrados (en forma de hash), tu IP y tu navegador, para que pueda relacionarlo con el anuncio. Nunca el contenido de tu mensaje.
 
 Además, podremos comunicar datos a las administraciones públicas o a las autoridades cuando una norma nos obligue a ello.
 
@@ -61,7 +62,8 @@ Procuramos que los datos se traten en la Unión Europea (por ejemplo, alojando l
 
 ## 7. Plazos de conservación
 
-- **Solicitudes de contacto que no acaban en proyecto:** \{\{PLAZO\}\} desde la última comunicación.
+- **Solicitudes de contacto que no acaban en proyecto:** 12 meses desde la última comunicación.
+- **Cookies de analítica y publicidad:** lo que dura cada cookie, según la [Política de cookies](/legal/cookies).
 - **Datos de clientes:** mientras dure la relación contractual y, después, durante los plazos de prescripción de las obligaciones legales (fiscales, contables y contractuales) que resulten de aplicación.
 - **Suscripción al boletín:** hasta que te des de baja.
 - **Origen de la visita** (`utm_*` y procedencia): solo durante la sesión de navegación; se borra al cerrar el navegador.

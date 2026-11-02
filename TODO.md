@@ -7,9 +7,9 @@ Convención de la guía: `{{LLAVES}}` = dato que hay que rellenar · ⚠️ = va
 - [x] `{{MARCA}}` → **AUTOMATO** (`site.name`). Isotipo: tomate cortado por la mitad visto desde el corte (`components/layout/brand-mark.tsx`, `app/icon.svg`, `app/apple-icon.png`; se regeneran con `npm run brand:icons`).
 - [x] `{{DOMINIO}}` → **automatoagency.art** (canónica `https://www.automatoagency.art`, fijada en `site.config.ts`; `NEXT_PUBLIC_SITE_URL` solo hace falta para sobrescribirla). Email `hola@automatoagency.art` en `site.email`, legales y `.env.example`.
 - [ ] ⚠️ Confirmar que el buzón `hola@automatoagency.art` existe y recibe correo (y `no-reply@` en Resend) antes de activar el aviso por email del formulario.
-- [ ] `{{RAZÓN_SOCIAL}}` y jurisdicción → `site.legalName` y páginas legales.
+- [x] `{{RAZÓN_SOCIAL}}` y jurisdicción → **Jesús Valenzuela Chuliá** (empresario individual, NIF 53759792Y, Torrent), legislación española y tribunales de Valencia, en `site.legalName` y páginas legales.
 - [ ] Herramienta de agenda (Cal.com o Calendly) → `NEXT_PUBLIC_CAL_URL`.
-- [ ] Analítica (Plausible o Umami) → script en `app/layout.tsx` + `NEXT_PUBLIC_ANALYTICS_DOMAIN`.
+- [x] Analítica → GTM-K3ZHSP9S (GA4 G-MHXH3R4RX3 y píxel de Meta 1826034535373102, con Modo de consentimiento v2 y aviso propio), instalado desde Valme OS. Plausible/Umami ya no se usa.
 - [ ] ⚠️ `site.areaServed` en JSON-LD `Service` (hoy `ES`).
 - [ ] Redes sociales → `site.social`.
 
@@ -22,7 +22,7 @@ Convención de la guía: `{{LLAVES}}` = dato que hay que rellenar · ⚠️ = va
 - [ ] `/contacto`: "Te respondemos en menos de un día laborable" solo si es compromiso real; rangos de presupuesto `{{RANGOS}}`.
 - [ ] `/nosotros`: equipo (`{{EQUIPO}}`, `{{NOMBRE}}`), fotos, bios, colaboradores; "estudio pequeño" si es cierto.
 - [ ] Blog: autor `{{AUTOR}}`, proveedor de newsletter `{{PROVEEDOR}}` (doble opt-in, RGPD). Publicar ≥ 3 artículos reales.
-- [ ] Páginas legales: redactar/revisar con asesoría según la jurisdicción. Las de `content/legal/` son borrador con placeholders `{{RAZÓN_SOCIAL}}`, `{{NIF}}`, `{{DOMICILIO}}`, `{{DATOS_REGISTRALES}}`, `{{JURISDICCIÓN}}`, `{{PLAZO}}` (conservación de leads).
+- [ ] ⚠️ Páginas legales: placeholders rellenos y cookies/privacidad al día con GTM, GA4, el píxel de Meta y Valme OS (2-nov-2026). Plazo de conservación de contactos sin proyecto fijado en 12 meses. Falta la revisión con asesoría.
 - [ ] ⚠️ Confirmar con cada proveedor el mecanismo de transferencia internacional (Vercel, Resend, Cloudflare), si Turnstile usa cookies y qué cookies pone la agenda (Cal.com/Calendly). La referencia a la AEPD asume jurisdicción española.
 
 ## Hero (§7)

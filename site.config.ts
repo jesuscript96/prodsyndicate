@@ -23,7 +23,7 @@ function siteUrl(): string {
 
 export const site = {
   name: 'AUTOMATO',
-  legalName: '{{RAZÓN_SOCIAL}}',
+  legalName: 'Jesús Valenzuela Chuliá',
   domain: PRODUCTION_DOMAIN,
   url: siteUrl(),
   locale: 'es',
