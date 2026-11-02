@@ -7,6 +7,8 @@ import './cookie-banner.css';
 type Choice = 'granted' | 'denied';
 
 const STORAGE_KEY = 'valme_cookies';
+/** Lo lanza «Configurar cookies» (pie de página) para volver a abrir el aviso. */
+const OPEN_EVENT = 'valme:configurar-cookies';
 
 function updateConsent(value: Choice) {
   const w = window as unknown as { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void };
@@ -23,6 +25,15 @@ function updateConsent(value: Choice) {
   w.dataLayer?.push({ event: 'valme_consentimiento', valme_cookies: value });
 }
 
+/** «Configurar cookies»: vuelve a abrir el aviso para aceptar o rechazar de nuevo. */
+export function CookieSettingsButton({ className }: { className?: string }) {
+  return (
+    <button type="button" className={className} onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}>
+      Configurar cookies
+    </button>
+  );
+}
+
 /** Aviso de cookies (Valme): sólo aparece si no hay elección guardada en localStorage. */
 export function CookieBanner() {
   const [open, setOpen] = useState(false);
@@ -34,6 +45,9 @@ export function CookieBanner() {
     } catch {
       setOpen(true);
     }
+    const reopen = () => setOpen(true);
+    window.addEventListener(OPEN_EVENT, reopen);
+    return () => window.removeEventListener(OPEN_EVENT, reopen);
   }, []);
 
   const choose = (value: Choice) => {

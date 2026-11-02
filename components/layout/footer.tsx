@@ -3,6 +3,7 @@ import { site } from '@/site.config';
 import { services } from '@/content/services';
 import { audienceNav, companyNav, legalNav } from '@/content/nav';
 import { BrandMark } from './brand-mark';
+import { CookieSettingsButton } from './cookie-banner';
 
 const socials = [
   { label: 'LinkedIn', href: site.social.linkedin },
@@ -63,6 +64,7 @@ export function Footer() {
               {item.label}
             </Link>
           ))}
+          <CookieSettingsButton className="w-fit cursor-pointer text-left text-ink-2 hover:text-ink" />
           {socials.length > 0 && (
             <>
               <p className="label mt-4">Redes</p>
