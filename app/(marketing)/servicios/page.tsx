@@ -22,7 +22,7 @@ import '@/components/services/services.css';
 export const metadata: Metadata = buildMetadata({
   title: 'Servicios · Productos digitales a medida',
   description:
-    'MVPs, software a medida, automatización con IA y productos creativos. Descubre cómo diseñamos y construimos productos digitales de la idea al lanzamiento.',
+    'MVPs, software a medida, automatización con IA y productos creativos: así diseñamos y construimos productos digitales, de la idea al lanzamiento.',
   path: '/servicios',
 });
 

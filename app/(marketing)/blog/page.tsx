@@ -8,11 +8,11 @@ import { BlogList } from '@/components/blog/blog-list';
 import { SubscribeBlock } from '@/components/blog/subscribe-block';
 import '@/components/blog/blog.css';
 
-/** §8.9 — Title exacto de la guía (el sufijo ` | {{MARCA}}` lo añade buildMetadata). */
+/** §8.9 — Title exacto de la guía (el sufijo de marca lo añade buildMetadata). */
 export const metadata: Metadata = buildMetadata({
   title: 'Laboratorio · Notas de producto, diseño y automatización',
   description:
-    'Notas prácticas sobre producto, diseño, desarrollo y automatización: los métodos que usamos, las decisiones que tomamos y el making of técnico de lo que construimos.',
+    'Notas sobre producto, diseño, desarrollo y automatización: los métodos que usamos, las decisiones que tomamos y cómo está hecho lo que construimos.',
   path: '/blog',
 });
 
@@ -29,7 +29,7 @@ export default function BlogPage() {
             Laboratorio: <em className="accent-word text-accent">notas</em> de producto, diseño y automatización.
           </>
         }
-        intro="Lo que aprendemos construyendo MVPs, software a medida y automatizaciones, contado sin humo: métodos, decisiones y making of técnicos."
+        intro="Lo que vamos aprendiendo al construir MVPs, software a medida y automatizaciones: métodos, decisiones y cómo está hecho lo que ves."
       />
 
       <section className="section--tight pt-0" aria-label="Artículos">

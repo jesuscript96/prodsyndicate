@@ -68,7 +68,7 @@ export const TIMELINE_OPTIONS: readonly Option<Timeline>[] = [
 ];
 
 /**
- * ⚠️ Rangos de presupuesto `{{RANGOS}}`: pendientes de negocio (TODO.md).
+ * ⚠️ Rangos de presupuesto: pendientes de negocio (TODO.md).
  * Rellenar con pares { value, label }, p. ej. { value: '5k-15k', label: '5.000 – 15.000 €' }.
  * Mientras esté vacío, el formulario solo ofrece "Prefiero comentarlo".
  */

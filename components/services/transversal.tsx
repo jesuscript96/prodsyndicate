@@ -6,7 +6,7 @@ import './services.css';
 const items = [
   { icon: PenTool, title: 'UX/UI', text: 'Investigación, flujos e interfaz cuidada en todo lo que hacemos.' },
   { icon: Gauge, title: 'Calidad y rendimiento', text: 'Pruebas, accesibilidad y velocidad medida en dispositivos reales.' },
-  { icon: BarChart3, title: 'Analítica', text: 'Medición sin cookies para saber qué se usa y qué no.' },
+  { icon: BarChart3, title: 'Analítica', text: 'Medición respetuosa con la privacidad, para saber qué se usa y qué no.' },
   { icon: Wrench, title: 'Mantenimiento', text: 'Seguimos contigo después del lanzamiento con un plan acordado.' },
 ] as const;
 

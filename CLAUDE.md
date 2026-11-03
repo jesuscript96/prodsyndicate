@@ -6,7 +6,7 @@ Léela por secciones con `sed -n 'A,Bp'`; la línea de cada sección: §5 → 31
 
 ## Reglas de oro
 
-1. **No inventes datos.** Nada de métricas, clientes, logos, testimonios ni cifras. Usa el copy exacto de la guía. Lo pendiente de negocio se deja con `{{LLAVES}}` (p. ej. `site.legalName` es `{{RAZÓN_SOCIAL}}`) y se anota en `TODO.md` con ⚠️. La marca ya está fijada: `site.name` es `AUTOMATO`, dominio `automatoagency.art`, isotipo = tomate cortado por la mitad (`components/layout/brand-mark.tsx`).
+1. **No inventes datos.** Nada de métricas, clientes, logos, testimonios ni cifras. Usa el copy exacto de la guía. Lo pendiente de negocio se anota en `TODO.md` con ⚠️; nunca se dejan marcadores de plantilla ni avisos visibles en el copy. La marca ya está fijada: `site.name` es `AUTOMATO`, dominio `automatoagency.art`, isotipo = tomate cortado por la mitad (`components/layout/brand-mark.tsx`).
 2. **Un gesto espectacular por pantalla**; el resto, silencio y precisión. Blanco `#FFFFFF` real, hairlines 1 px, radios 24 px, sombras `--shadow-card` / `--shadow-float`. Un único acento ultramar; `--signal` naranja solo decorativo (nunca texto).
 3. **Un solo `<h1>` por página.** Titulares con 1–2 palabras en serif cursiva: `<em className="accent-word text-accent">palabra</em>` (o sin `text-accent`).
 4. **Accesibilidad AA:** texto real en HTML, foco visible, teclado, `prefers-reduced-motion` respetado (usa `gsap.matchMedia`), `aria-*` correctos, alt descriptivo (vacío si decorativo).

@@ -82,7 +82,7 @@ export function Footer() {
           <p className="label">
             © {year} {site.legalName}
           </p>
-          <p className="label">Diseñado y construido con criterio.</p>
+          <p className="label">Diseñado y construido en Valencia.</p>
         </div>
       </div>
     </footer>

@@ -424,14 +424,14 @@ export const nosotrosPage = {
       },
     ],
   },
-  /** ⚠️ {{NOMBRE}}, rol, frase y foto pendientes. Si hay más personas, ampliar a fichas ({{EQUIPO}}). */
+  /** Ficha única, sin foto por ahora. Si el equipo crece, ampliar a varias fichas. */
   team: {
     label: 'Equipo',
     title: { before: 'Quién está ', accent: 'detrás', after: '' },
     lead: {
-      headline: 'Estudio liderado por {{NOMBRE}}, con una red de especialistas de confianza',
-      name: '{{NOMBRE}}',
-      role: '{{ROL}}',
+      headline: 'Jesús Valenzuela, con una red de especialistas de confianza cuando el proyecto lo pide.',
+      name: 'Jesús Valenzuela',
+      role: 'Fundador y desarrollador de producto',
     },
   },
   /** ⚠️ Colaboradores: confirmar disciplinas y, si procede, nombres. */
@@ -459,7 +459,7 @@ export const nosotrosPage = {
     ]),
     {
       q: '¿Quién va a trabajar en mi proyecto?',
-      a: 'El estudio lo lidera {{NOMBRE}} y, cuando el proyecto lo necesita, contamos con una red de especialistas de confianza en 3D, motion, copy y legal.',
+      a: 'Jesús Valenzuela, de principio a fin: habla contigo, diseña y programa. Cuando el proyecto lo necesita, entran especialistas de confianza en 3D, motion, copy o legal.',
     },
   ] as readonly FaqItem[],
   cta: { primary: { label: 'Hablemos', href: '/contacto' } },

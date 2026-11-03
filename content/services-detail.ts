@@ -3,9 +3,9 @@ import { getServiceSummary } from './services';
 
 /**
  * Detalle de cada página de servicio (§8.3). Copy EXACTO de la guía (§8.3.1–§8.3.4).
- * Los ⚠️ se mantienen tal cual: son datos pendientes de validar con negocio (ver TODO.md).
+ * Lo pendiente de validar con negocio se anota en TODO.md, nunca en el copy visible.
  *
- * - `seo.title` va SIN el sufijo ` | {{MARCA}}`: lo añade `buildMetadata` a partir de `site.name`.
+ * - `seo.title` va sin el sufijo de marca: lo añade `buildMetadata` a partir de `site.name`.
  * - `h1` marca la palabra acento entre *asteriscos*; se renderiza con `<AccentTitle />`
  *   (`components/services/accent-title.tsx`) como `<em className="accent-word text-accent">`.
  * - Donde la guía solo da el título (pasos de 3 servicios, respuestas de FAQ, 3 puntos del índice)
@@ -90,12 +90,12 @@ const mvp: ServiceDetail = {
     { icon: 'layout-template', text: 'Diseño de interfaz listo para desarrollo.' },
     { icon: 'rocket', text: 'Producto funcional en producción (web o móvil).' },
     { icon: 'bar-chart', text: 'Analítica básica para medir el uso real.' },
-    { icon: 'file-text', text: 'Documentación y traspaso del código ⚠️ (según contrato).' },
+    { icon: 'file-text', text: 'Documentación y traspaso del código, según lo acordado en el contrato.' },
   ],
   steps: [
     { title: 'Descubrimiento', text: 'Una sesión de trabajo y un mapa de funcionalidades.' },
     { title: 'Alcance del MVP', text: 'Matriz esencial / deseable / futuro.' },
-    { title: 'Prototipo validado', text: 'Pruebas con usuarios reales antes de programar ⚠️ (nº de usuarios).' },
+    { title: 'Prototipo validado', text: 'Pruebas con usuarios reales antes de programar.' },
     { title: 'Construcción por sprints', text: 'Entregas cortas y visibles.' },
     { title: 'Lanzamiento y medición', text: 'Publicación y primeras métricas.' },
   ],
@@ -113,7 +113,7 @@ const mvp: ServiceDetail = {
       a: 'El prototipo es una maqueta navegable para validar flujos y diseño antes de programar; no tiene lógica real. El MVP es un producto funcional en producción, con usuarios y datos reales, y solo lo mínimo necesario para validar tu hipótesis.',
     },
     {
-      q: '¿Cuánto tarda? ⚠️',
+      q: '¿Cuánto tarda?',
       a: 'Normalmente entre 4 y 10 semanas, según la complejidad. Tras la primera llamada te damos una estimación concreta para tu caso.',
     },
     {
@@ -268,7 +268,7 @@ const automatizacionIa: ServiceDetail = {
       a: 'Los repetitivos, frecuentes y con reglas claras: copiar datos entre herramientas, enviar avisos, generar documentos o informes. Empezamos por un mapa de procesos y priorizamos por impacto y facilidad.',
     },
     {
-      q: '¿Es seguro usar IA con datos de mi empresa? ⚠️',
+      q: '¿Es seguro usar IA con datos de mi empresa?',
       a: 'Depende de cómo se use. Definimos qué datos se envían y a qué proveedor, aplicamos las opciones de privacidad disponibles y documentamos cada flujo. Lo revisamos contigo antes de activarlo.',
     },
     {
@@ -304,7 +304,7 @@ const productosCreativos: ServiceDetail = {
     { icon: 'palette', text: 'Dirección creativa y prototipo.' },
     { icon: 'mouse-pointer', text: 'Diseño de interacción y motion.' },
     { icon: 'code', text: 'Desarrollo front-end avanzado (animación, 3D si procede).' },
-    { icon: 'box', text: 'Producción de assets 3D/vídeo ⚠️.' },
+    { icon: 'box', text: 'Producción de assets 3D y vídeo.' },
     { icon: 'gauge', text: 'Optimización de rendimiento y accesibilidad.' },
     { icon: 'upload', text: 'Publicación y mantenimiento.' },
   ],
@@ -319,7 +319,7 @@ const productosCreativos: ServiceDetail = {
     },
     {
       title: 'Producción de assets',
-      text: 'Ilustración, 3D o vídeo ⚠️ según el proyecto, optimizados para web.',
+      text: 'Ilustración, 3D o vídeo según el proyecto, optimizados para web.',
     },
     {
       title: 'Desarrollo front-end',
@@ -348,7 +348,7 @@ const productosCreativos: ServiceDetail = {
     },
     {
       q: '¿Quién produce el 3D o el vídeo?',
-      a: 'Podemos producirlo nosotros, trabajar con tu equipo o coordinarnos con un estudio especializado ⚠️. Lo definimos en la propuesta según el alcance.',
+      a: 'Podemos producirlo nosotros, trabajar con tu equipo o coordinarnos con un estudio especializado. Lo definimos en la propuesta según el alcance.',
     },
     {
       q: '¿Cuánto pesa?',

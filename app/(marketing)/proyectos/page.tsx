@@ -7,7 +7,7 @@ import { PageHero } from '@/components/ui/page-hero';
 import { ProjectGrid } from '@/components/projects/project-grid';
 import '@/components/projects/projects.css';
 
-/** §8.4 — Title exacto de la guía (el sufijo ` | {{MARCA}}` lo añade buildMetadata). */
+/** §8.4 — Title exacto de la guía (el sufijo de marca lo añade buildMetadata). */
 export const metadata: Metadata = buildMetadata({
   title: 'Proyectos · Casos de estudio',
   description:
@@ -32,7 +32,7 @@ export default function ProjectsPage() {
             Proyectos que <em className="accent-word text-accent">funcionan</em>.
           </>
         }
-        intro="Productos reales para emprendedores y empresas. Cada caso cuenta el reto, lo que hicimos y lo que cambió."
+        intro="Trabajo para emprendedores y empresas, contado caso a caso: el reto, lo que hicimos y lo que cambió."
       />
 
       <section className="section--tight pt-0" aria-label="Casos de estudio">

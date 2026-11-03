@@ -1,7 +1,6 @@
 /**
- * Configuración central del sitio (§4.4). Todo lo que lleva {{LLAVES}} es un
- * dato pendiente de negocio: se rellena aquí y se propaga a toda la web.
- * Ver TODO.md.
+ * Configuración central del sitio (§4.4). Los datos de negocio se fijan aquí
+ * y se propagan a toda la web. Lo pendiente está en TODO.md.
  */
 
 /** Dominio de producción. El apex redirige a `www` en Vercel, así que la canónica lleva `www`. */
@@ -31,7 +30,7 @@ export const site = {
   calendarUrl: process.env.NEXT_PUBLIC_CAL_URL ?? '',
   tagline: 'Productos digitales a medida, de la idea al lanzamiento.',
   description:
-    'Diseñamos y construimos MVPs, software a medida y automatizaciones con IA. De la idea al lanzamiento, con diseño de alto nivel y desarrollo eficiente.',
+    'Diseñamos y construimos MVPs, software a medida y automatizaciones con IA. Te acompañamos de la idea al lanzamiento, con diseño cuidado y código que se puede heredar.',
   /** ⚠️ Zona geográfica declarada en JSON-LD `Service.areaServed`. */
   areaServed: 'ES',
   social: { linkedin: '', x: '', github: '' },

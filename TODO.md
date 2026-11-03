@@ -1,6 +1,6 @@
 # TODO · Pendientes de negocio y validación antes de publicar
 
-Convención de la guía: `{{LLAVES}}` = dato que hay que rellenar · ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2.
+Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nada pendiente se deja visible en la web: ni marcadores de plantilla ni avisos en el copy.
 
 ## Decisiones previas (§1.3)
 
@@ -18,10 +18,11 @@ Convención de la guía: `{{LLAVES}}` = dato que hay que rellenar · ⚠️ = va
 - [ ] Casos de estudio **reales** con permiso escrito. Hoy `content/projects/*.mdx` son **casos de concepto** etiquetados (`isConcept: true`), sin cliente ni métricas.
 - [ ] FAQ (`content/faq.ts`): confirmar precios, plazos ("4 y 10 semanas"), propiedad del código y soporte.
 - [ ] Proceso (`content/process.ts` y `/proceso`): duraciones orientativas, cadencia de entregas, garantías y soporte post-lanzamiento.
-- [ ] Servicios: nº de usuarios en pruebas (MVP), traspaso de código según contrato, producción de assets 3D/vídeo, seguridad de datos con IA.
-- [ ] `/contacto`: "Te respondemos en menos de un día laborable" solo si es compromiso real; rangos de presupuesto `{{RANGOS}}`.
-- [ ] `/nosotros`: equipo (`{{EQUIPO}}`, `{{NOMBRE}}`), fotos, bios, colaboradores; "estudio pequeño" si es cierto.
-- [ ] Blog: autor `{{AUTOR}}`, proveedor de newsletter `{{PROVEEDOR}}` (doble opt-in, RGPD). Publicar ≥ 3 artículos reales.
+- [ ] Servicios: nº de usuarios en pruebas (MVP), traspaso de código según contrato, producción de assets 3D/vídeo, seguridad de datos con IA. Los avisos ⚠️ ya no aparecen en el copy.
+- [ ] `/contacto`: "Te respondemos en menos de un día laborable" solo si es compromiso real; rangos de presupuesto (`BUDGET_RANGES` en `lib/validators.ts`).
+- [x] `/nosotros`: Jesús Valenzuela como responsable del estudio (ficha única, sin foto). Pendiente: foto y, si el equipo crece, más fichas.
+- [x] Blog: autor Jesús Valenzuela en los seis artículos.
+- [ ] Blog: proveedor de newsletter (doble opt-in, RGPD).
 - [ ] ⚠️ Páginas legales: placeholders rellenos y cookies/privacidad al día con GTM, GA4, el píxel de Meta y Valme OS (2-nov-2026). Plazo de conservación de contactos sin proyecto fijado en 12 meses. Falta la revisión con asesoría.
 - [ ] ⚠️ Confirmar con cada proveedor el mecanismo de transferencia internacional (Vercel, Resend, Cloudflare), si Turnstile usa cookies y qué cookies pone la agenda (Cal.com/Calendly). La referencia a la AEPD asume jurisdicción española.
 

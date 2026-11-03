@@ -36,7 +36,7 @@ Construimos el flujo en n8n, con un formulario de alta como punto de entrada ún
 
 El alta de un cliente pasa de ser una lista mental a un proceso que ocurre solo, siempre en el mismo orden y con los mismos datos en todas las herramientas. El equipo recibe avisos claros, no tareas pendientes, y puede ver en cualquier momento en qué punto está cada alta.
 
-Lo más valioso es lo que no se nota: los errores de copia desaparecen y la primera factura llega cuando toca.
+Lo que más se agradece es lo que deja de pasar: ya no hay errores de copia y la primera factura llega cuando toca.
 
 </Block>
 
@@ -72,7 +72,7 @@ Para esos casos el flujo se detiene, avisa a la persona adecuada con el contexto
 
 <Decision title="Cada paso deja rastro y se puede repetir">
 
-Los flujos conectados a varias herramientas fallan de vez en cuando: una API no responde, un dato llega vacío, una sesión caduca. Lo peligroso no es el fallo, es no enterarse.
+Los flujos conectados a varias herramientas fallan de vez en cuando: una API no responde, un dato llega vacío, una sesión caduca. Fallar no es grave. No enterarse, sí.
 
 Cada nodo del flujo registra qué hizo, con qué datos y cuándo. Si un paso falla, el flujo lo reintenta y, si sigue fallando, avisa con un enlace para relanzarlo desde ese punto exacto sin repetir los anteriores. Así el equipo no necesita entender n8n para saber que todo va bien.
 

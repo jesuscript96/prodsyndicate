@@ -7,7 +7,7 @@ import { SplitReveal } from '@/components/ui/split-reveal';
 
 /**
  * Bloque "Suscríbete" honesto (§8.9): hasta que exista proveedor de newsletter
- * ({{PROVEEDOR}}, doble opt-in, RGPD) no hay formulario; se ofrece el RSS y el email.
+ * (con doble opt-in y RGPD) no hay formulario; se ofrece el RSS y el email.
  */
 export function SubscribeBlock() {
   return (
@@ -39,7 +39,7 @@ export function SubscribeBlock() {
                 Escríbenos
               </Button>
             </div>
-            <p className="subscribe__note">Sin formularios de mentira: solo lo que funciona hoy.</p>
+            <p className="subscribe__note">Cuando haya newsletter, lo verás aquí.</p>
           </Reveal>
         </div>
       </div>
