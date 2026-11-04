@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
 
 export const metadata: Metadata = {
   title: 'Página no encontrada',
@@ -35,49 +37,55 @@ const css = `
 }
 `;
 
-/** §8.13 — 404: H1 y texto de la guía, línea de lápiz incompleta y cuatro salidas. `noindex`. */
+/** §8.13 — 404 (fuera de los grupos de rutas, así que trae su cabecera y su pie): H1 y texto de la guía, línea de lápiz incompleta y cuatro salidas. `noindex`. */
 export default function NotFound() {
   return (
-    <section className="page-hero pb-[var(--section-y)]" aria-labelledby="not-found-title">
-      <div className="wrap grid items-center gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        <div className="grid gap-6">
-          <p className="label">Error 404</p>
-          <h1 id="not-found-title" className="display-l max-w-[14ch]">
-            Esta página no existe (<em className="accent-word text-accent">todavía</em>).
-          </h1>
-          <p className="body-l max-w-[44ch] text-ink-2">Quizá el enlace cambió o nunca estuvo. Prueba por aquí:</p>
-          <nav aria-label="Páginas sugeridas" className="flex flex-wrap gap-3 pt-2">
-            {LINKS.map((link, i) => (
-              <Button
-                key={link.href}
-                href={link.href}
-                variant={i === 0 ? 'primary' : 'secondary'}
-                arrow={i === 0}
-                analytics={{ location: 'not-found', label: link.label }}
-              >
-                {link.label}
-              </Button>
-            ))}
-          </nav>
-        </div>
+    <>
+      <Header />
+      <main id="contenido" tabIndex={-1} className="outline-none">
+        <section className="page-hero pb-[var(--section-y)]" aria-labelledby="not-found-title">
+          <div className="wrap grid items-center gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+            <div className="grid gap-6">
+              <p className="label">Error 404</p>
+              <h1 id="not-found-title" className="display-l max-w-[14ch]">
+                Esta página no existe (<em className="accent-word text-accent">todavía</em>).
+              </h1>
+              <p className="body-l max-w-[44ch] text-ink-2">Quizá el enlace cambió o nunca estuvo. Prueba por aquí:</p>
+              <nav aria-label="Páginas sugeridas" className="flex flex-wrap gap-3 pt-2">
+                {LINKS.map((link, i) => (
+                  <Button
+                    key={link.href}
+                    href={link.href}
+                    variant={i === 0 ? 'primary' : 'secondary'}
+                    arrow={i === 0}
+                    analytics={{ location: 'not-found', label: link.label }}
+                  >
+                    {link.label}
+                  </Button>
+                ))}
+              </nav>
+            </div>
 
-        <div className="flex justify-center lg:justify-end">
-          <svg className="nf-sketch" viewBox="0 0 480 320" width="480" height="320" aria-hidden="true" focusable="false">
-            <path
-              className="nf-sketch__line"
-              d={SKETCH}
-              pathLength={1}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle className="nf-sketch__dot" cx={DOT.cx} cy={DOT.cy} r="7" fill="var(--accent)" />
-          </svg>
-        </div>
-      </div>
-      <style>{css}</style>
-    </section>
+            <div className="flex justify-center lg:justify-end">
+              <svg className="nf-sketch" viewBox="0 0 480 320" width="480" height="320" aria-hidden="true" focusable="false">
+                <path
+                  className="nf-sketch__line"
+                  d={SKETCH}
+                  pathLength={1}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle className="nf-sketch__dot" cx={DOT.cx} cy={DOT.cy} r="7" fill="var(--accent)" />
+              </svg>
+            </div>
+          </div>
+          <style>{css}</style>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }

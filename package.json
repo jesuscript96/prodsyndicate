@@ -18,7 +18,9 @@
     "hero:render": "bash scripts/hero/render-all.sh",
     "sequence:build:services": "node scripts/build-sequence.mjs --services",
     "hero:render:service": "bash scripts/hero/render-service.sh",
-    "brand:icons": "node scripts/make-brand-icons.mjs"
+    "brand:icons": "node scripts/make-brand-icons.mjs",
+    "agenda:token": "node scripts/google-calendar-token.mjs",
+    "encaja:presentaciones": "node scripts/encaja/build-presentations.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
