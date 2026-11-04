@@ -1,5 +1,7 @@
 # Landings «Encaja» · propuesta de contenido
 
+> Documento histórico del 4 de noviembre de 2026. El texto vigente de las landings está en `content/encaja.ts` y el mapa de la campaña, en `docs/encaja/README.md`.
+
 Basada en tu discovery del 4 de noviembre de 2026. Es un borrador para revisar antes de construir: lo marcado con ⚠️ necesita un dato tuyo y no se publica hasta tenerlo.
 
 ---
@@ -214,7 +216,5 @@ Detrás de AUTOMATO hay un programador, product manager y consultor de negocio c
 
 1. **Precio «desde» del piloto** y cómo es la cuota mensual: importe orientativo y si hay permanencia.
 2. **El caso real:** qué cambió de verdad, si se puede contar sin nombre, y su sector y tamaño aproximados.
-3. **Valme Solutions y VARULLO:** qué construiste tú allí. Si hiciste sus paneles, portales o automatizaciones, es experiencia real que podemos contar sin atribuirnos sus cifras de marketing.
-4. **Herramienta de agenda:** la de Google Calendar no avisa a la web cuando alguien reserva, así que no se podría medir la llamada agendada en Meta ni en Google. Cal.com o Calendly sí lo permiten.
-5. **Integraciones:** con cuáles de la lista te has conectado o te puedes conectar de verdad.
-6. **Objetivo frente a presupuesto:** 20 llamadas al mes con 300 a 1.000 € es exigente para servicios B2B. Con ese presupuesto conviene concentrar en lugar de repartir entre tres landings y dos plataformas desde el primer día.
+3. **Herramienta de agenda:** la de Google Calendar no avisa a la web cuando alguien reserva, así que no se podría medir la llamada agendada en Meta ni en Google. Cal.com o Calendly sí lo permiten.
+4. **Integraciones:** con cuáles de la lista te has conectado o te puedes conectar de verdad.
