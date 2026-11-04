@@ -183,15 +183,23 @@ const check = (kind, s) => {
 for (const g of AD_GROUPS) {
   g.allHeadlines = [...g.headlines, ...COMMON_HEADLINES];
   g.allDescriptions = [...g.descriptions, COMMON_DESCRIPTION];
-  if (g.allHeadlines.length > 15) (errors++, console.error(`[google-ads] ${g.name}: más de 15 títulos`));
-  if (g.allDescriptions.length > 4) (errors++, console.error(`[google-ads] ${g.name}: más de 4 descripciones`));
-  if (new Set(g.allHeadlines).size !== g.allHeadlines.length) (errors++, console.error(`[google-ads] ${g.name}: títulos repetidos`));
+  const fail = (msg) => {
+    errors++;
+    console.error(`[google-ads] ${g.name}: ${msg}`);
+  };
+  if (g.allHeadlines.length > 15) fail('más de 15 títulos');
+  if (g.allDescriptions.length > 4) fail('más de 4 descripciones');
+  if (new Set(g.allHeadlines).size !== g.allHeadlines.length) fail('títulos repetidos');
   g.allHeadlines.forEach((h) => check('headline', h));
   g.allDescriptions.forEach((d) => check('description', d));
   g.paths.forEach((p) => check('path', p));
-  g.pinned.forEach((p) => g.headlines.includes(p) || (errors++, console.error(`[google-ads] fijado que no existe: ${p}`)));
+  g.pinned.filter((p) => !g.headlines.includes(p)).forEach((p) => fail(`fijado que no existe: ${p}`));
 }
-SITELINKS.forEach((s) => (check('sitelink', s.text), check('sitelinkDesc', s.d1), check('sitelinkDesc', s.d2)));
+SITELINKS.forEach((s) => {
+  check('sitelink', s.text);
+  check('sitelinkDesc', s.d1);
+  check('sitelinkDesc', s.d2);
+});
 CALLOUTS.forEach((c) => check('callout', c));
 SNIPPET.values.forEach((v) => check('snippet', v));
 
