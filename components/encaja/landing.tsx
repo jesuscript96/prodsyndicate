@@ -17,8 +17,10 @@ import {
   encajaClosing,
   encajaCta,
   encajaMeeting,
+  encajaOutcomesLabel,
   encajaPrice,
   encajaSteps,
+  encajaTimeNote,
   encajaWho,
   type EncajaBlock,
   type EncajaLanding,
@@ -98,8 +100,23 @@ export function EncajaLandingPage({ landing }: { landing: EncajaLanding }) {
         </div>
       </section>
 
+      {/* Lo que cambia: un resultado para el dueño por cada dolor, sin tecnicismos */}
+      <section className="section lp-section bg-paper-2" aria-labelledby="lp-outcomes-title">
+        <div className="wrap">
+          <SectionHead
+            n={next()}
+            id="lp-outcomes-title"
+            copy={{ label: encajaOutcomesLabel, title: landing.outcomes.title, intro: encajaTimeNote }}
+          />
+          <PillarGrid
+            items={landing.outcomes.items.map((o, i) => ({ n: `0${i + 1}`, title: o.title, text: o.text }))}
+            columns={3}
+          />
+        </div>
+      </section>
+
       {landing.blocks.map((block, i) => (
-        <AngleBlock key={block.id} block={block} n={next()} soft={i % 2 === 0} />
+        <AngleBlock key={block.id} block={block} n={next()} soft={i % 2 === 1} />
       ))}
 
       {/* Caso real */}
@@ -173,7 +190,7 @@ export function EncajaLandingPage({ landing }: { landing: EncajaLanding }) {
               <AccentTitle parts={encajaClosing.title} />
             </SplitReveal>
             <Reveal as="p" className="body-l m-0 max-w-[40ch] text-ink-2">
-              Elige un hueco y te llega la invitación con el enlace de Google Meet.
+              {encajaClosing.text}
             </Reveal>
           </div>
           <Booking className="lp-closing__booking" landing={`encaja-${landing.slug}`} location={location} />

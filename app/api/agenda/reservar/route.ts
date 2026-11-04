@@ -51,7 +51,7 @@ function description(d: BookingInput, presentationUrl?: string) {
     `Llamada de ${agendaConfig.slotMinutes} minutos con AUTOMATO para hablar del proceso que más tiempo te quita.`,
     'Entra desde el enlace de Google Meet de esta invitación.',
     presentationUrl
-      ? `\nAntes de la llamada, aquí tienes una presentación corta con qué esperar, cómo trabajamos y quién está detrás:\n${presentationUrl}\n`
+      ? `\nAntes de la llamada, aquí tienes un resumen de una página con lo que puedes esperar y cómo trabajamos:\n${presentationUrl}\n`
       : '',
     `Si necesitas cambiarla, escríbenos a ${site.email}.`,
     '',
