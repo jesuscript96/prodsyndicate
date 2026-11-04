@@ -1,0 +1,156 @@
+{
+  "_": "Campaña «Encaja» (software a medida para empresas) · Meta y Google. Mensajes elegidos el 2026-11-03 de scripts/promo/encaja-mensajes.md. *palabra* = serif cursiva; `texto` = mono.",
+  "cta": "Agenda una llamada",
+  "url": "automatoagency.art",
+  "creatives": [
+    {
+      "id": "06-herramientas-internas",
+      "n": 6,
+      "theme": "light",
+      "label": "Software a medida",
+      "headline": "Herramientas internas hechas a *tu forma de trabajar*.",
+      "sub": "Paneles, portales y apps diseñadas con tu equipo, no un programa genérico.",
+      "visual": {
+        "type": "frame3d",
+        "frame": "0531.png",
+        "box": [
+          101,
+          576,
+          965,
+          1347
+        ]
+      }
+    },
+    {
+      "id": "10-datos-de-un-sitio-a-otro",
+      "n": 10,
+      "theme": "soft",
+      "label": "Automatización",
+      "headline": "¿Cuántas horas a la semana se te van pasando datos *de un sitio a otro*?",
+      "sub": "Conectamos tus herramientas y eliminamos el trabajo manual.",
+      "visual": {
+        "type": "copy"
+      }
+    },
+    {
+      "id": "11-no-son-un-sistema",
+      "n": 11,
+      "theme": "light",
+      "label": "Software a medida",
+      "headline": "Correos, hojas de cálculo y ~post-its~ *no son un sistema*.",
+      "sub": "Lo convertimos en uno: software a medida, pensado para cómo trabaja tu equipo.",
+      "visual": {
+        "type": "frame3d",
+        "frame": "0085.png",
+        "box": [
+          152,
+          579,
+          969,
+          1714
+        ]
+      }
+    },
+    {
+      "id": "15-inversion",
+      "n": 15,
+      "theme": "dark",
+      "label": "Digitalización",
+      "headline": "Digitalizarte no es un gasto. Es la *inversión* que llevas tiempo aplazando.",
+      "sub": "Software a medida y automatización para dejar atrás los procesos manuales.",
+      "visual": {
+        "type": "receipt"
+      }
+    },
+    {
+      "id": "18-empresa-ha-crecido",
+      "n": 18,
+      "theme": "light",
+      "label": "Software a medida",
+      "headline": "Tu empresa ha *crecido*. Tus herramientas, todavía no.",
+      "sub": "Herramientas a medida que crecen al ritmo de tu negocio.",
+      "visual": {
+        "type": "growth"
+      }
+    },
+    {
+      "id": "22-ia-procesos",
+      "n": 22,
+      "theme": "soft",
+      "label": "Automatización e IA",
+      "headline": "Antes de hablar de IA, hablemos de *tus procesos*.",
+      "sub": "Mapeamos cómo trabajas y añadimos IA solo donde de verdad aporta.",
+      "visual": {
+        "type": "flow"
+      }
+    },
+    {
+      "id": "25-software-que-encaja",
+      "n": 25,
+      "theme": "accent",
+      "label": "Software a medida",
+      "headline": "Software que *encaja* con tu empresa, no al revés.",
+      "sub": "Portales, paneles y herramientas internas diseñadas alrededor de tus procesos reales.",
+      "visual": {
+        "type": "frame3d",
+        "frame": "0215.png",
+        "box": [
+          40,
+          709,
+          914,
+          1641
+        ]
+      }
+    },
+    {
+      "id": "28-no-cabe-en-una-hoja",
+      "n": 28,
+      "theme": "light",
+      "label": "Software a medida",
+      "headline": "Tu negocio no cabe en una *hoja de cálculo*.",
+      "sub": "Cuando la empresa crece, necesita un sistema hecho a su medida.",
+      "visual": {
+        "type": "grid"
+      }
+    },
+    {
+      "id": "29-pedidos-final-v3",
+      "n": 29,
+      "theme": "tint",
+      "label": "Software a medida",
+      "headline": "`pedidos_FINAL_v3 (2).xlsx` no es un *sistema de gestión*.",
+      "sub": "Un solo sistema y una sola versión de tus datos, para todo el equipo.",
+      "visual": {
+        "type": "files"
+      }
+    },
+    {
+      "id": "30-ctrl-c-ctrl-v",
+      "n": 30,
+      "theme": "dark",
+      "label": "Automatización",
+      "headline": "Ctrl+C, Ctrl+V no es una *estrategia*.",
+      "sub": "Automatizamos lo que hoy pasas a mano de una herramienta a otra.",
+      "visual": {
+        "type": "keys"
+      }
+    },
+    {
+      "id": "33-erp-crm-correo",
+      "n": 33,
+      "theme": "light",
+      "label": "Integraciones",
+      "headline": "Tu ERP, tu CRM y tu correo, por fin *hablando entre ellos*.",
+      "sub": "Integraciones a medida con las herramientas que ya usas.",
+      "visual": {
+        "type": "frame3d",
+        "frame": "0381.png",
+        "box": [
+          66,
+          525,
+          1010,
+          1593
+        ]
+      }
+    }
+  ]
+}

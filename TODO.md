@@ -36,7 +36,7 @@ Antes de poner anuncios hacia las landings:
 - [ ] ⚠️ Precio «Desde 3.000 € por seis meses de trabajo» (`content/encaja.ts`): redactado a partir de «a partir de 3.000 € en 6 meses»; confirmar.
 - [ ] ⚠️ Caso real del equipo comercial (`encajaCase`): publicado sin nombre ni cifras a partir del discovery; confirmar que se puede contar así.
 - [ ] ⚠️ «¿De quién es la herramienta?» responde «Tuya» con el texto de la FAQ global: confirmar que vale con el modelo de pago por meses.
-- [ ] En GTM, usar el evento `generate_lead` (lo envía la reserva) como conversión de Meta y Google Ads.
+- [ ] Conversión «Llamada reservada» en Google Ads con el evento `generate_lead` de GTM, y campaña de búsqueda según `docs/encaja/google-ads.md`. Mapa de todos los assets: `docs/encaja/README.md`.
 
 ## Hero (§7)
 
