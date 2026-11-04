@@ -6,6 +6,10 @@ import type { TitleParts } from './company';
  * personas). Una sola estructura y tres ángulos: Tiempo, Decisión y Camino. El titular de cada
  * hero repite el anuncio que lleva a ella. Fuente: discovery del 4/11/2026 y
  * docs/encaja/propuesta-landings.md. Pendientes de negocio en TODO.md (⚠️ Encaja).
+ *
+ * Tono pedido por el negocio: la solución se cuenta como resultado para el dueño (tiempo que
+ * recupera, control, no depender de nadie), no como tecnología. Sin cifras inventadas: cuánto
+ * tiempo se ahorra se calcula con cada cliente en la llamada.
  */
 
 export type EncajaSlug = 'tiempo' | 'crecer' | 'procesos';
@@ -29,6 +33,8 @@ export type EncajaBlock = {
   chipsLabel?: string;
 };
 
+export type EncajaOutcome = { title: string; text: string };
+
 export type EncajaLanding = {
   slug: EncajaSlug;
   /** Nombre interno del ángulo, para analítica */
@@ -36,10 +42,20 @@ export type EncajaLanding = {
   meta: { title: string; description: string; og: string };
   hero: { label: string; title: TitleParts; intro: string; visual: EncajaVisual };
   pains: { label: string; title: TitleParts; items: readonly string[]; chips?: readonly string[] };
+  /** Lo que cambia para el dueño: un resultado por cada dolor */
+  outcomes: { title: TitleParts; items: readonly EncajaOutcome[] };
   blocks: readonly EncajaBlock[];
   /** Línea que conecta el caso real con el ángulo */
   caseIntro: string;
   faq: readonly FaqItem[];
+  /** One pager en PDF que recibe al reservar */
+  onePager: {
+    audience: string;
+    headline: TitleParts;
+    lead: string;
+    /** «Hoy» → «Con AUTOMATO», fila a fila */
+    pairs: readonly { before: string; after: string }[];
+  };
 };
 
 /* ───────────── Comunes ───────────── */
@@ -54,6 +70,11 @@ export const encajaCallNote = '30 minutos por videollamada, gratis y sin comprom
  */
 export const encajaPrice = 'Desde 3.000 € por seis meses de trabajo.';
 
+/** Cuánto tiempo se ahorra no se promete en cifras: se calcula con cada cliente. */
+export const encajaTimeNote = 'Cuánto tiempo exactamente depende de tu empresa: lo calculamos contigo en la llamada.';
+
+export const encajaOutcomesLabel = 'Lo que cambia';
+
 /**
  * Caso real descrito por el negocio en el discovery (en pasado: «lo que se hizo fue una
  * aplicación…»). Sin nombre, sector ni cifras. ⚠️ Confirmar que se puede publicar así.
@@ -63,43 +84,43 @@ export const encajaCase = {
   title: { before: 'Un socio que hacía de ', accent: 'administrativo', after: ' comercial' },
   parts: [
     {
-      title: 'Punto de partida',
-      text: 'Una empresa con un equipo comercial de varias personas. Uno de los socios pasaba buena parte del día haciendo de administrativo: reconstruía en Excels y grupos de WhatsApp cómo iba cada venta y ayudaba a cada comercial a preparar sus presupuestos.',
+      title: 'Antes',
+      text: 'Una empresa con un equipo comercial de varias personas. Uno de los socios pasaba buena parte del día haciendo de administrativo: perseguía por Excel y WhatsApp cómo iba cada venta y ayudaba a cada comercial con sus presupuestos.',
     },
     {
       title: 'Qué hicimos',
-      text: 'Una aplicación a medida en la que cada comercial tiene su usuario y dirección lo ve todo. Lo que vivía en Excel y en WhatsApp pasó a la aplicación, con pasos validados y la misma operativa a la que el equipo ya estaba acostumbrado.',
+      text: 'Llevamos su forma de vender a una herramienta hecha a su medida, con los mismos pasos que el equipo ya conocía.',
     },
     {
-      title: 'Cómo quedó',
-      text: 'Ventas, presupuestos y dudas en un solo sitio, con acceso por persona y más seguridad que en hojas sueltas y chats.',
+      title: 'Después',
+      text: 'El socio dejó de reconstruir a mano cómo iba cada venta: ahora lo ve de un vistazo, todo en un solo sitio y más seguro que en hojas sueltas.',
     },
   ],
 } as const;
 
 export const encajaSteps = {
   label: 'Cómo funciona',
-  title: { before: 'De la llamada a tu ', accent: 'herramienta', after: '' },
+  title: { before: 'De la llamada al ', accent: 'primer resultado', after: '' },
   items: [
     {
       n: '01',
       title: 'Llamada de 30 minutos',
-      text: 'Nos cuentas el proceso que más tiempo te quita y sales con una idea de cómo quedaría.',
+      text: 'Nos cuentas qué te quita más tiempo y sales con una idea de cómo quedaría.',
     },
     {
       n: '02',
       title: 'Propuesta cerrada en pocos días',
-      text: 'Qué haremos, en cuánto tiempo y por cuánto. Si hay que ajustar el alcance, lo hablamos antes, no después.',
+      text: 'Qué haremos, en cuánto tiempo y por cuánto. Si hay que ajustar algo, lo hablamos antes, no después.',
     },
     {
       n: '03',
-      title: 'Piloto con un solo proceso',
-      text: 'Empezamos por lo que más duele. Ves un primer resultado en 2 a 4 semanas.',
+      title: 'Empezamos por lo que más duele',
+      text: 'Un solo proceso para empezar. Ves un primer resultado en 2 a 4 semanas.',
     },
     {
       n: '04',
-      title: 'Crecemos contigo',
-      text: 'Si funciona, seguimos con el siguiente proceso, al ritmo de tu empresa.',
+      title: 'Seguimos contigo',
+      text: 'Si funciona, vamos a por lo siguiente, al ritmo de tu empresa.',
     },
   ],
 } as const;
@@ -108,7 +129,7 @@ export const encajaWho = {
   label: 'Quién está detrás',
   title: { before: 'Alguien que entiende tu ', accent: 'negocio', after: '' },
   paragraphs: [
-    'Detrás de AUTOMATO hay un programador, product manager y consultor de negocio con experiencia en venture capital. Lleva ocho años trabajando con negocios distintos, convirtiendo problemas operativos en herramientas digitales.',
+    'Detrás de AUTOMATO hay un programador, product manager y consultor de negocio con experiencia en venture capital. Lleva ocho años trabajando con negocios distintos, convirtiendo problemas del día a día en soluciones que ahorran tiempo.',
     'Trabajamos como una persona más de tu equipo: cerca, rápido y sin la carga de una contratación.',
   ],
 } as const;
@@ -117,8 +138,8 @@ export const encajaMeeting = {
   title: 'Qué esperar de la llamada',
   items: [
     '30 minutos por videollamada, gratis y sin compromiso.',
-    'Hablamos del proceso que más tiempo te quita.',
-    'Sales con una idea de cómo quedaría tu herramienta.',
+    'Hablamos de lo que más tiempo te quita.',
+    'Sales con una idea de cómo quedaría y de cuánto tiempo te puede ahorrar.',
     'En pocos días recibes una propuesta cerrada.',
     'Y un siguiente paso claro, aunque sea que no te conviene.',
   ],
@@ -126,61 +147,44 @@ export const encajaMeeting = {
 
 export const encajaClosing = {
   title: { before: 'Software que ', accent: 'encaja', after: ' con tu empresa, no al revés.' },
-  text: 'Déjanos tus datos y te escribimos para cerrar día y hora de la llamada.',
+  text: 'Elige un hueco y te llega la invitación con el enlace de Google Meet.',
 } as const;
 
 const faqPrice: FaqItem = {
   q: '¿Cuánto cuesta?',
-  a: `${encajaPrice} Tras la llamada te enviamos una propuesta cerrada con entregables, plazos y presupuesto. Si hay que ajustar el alcance, lo hablamos antes, no después.`,
+  a: `${encajaPrice} Tras la llamada te enviamos una propuesta cerrada con lo que haremos, los plazos y el presupuesto. Si hay que ajustar algo, lo hablamos antes, no después.`,
 };
 const faqTools: FaqItem = {
   q: '¿Funciona con lo que ya uso?',
-  a: 'Sí. Conectamos la herramienta con lo que ya usáis, como vuestras hojas de cálculo, el correo o el CRM, para que los datos fluyan sin copiar y pegar.',
+  a: 'Sí. Partimos de lo que ya usáis, como vuestras hojas de cálculo, el correo o el CRM, para que nadie tenga que copiar datos de un sitio a otro.',
 };
 const faqOwnership: FaqItem = {
-  q: '¿De quién es la herramienta?',
-  a: 'Tuya. Al terminar recibes el código fuente, los diseños y la documentación, según lo acordado en el contrato.',
+  q: '¿De quién es lo que hacemos?',
+  a: 'Tuyo. Al terminar recibes el código fuente, los diseños y la documentación, según lo acordado en el contrato.',
 };
 
-/* ───────────── Presentaciones (PDF) ───────────── */
+/* ───────────── One pager (PDF) ───────────── */
 
 /**
- * Presentación de cada landing: va enlazada en la invitación de Google Calendar al reservar y en
+ * One pager A4 de cada landing: va enlazado en la invitación de Google Calendar al reservar y en
  * la pantalla de confirmación. Se genera con `npm run encaja:presentaciones` a partir de este
  * archivo (scripts/encaja/build-presentations.mjs) y se sirve desde public/encaja/.
  */
 export const encajaPresentationPath = (slug: EncajaSlug) => `/encaja/presentacion-${slug}.pdf`;
 
-export const encajaDeckCommon = {
-  kicker: 'Antes de nuestra llamada',
-  meetingNote: 'Treinta minutos por videollamada, gratis y sin compromiso. Esto es lo que puedes esperar.',
-  prepare: {
-    title: { before: 'Cómo ', accent: 'prepararla', after: '' },
-    items: [
-      'Piensa en el proceso que más tiempo te quita. Con uno basta.',
-      'Ten a mano un ejemplo real: la hoja de cálculo, el correo o el pedido de siempre.',
-      'Si otra persona lo vive a diario, puede unirse. Dínoslo y la añadimos a la invitación.',
-    ],
-  },
-  helpTitle: { before: 'Cómo te ', accent: 'ayudamos', after: '' },
-  goodbye: 'Nos vemos en la llamada.',
-} as const;
+/** Línea de tiempo del one pager: solo plazos y precio reales, sin cifras inventadas. */
+export const encajaTimeline = [
+  { big: '30 min', title: 'Llamada', text: 'Gratis y sin compromiso.' },
+  { big: 'Pocos días', title: 'Propuesta cerrada', text: 'Qué, cuándo y cuánto.' },
+  { big: '2–4 sem.', title: 'Primer resultado', text: 'Con un solo proceso.' },
+  { big: '6 meses', title: 'Desde 3.000 €', text: 'Seguimos contigo.' },
+] as const;
 
-export const encajaDecks: Record<EncajaSlug, { lead: string; quote: string; quoteNote?: string }> = {
-  tiempo: {
-    lead: 'Para quien dirige su empresa y ha acabado haciendo de administrativo.',
-    quote: '«Actúo como un administrativo, cuando debería estar pensando en lo importante.»',
-    quoteNote: 'Si alguna vez lo has pensado, esta llamada es para ti.',
-  },
-  crecer: {
-    lead: 'Para empresas que han crecido más rápido que sus herramientas.',
-    quote: 'Lo que funcionaba cuando erais pocos se queda corto ahora.',
-  },
-  procesos: {
-    lead: 'Para empresas con herramientas que no se hablan entre ellas.',
-    quote: 'Primero tus procesos. La tecnología, después.',
-  },
-};
+/** El caso real en dos líneas, para el one pager. */
+export const encajaCaseShort = {
+  before: 'Un socio perseguía por Excel y WhatsApp cómo iba cada venta de su equipo.',
+  after: 'Ahora lo ve todo de un vistazo, en un solo sitio y sin preguntar a nadie.',
+} as const;
 
 /* ───────────── Las tres landings ───────────── */
 
@@ -191,14 +195,14 @@ export const encajaLandings: readonly EncajaLanding[] = [
     meta: {
       title: 'Correos, hojas de cálculo y post-its no son un sistema',
       description:
-        'Si diriges tu empresa y acabas haciendo de administrativo, convertimos tu operativa en una herramienta hecha a tu medida. Llamada de 30 minutos, gratis.',
+        'Si diriges tu empresa y acabas haciendo de administrativo, te quitamos esa operativa de encima. Llamada de 30 minutos, gratis.',
       og: '/encaja/og-tiempo.png',
     },
     hero: {
       label: 'Software a medida para empresas',
       title: { before: 'Correos, hojas de cálculo y post-its ', accent: 'no son un sistema', after: '.' },
       intro:
-        'Diriges tu empresa y acabas haciendo de administrativo. No es falta de orden: es que tu operativa no tiene dónde vivir. La convertimos en una herramienta hecha a tu medida.',
+        'Diriges tu empresa y acabas haciendo de administrativo. Nos llevamos ese trabajo de encima para que vuelvas a lo que solo tú sabes hacer.',
       visual: {
         type: 'image',
         src: '/encaja/hero-tiempo.webp',
@@ -222,22 +226,49 @@ export const encajaLandings: readonly EncajaLanding[] = [
       ],
       chips: ['Pedidos', 'Stock', 'Turnos y vacaciones', 'Seguimiento de proyectos'],
     },
+    outcomes: {
+      title: { before: 'Tu tiempo, de vuelta a ', accent: 'tu negocio', after: '' },
+      items: [
+        {
+          title: 'Recuperas tus horas',
+          text: 'Las que hoy se van en revisar, copiar y preguntar vuelven a lo que solo tú sabes hacer.',
+        },
+        {
+          title: 'Sabes cómo va todo',
+          text: 'Pedidos, stock y proyectos de un vistazo, sin perseguir a nadie por WhatsApp.',
+        },
+        {
+          title: 'La empresa no depende de ti',
+          text: 'Si faltas una semana, cada cosa sigue en su sitio.',
+        },
+      ],
+    },
     blocks: [
       {
         id: 'un-sitio',
-        label: 'Un sitio para cada cosa',
+        label: 'Todo en su sitio',
         title: { before: '«pedidos_FINAL_v3 (2).xlsx» no es un ', accent: 'sistema de gestión', after: '.' },
-        text: 'Cada persona con su usuario. Cada pedido, cada turno y cada proyecto en un solo sitio, con una sola versión de los datos. Tú entras y ves cómo va todo, sin preguntar.',
+        text: 'Lo que hoy está repartido entre hojas, correos y mensajes, en un solo sitio y siempre al día. Sabes cómo va tu empresa sin tener que preguntar.',
       },
       {
         id: 'sin-copiar',
         label: 'Lo repetitivo, solo',
         title: { before: 'Ctrl+C, Ctrl+V no es una ', accent: 'estrategia', after: '.' },
-        text: 'Lo que hoy pasas a mano de una herramienta a otra pasa solo. Y tú vuelves a lo que solo tú sabes hacer: pensar en tu negocio.',
+        text: 'Lo que hoy copias a mano de un sitio a otro se hace solo. Esas horas vuelven a ti.',
       },
     ],
     caseIntro: 'El socio que dejó de reconstruir en Excel cómo iba cada venta.',
     faq: [faqPrice, faqTools, faqOwnership],
+    onePager: {
+      audience: 'Para quien dirige su empresa y ha acabado haciendo de administrativo.',
+      headline: { before: 'Deja de hacer de administrativo en ', accent: 'tu propia empresa', after: '.' },
+      lead: 'Nos llevamos de encima la operativa que hoy te come el día, para que vuelvas a lo que solo tú sabes hacer.',
+      pairs: [
+        { before: 'Haces de administrativo en tu propia empresa.', after: 'Recuperas tus horas para dirigir.' },
+        { before: 'Preguntas por WhatsApp cómo va cada pedido.', after: 'Ves cómo va todo de un vistazo.' },
+        { before: 'Si faltas una semana, nadie encuentra nada.', after: 'Cada cosa sigue en su sitio sin ti.' },
+      ],
+    },
   },
   {
     slug: 'crecer',
@@ -245,14 +276,14 @@ export const encajaLandings: readonly EncajaLanding[] = [
     meta: {
       title: 'Tu empresa ha crecido. Tus herramientas, todavía no',
       description:
-        'Diseñamos la herramienta que tu empresa necesita ahora, empezando por un solo proceso. Primer resultado en 2 a 4 semanas. Llamada de 30 minutos, gratis.',
+        'Ordenamos cómo trabaja tu empresa, empezando por lo que más tiempo os quita. Primer resultado en 2 a 4 semanas. Llamada de 30 minutos, gratis.',
       og: '/encaja/og-crecer.png',
     },
     hero: {
       label: 'Software a medida para empresas',
       title: { before: 'Tu empresa ha ', accent: 'crecido', after: '. Tus herramientas, todavía no.' },
       intro:
-        'Lo que funcionaba cuando erais pocos se queda corto ahora. Diseñamos la herramienta que tu empresa necesita hoy, empezando por un solo proceso.',
+        'Lo que funcionaba cuando erais pocos se queda corto ahora. Te ayudamos a ordenar cómo trabaja tu empresa, empezando por lo que más tiempo os quita.',
       visual: {
         type: 'image',
         src: '/encaja/hero-crecer.webp',
@@ -271,6 +302,23 @@ export const encajaLandings: readonly EncajaLanding[] = [
         'Sabes que hay que digitalizarse, pero no por dónde empezar.',
       ],
     },
+    outcomes: {
+      title: { before: 'Crecer sin que todo ', accent: 'pase por ti', after: '' },
+      items: [
+        {
+          title: 'Tu equipo da abasto',
+          text: 'Más trabajo sin que cada decisión tenga que pasar por ti.',
+        },
+        {
+          title: 'Quien llega aprende antes',
+          text: 'Cada cosa se hace siempre igual y está a la vista de todos.',
+        },
+        {
+          title: 'Creces con control',
+          text: 'Sabes cómo va el negocio, aunque cada mes haya más que vigilar.',
+        },
+      ],
+    },
     blocks: [
       {
         id: 'dudas',
@@ -279,15 +327,15 @@ export const encajaLandings: readonly EncajaLanding[] = [
         qa: [
           {
             q: '¿Y si no funciona?',
-            a: 'Empezamos por un piloto con un solo proceso. En 2 a 4 semanas ves un primer resultado y decides si seguimos.',
+            a: 'Empezamos por un solo proceso. En 2 a 4 semanas ves un primer resultado y decides si seguimos.',
           },
           {
             q: '¿Por dónde empiezo?',
-            a: 'En la llamada elegimos juntos el proceso que más tiempo te quita y te enseñamos cómo quedaría.',
+            a: 'En la llamada elegimos juntos lo que más tiempo te quita y te enseñamos cómo quedaría.',
           },
           {
-            q: '¿Y si mi equipo no la usa?',
-            a: 'La herramienta sigue la operativa que tu equipo ya conoce, con sus mismos pasos. Y les acompañamos al principio para que la adopten desde el primer día.',
+            q: '¿Y si mi equipo no lo usa?',
+            a: 'Partimos de cómo ya trabaja tu equipo, sin obligarle a cambiar su manera de hacer las cosas. Y les acompañamos al principio.',
           },
         ],
       },
@@ -302,7 +350,7 @@ export const encajaLandings: readonly EncajaLanding[] = [
         text: `${encajaPrice} Trabajamos como una persona más de tu equipo, sin la carga de una contratación.`,
       },
     ],
-    caseIntro: 'Una empresa cuyo equipo comercial creció más rápido que sus herramientas.',
+    caseIntro: 'Una empresa cuyo equipo comercial creció más rápido que su manera de organizarse.',
     faq: [
       faqPrice,
       {
@@ -311,6 +359,16 @@ export const encajaLandings: readonly EncajaLanding[] = [
       },
       faqOwnership,
     ],
+    onePager: {
+      audience: 'Para empresas que han crecido más rápido que su manera de trabajar.',
+      headline: { before: 'Que tu empresa crezca ', accent: 'sin que todo pase por ti', after: '.' },
+      lead: 'Ordenamos cómo trabaja tu equipo hoy, empezando por lo que más tiempo os quita.',
+      pairs: [
+        { before: 'Entra más trabajo y el equipo no da abasto.', after: 'El equipo da abasto sin que todo pase por ti.' },
+        { before: 'Cada persona nueva tarda semanas en arrancar.', after: 'Quien llega aprende antes: todo se hace igual.' },
+        { before: 'Todo depende de ti o de una sola persona.', after: 'Creces sin perder el control.' },
+      ],
+    },
   },
   {
     slug: 'procesos',
@@ -318,14 +376,14 @@ export const encajaLandings: readonly EncajaLanding[] = [
     meta: {
       title: 'Antes de hablar de IA, hablemos de tus procesos',
       description:
-        'Entendemos cómo trabaja tu empresa, construimos la herramienta y la conectamos con lo que ya usas. Llamada de 30 minutos, gratis.',
+        'Entendemos cómo trabaja tu empresa y te quitamos de encima lo que más se repite, con lo que ya usas. Llamada de 30 minutos, gratis.',
       og: '/encaja/og-procesos.png',
     },
     hero: {
       label: 'Software a medida para empresas',
       title: { before: 'Antes de hablar de IA, hablemos de ', accent: 'tus procesos', after: '.' },
       intro:
-        'Hoy un programa ya puede quitarte buena parte del trabajo aburrido. Primero entendemos cómo trabaja tu empresa. Después construimos la herramienta y la conectamos con lo que ya usas.',
+        'Buena parte del trabajo aburrido de tu empresa ya puede hacerse solo. Empezamos por entender cómo trabajáis y te quitamos de encima lo que más se repite.',
       visual: { type: 'flow' },
     },
     pains: {
@@ -337,34 +395,51 @@ export const encajaLandings: readonly EncajaLanding[] = [
         'Hay procesos que solo existen en la cabeza de alguien.',
       ],
     },
+    outcomes: {
+      title: { before: 'Lo que se repite, ', accent: 'que se haga solo', after: '' },
+      items: [
+        {
+          title: 'Nadie copia datos a mano',
+          text: 'Lo que entra por un lado aparece donde tiene que aparecer.',
+        },
+        {
+          title: 'Nada vive en una sola cabeza',
+          text: 'Cada proceso queda claro para todo el equipo, aunque alguien falte.',
+        },
+        {
+          title: 'Tecnología donde ahorra tiempo',
+          text: 'También la IA, pero solo donde de verdad te quita trabajo.',
+        },
+      ],
+    },
     blocks: [
       {
         id: 'metodo',
         label: 'El método',
-        title: { before: 'Del proceso a la ', accent: 'herramienta', after: '' },
+        title: { before: 'Primero tus procesos, ', accent: 'después la tecnología', after: '' },
         steps: [
           'Vemos cómo trabajáis hoy, paso a paso.',
-          'Elegimos el proceso que más se repite o más duele.',
-          'Lo convertimos en una herramienta con vuestra operativa de siempre.',
-          'La conectamos con lo que ya usáis.',
+          'Elegimos lo que más se repite o más duele.',
+          'Lo dejamos funcionando a vuestra manera.',
+          'Y lo conectamos con lo que ya usáis.',
         ],
       },
       {
         id: 'conectado',
         label: 'Conectado',
         title: { before: 'Tu ERP, tu CRM y tu correo, por fin ', accent: 'hablando entre ellos', after: '.' },
-        text: 'Partimos de lo que ya tienes en lugar de obligarte a cambiarlo todo.',
+        text: 'Lo que pasa en un programa aparece en el otro, sin que nadie lo copie. Partimos de lo que ya tienes, sin obligarte a cambiarlo todo.',
         chipsLabel: 'Por ejemplo',
         chips: ['Excel y Google Sheets', 'Odoo', 'HubSpot', 'Google Workspace', 'WhatsApp Business'],
       },
       {
         id: 'a-medida',
-        label: 'A medida',
+        label: 'A tu medida',
         title: { before: 'Herramientas internas hechas a ', accent: 'tu forma de trabajar', after: '.' },
-        text: 'Aplicaciones web a medida para tu equipo. Y, donde de verdad aporta, un asistente de IA que prepara el trabajo repetitivo.',
+        text: 'Tu equipo deja de repetir a mano lo de cada día y tú dejas de revisarlo todo. Si la IA ahorra trabajo, la usamos; si no, no.',
       },
     ],
-    caseIntro: 'Del Excel y los grupos de WhatsApp a una aplicación con pasos validados.',
+    caseIntro: 'Del Excel y los grupos de WhatsApp a tenerlo todo en un solo sitio.',
     faq: [
       faqPrice,
       {
@@ -373,6 +448,16 @@ export const encajaLandings: readonly EncajaLanding[] = [
       },
       faqTools,
     ],
+    onePager: {
+      audience: 'Para empresas con herramientas que no se hablan entre ellas.',
+      headline: { before: 'Lo que hoy se hace a mano, ', accent: 'que se haga solo', after: '.' },
+      lead: 'Entendemos cómo trabajáis y te quitamos de encima lo que más se repite, con lo que ya usas.',
+      pairs: [
+        { before: 'Los datos se copian a mano de un programa a otro.', after: 'Lo que entra por un lado aparece en el otro.' },
+        { before: 'Hay procesos que solo están en la cabeza de alguien.', after: 'Cada proceso, claro para todo el equipo.' },
+        { before: 'Te hablan de IA sin decirte para qué.', after: 'Tecnología solo donde ahorra tiempo.' },
+      ],
+    },
   },
 ] as const;
 

@@ -289,13 +289,13 @@ export function Booking({ landing, location, className }: Props) {
           <p className="body-l">{capitalize(fmt.long.format(new Date(done.start)))}</p>
           <p className="text-ink-2">
             Te hemos enviado la invitación con el enlace de Google Meet a <strong>{done.email}</strong>
-            {done.presentationUrl ? ', junto con una presentación corta para preparar la llamada' : ''}. Si en unos
+            {done.presentationUrl ? ', junto con un resumen de una página para preparar la llamada' : ''}. Si en unos
             minutos no la ves, mira en correo no deseado.
           </p>
           <div className="booking__done-actions">
             {done.presentationUrl && (
               <Button href={done.presentationUrl} external arrow="up">
-                Ver la presentación
+                Ver el resumen
               </Button>
             )}
             {done.meetUrl && (
