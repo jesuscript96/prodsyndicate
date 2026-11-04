@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import { site } from '@/site.config';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import { SmoothScrollProvider } from '@/components/providers/smooth-scroll-provider';
 import { RouteFocus } from '@/components/providers/route-focus';
@@ -79,11 +77,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SmoothScrollProvider>
           <RouteFocus />
           <UtmCapture />
-          <Header />
-          <main id="contenido" tabIndex={-1} className="outline-none">
-            {children}
-          </main>
-          <Footer />
+          {/* Cabecera, <main id="contenido"> y pie los pone cada grupo de rutas: (marketing) la web
+              completa y (campaign) las landings de anuncios, con cabecera mínima. */}
+          {children}
         </SmoothScrollProvider>
         <CookieBanner />
         <JsonLd data={organizationJsonLd()} />

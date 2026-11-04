@@ -8,7 +8,7 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 - [x] `{{DOMINIO}}` → **automatoagency.art** (canónica `https://www.automatoagency.art`, fijada en `site.config.ts`; `NEXT_PUBLIC_SITE_URL` solo hace falta para sobrescribirla). Email `hola@automatoagency.art` en `site.email`, legales y `.env.example`.
 - [ ] ⚠️ Confirmar que el buzón `hola@automatoagency.art` existe y recibe correo (y `no-reply@` en Resend) antes de activar el aviso por email del formulario.
 - [x] `{{RAZÓN_SOCIAL}}` y jurisdicción → **Jesús Valenzuela Chuliá** (empresario individual, NIF 53759792Y, Torrent), legislación española y tribunales de Valencia, en `site.legalName` y páginas legales.
-- [ ] Herramienta de agenda (Cal.com o Calendly) → `NEXT_PUBLIC_CAL_URL`.
+- [ ] Herramienta de agenda: las landings `/encaja/*` usan la agenda propia con Google Calendar (`docs/agenda-google.md`). `/contacto` sigue esperando `NEXT_PUBLIC_CAL_URL` (Cal.com o Calendly) o pasar a la agenda propia.
 - [x] Analítica → GTM-K3ZHSP9S (GA4 G-MHXH3R4RX3 y píxel de Meta 1826034535373102, con Modo de consentimiento v2 y aviso propio), instalado desde Valme OS. Plausible/Umami ya no se usa.
 - [ ] ⚠️ `site.areaServed` en JSON-LD `Service` (hoy `ES`).
 - [ ] Redes sociales → `site.social`.
@@ -25,6 +25,18 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 - [ ] Blog: proveedor de newsletter (doble opt-in, RGPD).
 - [ ] ⚠️ Páginas legales: placeholders rellenos y cookies/privacidad al día con GTM, GA4, el píxel de Meta y Valme OS (2-nov-2026). Plazo de conservación de contactos sin proyecto fijado en 12 meses. Falta la revisión con asesoría.
 - [ ] ⚠️ Confirmar con cada proveedor el mecanismo de transferencia internacional (Vercel, Resend, Cloudflare), si Turnstile usa cookies y qué cookies pone la agenda (Cal.com/Calendly). La referencia a la AEPD asume jurisdicción española.
+
+## Campaña «Encaja» (`/encaja/*`) ⚠️
+
+Antes de poner anuncios hacia las landings:
+
+- [ ] ⚠️ **Agenda con Google Calendar:** sin `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_REFRESH_TOKEN` en Vercel, la agenda no aparece y solo queda el email. Pasos en `docs/agenda-google.md`.
+- [ ] ⚠️ **Turnstile en producción** (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`): obligatorio para reservar y para `/contacto`. Comprobado el 4/11/2026: la web publicada no lleva clave de Turnstile, así que hoy el formulario de `/contacto` no puede entregar leads.
+- [ ] ⚠️ Horario de llamadas, margen entre llamadas y antelación mínima en `lib/agenda/config.ts` (por defecto: L-J 10-14 y 16-19, V 10-14, 15 min de margen, 12 h de antelación, 14 días).
+- [ ] ⚠️ Precio «Desde 3.000 € por seis meses de trabajo» (`content/encaja.ts`): redactado a partir de «a partir de 3.000 € en 6 meses»; confirmar.
+- [ ] ⚠️ Caso real del equipo comercial (`encajaCase`): publicado sin nombre ni cifras a partir del discovery; confirmar que se puede contar así.
+- [ ] ⚠️ «¿De quién es la herramienta?» responde «Tuya» con el texto de la FAQ global: confirmar que vale con el modelo de pago por meses.
+- [ ] En GTM, usar el evento `generate_lead` (lo envía la reserva) como conversión de Meta y Google Ads.
 
 ## Hero (§7)
 

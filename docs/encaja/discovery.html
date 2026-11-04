@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Discovery Encaja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Mundo AUTOMATO: blanco real, tinta casi negra, un único acento ultramar (naranja solo decorativo).
+     Una columna de lectura para el móvil, un paso por pantalla, barra de navegación fija abajo. */
+  --paper: #ffffff;
+  --paper-2: #f6f6f3;
+  --ink: #0b0b0f;
+  --ink-2: #3a3a42;
+  --ink-3: #6b6b76;
+  --line: #e8e8e3;
+  --accent: #2b3bff;
+  --accent-soft: #eef0ff;
+  --signal: #ff5a1f;
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 24px;
+  --radius-s: 14px;
+  --shadow-card: 0 1px 0 rgba(11,11,15,.04), 0 12px 32px -12px rgba(11,11,15,.12), 0 2px 6px rgba(11,11,15,.04);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bar-h: 76px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  padding-bottom: calc(var(--bar-h) + var(--safe-bottom) + 24px);
+}
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 max(18px, env(safe-area-inset-left, 0px)) 0 max(18px, env(safe-area-inset-right, 0px)); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+em.accent { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent); letter-spacing: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Cabecera */
+.top {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(255,255,255,.94);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+  padding-top: var(--safe-top);
+}
+.top__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 52px; }
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.brand__mark { color: var(--ink); flex: none; }
+.brand__name { font-weight: 600; letter-spacing: .08em; font-size: 13px; }
+@media (max-width: 480px) { .brand h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+.brand h1 { margin: 0; font: 500 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--font-mono); color: var(--ink-3); white-space: nowrap; }
+.status__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line); flex: none; }
+.status[data-state="saved"] .status__dot { background: var(--accent); }
+.status[data-state="saving"] .status__dot, .status[data-state="pending"] .status__dot { background: var(--ink-3); animation: pulse 1s infinite alternate; }
+.status[data-state="error"] { color: #a1260b; }
+.status[data-state="error"] .status__dot { background: #c2410c; }
+@keyframes pulse { from { opacity: .35; } to { opacity: 1; } }
+.progress { height: 2px; background: var(--line); }
+.progress__fill { height: 100%; width: 0; background: var(--accent); transition: width .5s var(--ease); }
+
+/* Pestañas de pasos */
+.tabs { position: relative; display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 36px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--paper); color: var(--ink-2);
+  font: 500 13px/1 var(--font-sans); cursor: pointer; text-decoration: none;
+}
+.tab__n { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+.tab[aria-current="step"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tab[aria-current="step"] .tab__n { color: rgba(255,255,255,.7); }
+.tab__dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; border: 1px solid var(--line); }
+.tab[data-fill="some"] .tab__dot { background: var(--accent-soft); border-color: var(--accent); }
+.tab[data-fill="all"] .tab__dot { background: var(--accent); border-color: var(--accent); }
+.tab[aria-current="step"][data-fill="all"] .tab__dot { background: #fff; border-color: #fff; }
+
+/* Portada del paso */
+.step-head { padding: 20px 0 8px; }
+.eyebrow { margin: 0 0 10px; font: 500 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.eyebrow b { color: var(--accent); font-weight: 500; }
+.step-title { margin: 0; font-size: clamp(30px, 8vw, 40px); line-height: 1.08; letter-spacing: -0.02em; font-weight: 500; text-wrap: balance; outline: none; }
+.step-title em.accent { font-size: 1.08em; }
+.step-intro { margin: 12px 0 0; font-size: 17px; color: var(--ink-2); max-width: 34em; }
+.welcome { margin: 18px 0 4px; padding: 16px 18px; border-radius: var(--radius-s); background: var(--paper-2); border: 1px solid var(--line); font-size: 15px; color: var(--ink-2); display: grid; gap: 8px; }
+.welcome p { margin: 0; }
+.welcome strong { color: var(--ink); font-weight: 600; }
+.notice { margin: 14px 0 0; padding: 12px 14px; border-radius: var(--radius-s); background: #fff7f2; border: 1px solid #ffd9c7; font-size: 14px; color: #7a2a0c; }
+.notice[hidden] { display: none; }
+
+/* Preguntas */
+.q { border: 0; margin: 0; padding: 26px 0; border-top: 1px solid var(--line); min-width: 0; }
+.step-head + .q { border-top: 0; }
+.q__label, .q legend { display: block; padding: 0; margin: 0 0 4px; font-size: 18px; line-height: 1.35; font-weight: 500; color: var(--ink); text-wrap: pretty; }
+.q__help { margin: 0 0 14px; font-size: 14px; color: var(--ink-3); }
+.q__label + .q__help, legend + .q__help { margin-top: 2px; }
+.q__label:only-child, legend + .chips, legend + .scale, legend + .rows, .q__label + textarea, .q__label + input { margin-top: 12px; }
+.q__note { margin: 10px 0 0; font-size: 13px; color: var(--accent); min-height: 0; }
+.q__note:empty { display: none; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; display: inline-flex; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip span {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 10px 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+  font-size: 15px; line-height: 1.25; cursor: pointer; user-select: none;
+  transition: background-color .16s, border-color .16s, color .16s;
+}
+.chip span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--ink-3); flex: none; transition: inherit; }
+.chip input[type="checkbox"] + span::before { border-radius: 2px; }
+.chip input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip input:checked + span::before { background: #fff; border-color: #fff; }
+.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) { .chip span:hover { border-color: var(--ink-3); } .chip input:checked + span:hover { border-color: var(--accent); } }
+.chips--stack { flex-direction: column; align-items: stretch; }
+.chips--stack .chip span { border-radius: var(--radius-s); width: 100%; }
+
+.other { margin-top: 10px; }
+.other[hidden] { display: none; }
+
+input[type="text"], input[type="number"], textarea {
+  width: 100%; font: 400 16px/1.5 var(--font-sans); color: var(--ink);
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-s);
+  padding: 12px 14px; -webkit-appearance: none; appearance: none;
+  transition: border-color .16s, background-color .16s, box-shadow .16s;
+}
+textarea { min-height: 112px; resize: vertical; display: block; }
+input::placeholder, textarea::placeholder { color: #8b8b95; }
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus { outline: none; background: var(--paper); border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+input[type="number"] { max-width: 200px; font-variant-numeric: tabular-nums; }
+
+/* Escala 1-5 */
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.scale .chip { display: block; }
+.scale .chip span { justify-content: center; width: 100%; padding: 10px 0; border-radius: 12px; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.scale .chip span::before { display: none; }
+.scale__ends { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; font-size: 13px; color: var(--ink-3); }
+.scale__ends span:last-child { text-align: right; }
+
+/* Reparto de mensajes */
+.rows { display: grid; gap: 12px; }
+.row { border: 1px solid var(--line); border-radius: 18px; padding: 14px; margin: 0; min-width: 0; background: var(--paper); }
+.row legend { float: left; width: 100%; padding: 0; margin: 0 0 12px; font-size: 16px; line-height: 1.35; font-weight: 400; }
+.row legend + * { clear: both; }
+.row__n { display: inline-block; margin-right: 8px; font: 500 12px/1 var(--font-mono); color: var(--accent); vertical-align: 2px; }
+.seg { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 3px; border-radius: 12px; background: var(--paper-2); border: 1px solid var(--line); }
+.seg .chip { display: block; }
+.seg .chip span { width: 100%; justify-content: center; min-height: 40px; padding: 8px 2px; border: 0; border-radius: 9px; background: transparent; font-size: 12.5px; letter-spacing: -0.01em; color: var(--ink-2); }
+@media (max-width: 359px) { .seg { grid-template-columns: repeat(3, 1fr); } .row { padding: 12px; } }
+.seg .chip span::before { display: none; }
+.seg .chip input:checked + span { background: var(--accent); color: #fff; }
+.seg .chip input[value="fuera"]:checked + span { background: var(--ink-3); }
+.seg .chip input[value="cierre"]:checked + span { background: var(--ink); }
+
+/* Cierre */
+.finish { margin: 8px 0 0; padding: 20px; border-radius: var(--radius); background: var(--accent-soft); display: grid; gap: 12px; }
+.finish h3 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+.finish p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.finish__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.finish__done { font-weight: 500; color: var(--accent); }
+.finish__done[hidden], .copybox[hidden] { display: none; }
+.copybox { margin-top: 4px; }
+.copybox textarea { min-height: 180px; font: 400 13px/1.5 var(--font-mono); }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1px solid transparent;
+  font: 500 15px/1 var(--font-sans); cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background-color .16s, border-color .16s, transform .16s;
+}
+.btn:active { transform: scale(.98); }
+.btn--primary { background: var(--accent); color: #fff; }
+.btn--primary:hover { background: #1f2de0; }
+.btn--secondary { background: var(--paper); color: var(--ink); border-color: var(--line); }
+.btn--secondary:hover { border-color: var(--ink-3); }
+.btn[disabled] { opacity: .4; pointer-events: none; }
+.btn svg { width: 16px; height: 16px; }
+
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: rgba(255,255,255,.96);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  padding: 12px 0 calc(12px + var(--safe-bottom));
+}
+.bar__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bar__count { font: 500 12px/1.3 var(--font-mono); color: var(--ink-3); text-align: center; font-variant-numeric: tabular-nums; }
+.bar .btn { flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top__row">
+      <div class="brand">
+        <svg class="brand__mark" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M29.52 22.31L23.4 16.19A18 18 0 0 1 40.6 16.19L34.48 22.31A10 10 0 0 0 29.52 22.31Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M41.69 29.52L47.81 23.4A18 18 0 0 1 47.81 40.6L41.69 34.48A10 10 0 0 0 41.69 29.52Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M34.48 41.69L40.6 47.81A18 18 0 0 1 23.4 47.81L29.52 41.69A10 10 0 0 0 34.48 41.69Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M22.31 34.48L16.19 40.6A18 18 0 0 1 16.19 23.4L22.31 29.52A10 10 0 0 0 22.31 34.48Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M32 5.5C32.77 5.5 33.54 5.52 34.31 5.57C35.08 5.62 35.85 5.69 36.62 5.79C37.39 5.89 38.16 6.01 38.92 6.16C39.69 6.32 40.45 6.49 41.2 6.71C41.96 6.92 42.71 7.17 43.45 7.45C44.18 7.73 44.92 8.05 45.63 8.4C46.33 8.75 47.03 9.14 47.71 9.57C48.38 10 49.03 10.46 49.66 10.96C50.28 11.45 50.88 11.99 51.45 12.55C52.01 13.12 52.55 13.72 53.04 14.34C53.54 14.97 54 15.62 54.43 16.29C54.86 16.97 55.25 17.67 55.6 18.38C55.95 19.08 56.27 19.82 56.55 20.55C56.83 21.29 57.08 22.04 57.29 22.8C57.51 23.55 57.68 24.31 57.84 25.08C57.99 25.84 58.11 26.61 58.21 27.38C58.31 28.15 58.38 28.92 58.43 29.69C58.48 30.46 58.5 31.23 58.5 32C58.5 32.77 58.48 33.54 58.43 34.31C58.38 35.08 58.31 35.85 58.21 36.62C58.11 37.39 57.99 38.16 57.84 38.92C57.68 39.69 57.51 40.45 57.29 41.2C57.08 41.96 56.83 42.71 56.55 43.45C56.27 44.18 55.95 44.92 55.6 45.62C55.25 46.33 54.86 47.03 54.43 47.71C54 48.38 53.54 49.03 53.04 49.66C52.55 50.28 52.01 50.88 51.45 51.45C50.88 52.01 50.28 52.55 49.66 53.04C49.03 53.54 48.38 54 47.71 54.43C47.03 54.86 46.33 55.25 45.63 55.6C44.92 55.95 44.18 56.27 43.45 56.55C42.71 56.83 41.96 57.08 41.2 57.29C40.45 57.51 39.69 57.68 38.92 57.84C38.16 57.99 37.39 58.11 36.62 58.21C35.85 58.31 35.08 58.38 34.31 58.43C33.54 58.48 32.77 58.5 32 58.5C31.23 58.5 30.46 58.48 29.69 58.43C28.92 58.38 28.15 58.31 27.38 58.21C26.61 58.11 25.84 57.99 25.08 57.84C24.31 57.68 23.55 57.51 22.8 57.29C22.04 57.08 21.29 56.83 20.55 56.55C19.82 56.27 19.08 55.95 18.37 55.6C17.67 55.25 16.97 54.86 16.29 54.43C15.62 54 14.97 53.54 14.34 53.04C13.72 52.55 13.12 52.01 12.55 51.45C11.99 50.88 11.45 50.28 10.96 49.66C10.46 49.03 10 48.38 9.57 47.71C9.14 47.03 8.75 46.33 8.4 45.63C8.05 44.92 7.73 44.18 7.45 43.45C7.17 42.71 6.92 41.96 6.71 41.2C6.49 40.45 6.32 39.69 6.16 38.92C6.01 38.16 5.89 37.39 5.79 36.62C5.69 35.85 5.62 35.08 5.57 34.31C5.52 33.54 5.5 32.77 5.5 32C5.5 31.23 5.52 30.46 5.57 29.69C5.62 28.92 5.69 28.15 5.79 27.38C5.89 26.61 6.01 25.84 6.16 25.08C6.32 24.31 6.49 23.55 6.71 22.8C6.92 22.04 7.17 21.29 7.45 20.55C7.73 19.82 8.05 19.08 8.4 18.37C8.75 17.67 9.14 16.97 9.57 16.29C10 15.62 10.46 14.97 10.96 14.34C11.45 13.72 11.99 13.12 12.55 12.55C13.12 11.99 13.72 11.45 14.34 10.96C14.97 10.46 15.62 10 16.29 9.57C16.97 9.14 17.67 8.75 18.37 8.4C19.08 8.05 19.82 7.73 20.55 7.45C21.29 7.17 22.04 6.92 22.8 6.71C23.55 6.49 24.31 6.32 25.08 6.16C25.84 6.01 26.61 5.89 27.38 5.79C28.15 5.69 28.92 5.62 29.69 5.57C30.46 5.52 31.23 5.5 32 5.5Z" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round"/></svg>
+        <span class="brand__name">AUTOMATO</span>
+        <h1>Discovery Encaja</h1>
+      </div>
+      <p class="status" id="status" role="status" data-state="connecting"><span class="status__dot" aria-hidden="true"></span><span id="status-text">Conectando</span></p>
+    </div>
+  </div>
+  <div class="progress" aria-hidden="true"><div class="progress__fill" id="progress"></div></div>
+</header>
+
+<main class="wrap">
+  <nav class="tabs" id="tabs" aria-label="Pasos del cuestionario"></nav>
+  <p class="notice" id="notice" hidden></p>
+  <form id="form" novalidate autocomplete="off"></form>
+</main>
+
+<div class="bar">
+  <div class="wrap bar__row">
+    <button type="button" class="btn btn--secondary" id="prev">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Anterior
+    </button>
+    <p class="bar__count" id="count" aria-live="off"></p>
+    <button type="button" class="btn btn--primary" id="next">
+      <span id="next-label">Siguiente</span>
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ───────────── Contenido ───────────── */
+
+  var LANDINGS = [
+    { id: 'tiempo', name: 'Tiempo' },
+    { id: 'decision', name: 'Decisión' },
+    { id: 'camino', name: 'Camino' },
+    { id: 'cierre', name: 'Cierre' },
+    { id: 'fuera', name: 'Fuera' }
+  ];
+
+  var MENSAJES = [
+    { id: '06', text: 'Herramientas internas hechas a tu forma de trabajar.', def: 'camino' },
+    { id: '10', text: '¿Cuántas horas a la semana se te van pasando datos de un sitio a otro?', def: 'tiempo' },
+    { id: '11', text: 'Correos, hojas de cálculo y post-its no son un sistema.', def: 'tiempo' },
+    { id: '15', text: 'Digitalizarte no es un gasto. Es la inversión que llevas tiempo aplazando.', def: 'decision' },
+    { id: '18', text: 'Tu empresa ha crecido. Tus herramientas, todavía no.', def: 'decision' },
+    { id: '22', text: 'Antes de hablar de IA, hablemos de tus procesos.', def: 'camino' },
+    { id: '25', text: 'Software que encaja con tu empresa, no al revés.', def: 'cierre' },
+    { id: '28', text: 'Tu negocio no cabe en una hoja de cálculo.', def: 'tiempo' },
+    { id: '29', text: '«pedidos_FINAL_v3 (2).xlsx» no es un sistema de gestión.', def: 'tiempo' },
+    { id: '30', text: 'Ctrl+C, Ctrl+V no es una estrategia.', def: 'tiempo' },
+    { id: '33', text: 'Tu ERP, tu CRM y tu correo, por fin hablando entre ellos.', def: 'camino' }
+  ];
+
+  function heroOptions(landing) {
+    return function (a) {
+      var rep = a.reparto || {};
+      return MENSAJES.filter(function (m) { return rep[m.id] === landing; })
+        .map(function (m) { return { value: m.id, label: m.id + ' · ' + m.text }; });
+    };
+  }
+
+  var STEPS = [
+    {
+      id: 'quien', short: 'Quién',
+      title: ['A quién le ', 'hablamos', ''],
+      intro: 'Las tres landings le hablan a la misma persona: quien decide y tiene el presupuesto. Vamos a definirla bien.',
+      welcome: true,
+      qs: [
+        { id: 'decisor', type: 'single', other: true, label: '¿A quién le hablan sobre todo las landings?',
+          options: ['Dueño o fundador', 'Gerente o director general', 'Director de operaciones', 'Director financiero', 'Responsable de IT', 'Socio de un despacho o asesoría'] },
+        { id: 'influyen', type: 'multi', label: '¿Quién más pesa en la decisión?', help: 'Marca todos los que suelan opinar.',
+          options: ['Los socios', 'Finanzas', 'IT', 'El equipo que lo va a usar', 'Un asesor externo', 'Nadie más, decide solo'] },
+        { id: 'tamano', type: 'multi', label: '¿De qué tamaño es la empresa?',
+          options: ['Menos de 10 personas', 'De 10 a 50', 'De 50 a 250', 'Más de 250'] },
+        { id: 'sectores', type: 'multi', other: true, label: '¿En qué sectores piensas?', help: 'Si no hay uno claro, marca «Cualquiera».',
+          options: ['Distribución y mayoristas', 'Industria y fabricación', 'Asesorías y despachos', 'Logística y transporte', 'Construcción e instalaciones', 'Clínicas y salud', 'Hostelería', 'Comercio y e-commerce', 'Formación', 'Inmobiliaria', 'Cualquiera'] },
+        { id: 'zona', type: 'single', label: '¿Dónde están?',
+          options: ['En mi provincia', 'En toda España', 'En España y Latinoamérica', 'Me da igual, todo en remoto'] },
+        { id: 'nivel', type: 'scale', label: '¿Cómo de digital es hoy tu cliente típico?', min: 'Papel, correo y Excel', max: 'Ya muy digital, quiere afinar' },
+        { id: 'retrato', type: 'long', label: 'Describe a tu cliente perfecto como si fuera una persona real.',
+          help: 'Cómo es su día, qué le quita el sueño, qué tiene encima de la mesa. Puedes dictarlo con el micro del teclado.' }
+      ]
+    },
+    {
+      id: 'dolor', short: 'Su tiempo', tag: 'Landing «Tiempo»',
+      title: ['Lo que le ', 'quita', ' el tiempo'],
+      intro: 'Esto alimenta la landing «Tiempo», la de las hojas de cálculo y el copiar y pegar.',
+      qs: [
+        { id: 'procesos', type: 'multi', other: true, label: '¿Qué procesos le roban más horas?',
+          options: ['Pedidos', 'Presupuestos', 'Facturación y cobros', 'Alta de clientes', 'Stock e inventario', 'Informes para dirección', 'Turnos, vacaciones y personal', 'Correos y atención al cliente', 'Seguimiento de proyectos u obras', 'Pasar datos de un programa a otro'] },
+        { id: 'frase', type: 'long', label: '¿Qué dice tu cliente cuando se queja?', help: 'Con sus palabras, tal cual. Es oro para los titulares.' },
+        { id: 'miedo', type: 'multi', max: 2, label: '¿Qué le preocupa más?', help: 'Elige dos como máximo.',
+          options: ['Que un error cueste dinero', 'Depender de la persona que lo sabe todo', 'Las horas que se pierden', 'No tener datos para decidir', 'No poder crecer sin contratar más', 'Que el equipo se queme'] },
+        { id: 'jefe', type: 'long', label: '¿Qué hace hoy quien decide que no debería estar haciendo?',
+          help: 'Por ejemplo: revisar pedidos uno a uno, cuadrar hojas a final de mes o ser el único que sabe dónde está cada cosa.' }
+      ]
+    },
+    {
+      id: 'decision', short: 'Decisión', tag: 'Landing «Decisión»',
+      title: ['La ', 'decisión', ' de invertir'],
+      intro: 'Esto alimenta la landing «Decisión», la de «Digitalizarte no es un gasto».',
+      qs: [
+        { id: 'frenos', type: 'multi', other: true, label: '¿Qué le frena a dar el paso?',
+          options: ['El precio', 'Miedo a que no funcione', 'Malas experiencias con informáticos', 'No tiene tiempo para el proyecto', 'Cree que su programa ya lo hace', 'No sabe por dónde empezar', 'Teme que el equipo no lo use'] },
+        { id: 'detonante', type: 'multi', other: true, label: '¿Qué le hace decidirse ahora?',
+          options: ['Ha crecido y el equipo no da abasto', 'Ha entrado mucho más volumen', 'Se va la persona clave', 'Obligaciones nuevas, como la factura electrónica', 'Ayudas o subvenciones', 'Un error caro reciente', 'Relevo generacional'] },
+        { id: 'comparacion', type: 'multi', other: true, label: '¿Con qué te compara cuando decide?',
+          options: ['Un programa estándar como Holded, Odoo o Sage', 'Herramientas no-code como Airtable o Notion', 'Un freelance', 'Una consultora grande', 'Un conocido que sabe de informática', 'Seguir como está'] },
+        { id: 'inversion', type: 'single', label: '¿Cuánto suele costar un primer proyecto?', help: 'Solo para mí. No aparece en ninguna landing salvo que lo digas en la pregunta siguiente.',
+          options: ['Menos de 5.000 €', 'De 5.000 a 15.000 €', 'De 15.000 a 40.000 €', 'Más de 40.000 €', 'Aún no lo sé'] },
+        { id: 'precio_landing', type: 'single', label: '¿Enseñamos precio en la landing?',
+          options: ['Sí, un «desde»', 'Solo un rango', 'No, se habla en la llamada'] },
+        { id: 'pago', type: 'multi', other: true, label: '¿Cómo se puede pagar?',
+          options: ['Proyecto cerrado', 'Por fases', 'Cuota mensual', 'Un piloto pequeño primero'] }
+      ]
+    },
+    {
+      id: 'camino', short: 'Camino', tag: 'Landing «Camino»',
+      title: ['El ', 'camino', ', con lo que ya usa'],
+      intro: 'Esto alimenta la landing «Camino», la de «Tu ERP, tu CRM y tu correo, por fin hablando entre ellos».',
+      qs: [
+        { id: 'herramientas', type: 'multi', other: true, label: '¿Qué suele tener ya tu cliente?',
+          options: ['Excel o Google Sheets', 'Holded', 'Sage o A3', 'Odoo', 'SAP', 'Salesforce', 'HubSpot', 'Pipedrive', 'Google Workspace', 'Microsoft 365', 'WhatsApp Business', 'Shopify o WooCommerce', 'Un programa a medida antiguo'] },
+        { id: 'fuerte', type: 'multi', max: 3, label: '¿Qué haces mejor hoy?', help: 'Elige tres como máximo. Es lo que más se enseñará.',
+          options: ['Conectar herramientas entre sí', 'Automatizaciones con n8n o Make', 'Aplicaciones web a medida', 'Paneles e informes', 'Asistentes de IA', 'Portales para clientes o proveedores'] },
+        { id: 'ia', type: 'single', label: '¿Qué papel tiene la IA en las landings?',
+          options: ['Protagonista', 'Una pieza más', 'Mencionarla poco', 'Nada de IA'] },
+        { id: 'ejemplo', type: 'long', label: 'Cuéntame un proceso de ejemplo: cómo es hoy y cómo quedaría.',
+          help: 'Puede ser real o inventado. Si es inventado, lo marcaremos como ejemplo.' }
+      ]
+    },
+    {
+      id: 'mensajes', short: 'Mensajes',
+      title: ['Los ', 'mensajes', ' de cada landing'],
+      intro: 'Los 11 anuncios que elegiste, con mi reparto de partida. Cambia lo que no te encaje y elige el titular de cada landing.',
+      qs: [
+        { id: 'reparto', type: 'matrix', label: '¿A qué landing va cada anuncio?', help: '«Cierre» es el lema común que cierra las tres. «Fuera» lo deja sin usar.' },
+        { id: 'hero_tiempo', type: 'single', stack: true, dyn: heroOptions('tiempo'), label: 'Titular de la landing «Tiempo»', empty: 'Ningún anuncio va a «Tiempo» ahora mismo.' },
+        { id: 'hero_decision', type: 'single', stack: true, dyn: heroOptions('decision'), label: 'Titular de la landing «Decisión»', empty: 'Ningún anuncio va a «Decisión» ahora mismo.' },
+        { id: 'hero_camino', type: 'single', stack: true, dyn: heroOptions('camino'), label: 'Titular de la landing «Camino»', empty: 'Ningún anuncio va a «Camino» ahora mismo.' },
+        { id: 'eje', type: 'single', other: true, label: '¿Te encaja repartir las landings por ángulo?',
+          help: 'Tiempo, Decisión y Camino. La alternativa es dividirlas por sector, por tamaño o por tipo de oferta.',
+          options: ['Sí, por ángulo', 'Mejor por sector', 'Mejor por tamaño de empresa', 'Mejor por oferta'] },
+        { id: 'tono', type: 'scale', label: '¿Qué tono quieres en general?', min: 'Serio y sobrio', max: 'Cercano y con humor' }
+      ]
+    },
+    {
+      id: 'reunion', short: 'Reunión',
+      title: ['Qué ', 'esperar', ' de la reunión'],
+      intro: 'Es lo que más tranquiliza a quien paga, y probablemente abrirá el PDF.',
+      qs: [
+        { id: 'duracion', type: 'single', label: '¿Cuánto dura la primera llamada?',
+          options: ['15 minutos', '30 minutos', '45 minutos', '1 hora'] },
+        { id: 'gratis', type: 'single', label: '¿Es gratis y sin compromiso?',
+          options: ['Sí', 'Gratis, con condiciones', 'No'] },
+        { id: 'formato', type: 'multi', label: '¿Cómo puede ser?',
+          options: ['Videollamada', 'Teléfono', 'Presencial'] },
+        { id: 'salida', type: 'multi', other: true, label: '¿Con qué sale tu cliente de la llamada?',
+          options: ['Uno a tres procesos que conviene automatizar', 'Una idea de cómo quedaría', 'Un orden de magnitud de la inversión', 'Una propuesta cerrada en pocos días', 'Una demo o un prototipo', 'Un siguiente paso claro, aunque sea que no le conviene'] },
+        { id: 'paso_pago', type: 'single', other: true, label: '¿Hay un paso de pago entre la llamada y el proyecto?',
+          options: ['Sí, un diagnóstico o mapa de procesos', 'Sí, un piloto con un solo proceso', 'No, de la llamada a la propuesta', 'No lo hay, pero quiero crearlo'] },
+        { id: 'paso_pago_detalle', type: 'text', label: 'Si lo hay o lo quieres crear, ¿qué incluye y cuánto cuesta?', placeholder: 'Por ejemplo: dos sesiones y un documento con el plan' },
+        { id: 'plazo', type: 'single', label: '¿Cuándo ve tu cliente un primer resultado?',
+          options: ['En 2 a 4 semanas', 'En 1 o 2 meses', 'En 3 meses o más', 'Depende, prefiero no prometerlo'] },
+        { id: 'pdf_cuando', type: 'multi', label: '¿Cuándo recibe el PDF?',
+          options: ['Antes de la reunión, para prepararla', 'Después, como resumen', 'En un correo en frío', 'Como descarga en la landing'] },
+        { id: 'pdf_primero', type: 'single', label: '¿Qué va primero en el PDF?',
+          options: ['Qué esperar de la reunión', 'Quién es AUTOMATO', 'El problema del cliente'] }
+      ]
+    },
+    {
+      id: 'automato', short: 'AUTOMATO',
+      title: ['Quién está ', 'detrás', ''],
+      intro: 'Para la parte de confianza de las landings y para el PDF. Solo cosas reales: lo que no exista no se publica.',
+      qs: [
+        { id: 'quien_eres', type: 'long', label: '¿Quién eres? Cuéntalo como lo dirías en una cena.',
+          help: 'Trayectoria, qué te mueve y por qué montaste AUTOMATO.' },
+        { id: 'cara', type: 'single', label: '¿Ponemos cara en las landings?',
+          options: ['Sí, foto y nombre', 'Solo el nombre', 'No, solo la marca', 'Solo en el PDF'] },
+        { id: 'experiencia', type: 'long', label: '¿Qué experiencia real podemos contar?', help: 'Proyectos, sectores, años. Aunque sea sin nombre de cliente.' },
+        { id: 'testimonios', type: 'single', label: '¿Tienes testimonios reales?',
+          options: ['Sí, varios', 'Uno o dos', 'Todavía no', 'Puedo pedirlos'] },
+        { id: 'porque', type: 'text', label: '¿Por qué AUTOMATO y no otro? En una frase.' },
+        { id: 'conceptos', type: 'single', label: 'Los casos de concepto, ¿los mostramos?',
+          options: ['Sí, marcados como concepto', 'No, fuera de estas landings'] }
+      ]
+    },
+    {
+      id: 'campana', short: 'Campaña',
+      title: ['La ', 'campaña', ''],
+      intro: 'Cómo llega la gente a las landings y qué queremos que haga al llegar.',
+      qs: [
+        { id: 'accion', type: 'single', label: '¿Qué quieres que haga quien entra?',
+          options: ['Agendar una llamada', 'Rellenar un formulario corto', 'Escribir por WhatsApp', 'Llamar por teléfono'] },
+        { id: 'agenda', type: 'single', label: '¿Con qué herramienta agendas las llamadas?',
+          options: ['Cal.com', 'Calendly', 'Citas de Google Calendar', 'Aún no tengo'] },
+        { id: 'cabecera', type: 'single', label: '¿Quitamos el menú en las landings?', help: 'Solo logo y botón, para que el clic pagado no se vaya al blog.',
+          options: ['Sí, solo logo y botón', 'No, con el menú completo'] },
+        { id: 'plataformas', type: 'multi', other: true, label: '¿Dónde vas a anunciarte?',
+          options: ['Instagram y Facebook', 'Google', 'LinkedIn', 'Correo en frío'] },
+        { id: 'presupuesto', type: 'single', label: '¿Cuánto invertirás al mes en anuncios?',
+          options: ['Menos de 300 €', 'De 300 a 1.000 €', 'De 1.000 a 3.000 €', 'Más de 3.000 €', 'Aún no lo sé'] },
+        { id: 'exito', type: 'number', label: '¿Cuántas llamadas al mes serían un éxito?', placeholder: 'Por ejemplo, 8' }
+      ]
+    },
+    {
+      id: 'vision', short: 'Visión',
+      title: ['Tu ', 'visión', ''],
+      intro: 'Sin límite. Dicta lo que se te pase por la cabeza; ya lo ordeno yo.',
+      qs: [
+        { id: 'vision', type: 'long', label: 'Cuéntame Encaja como se lo contarías a un socio.' },
+        { id: 'referencias', type: 'long', label: '¿Qué webs o landings te gustan y por qué?', help: 'Pega enlaces o descríbelas.' },
+        { id: 'nunca', type: 'long', label: '¿Qué no quieres ver nunca en estas landings?' },
+        { id: 'otro', type: 'long', label: '¿Algo que no te haya preguntado?' }
+      ],
+      finish: true
+    }
+  ];
+
+  var DEFAULTS = function () {
+    var rep = {};
+    MENSAJES.forEach(function (m) { rep[m.id] = m.def; });
+    return { reparto: rep, hero_tiempo: '28', hero_decision: '15', hero_camino: '33' };
+  };
+
+  /* ───────────── Estado ───────────── */
+
+  var LS_KEY = 'automato-encaja-discovery-v1';
+  var DOC_PATH = 'discovery/respuestas';
+  var state = { answers: DEFAULTS(), updatedAt: null, completed: false };
+  var current = 0;
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function readLocal() {
+    try {
+      var raw = window.localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s && s.answers) {
+        state = { answers: Object.assign(DEFAULTS(), s.answers), updatedAt: s.updatedAt || null, completed: !!s.completed };
+      }
+    } catch (e) { /* sin almacenamiento local */ }
+  }
+  function saveLocal() {
+    try { window.localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) { /* ignorar */ }
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function optionsOf(q) {
+    if (q.dyn) return q.dyn(state.answers);
+    return (q.options || []).map(function (o) { return { value: o, label: o }; });
+  }
+
+  function isAnswered(q) {
+    var v = state.answers[q.id];
+    if (q.type === 'matrix') return true;
+    if (Array.isArray(v)) return v.length > 0;
+    if (typeof v === 'number') return true;
+    return typeof v === 'string' && v.trim() !== '';
+  }
+
+  /* ───────────── Pintado ───────────── */
+
+  function titleHtml(t) {
+    return esc(t[0]) + '<em class="accent">' + esc(t[1]) + '</em>' + esc(t[2]);
+  }
+
+  function chipHtml(type, name, id, value, label, checked) {
+    return '<label class="chip"><input type="' + type + '" name="' + esc(name) + '" id="' + esc(id) + '" value="' + esc(value) + '"' + (checked ? ' checked' : '') + '><span>' + esc(label) + '</span></label>';
+  }
+
+  function questionHtml(q) {
+    var a = state.answers;
+    var v = a[q.id];
+    var h = '';
+    var helpId = q.help ? 'help-' + q.id : '';
+    var described = helpId ? ' aria-describedby="' + helpId + '"' : '';
+
+    if (q.type === 'single' || q.type === 'multi') {
+      var opts = optionsOf(q);
+      var type = q.type === 'single' ? 'radio' : 'checkbox';
+      var sel = q.type === 'single' ? [v] : (Array.isArray(v) ? v : []);
+      h += '<fieldset class="q" id="q-' + q.id + '"' + described + '><legend>' + esc(q.label) + '</legend>';
+      if (q.help) h += '<p class="q__help" id="' + helpId + '">' + esc(q.help) + '</p>';
+      if (!opts.length) {
+        h += '<p class="q__help">' + esc(q.empty || 'Sin opciones.') + '</p>';
+      } else {
+        h += '<div class="chips' + (q.stack ? ' chips--stack' : '') + '">';
+        opts.forEach(function (o, i) {
+          h += chipHtml(type, 'q:' + q.id, q.id + '-' + i, o.value, o.label, sel.indexOf(o.value) !== -1);
+        });
+        if (q.other) h += chipHtml(type, 'q:' + q.id, q.id + '-otro', '__otro', 'Otro', sel.indexOf('__otro') !== -1);
+        h += '</div>';
+      }
+      if (q.other) {
+        var show = sel.indexOf('__otro') !== -1;
+        h += '<div class="other"' + (show ? '' : ' hidden') + ' id="other-' + q.id + '"><label class="visually-hidden" for="' + q.id + '-otro-text">Otro: cuál</label>' +
+          '<input type="text" id="' + q.id + '-otro-text" name="o:' + q.id + '" placeholder="¿Cuál?" value="' + esc(a[q.id + '__otro'] || '') + '"></div>';
+      }
+      if (q.max) h += '<p class="q__note" id="note-' + q.id + '" aria-live="polite"></p>';
+      h += '</fieldset>';
+      return h;
+    }
+
+    if (q.type === 'scale') {
+      h += '<fieldset class="q" id="q-' + q.id + '"><legend>' + esc(q.label) + '</legend><div class="scale">';
+      for (var n = 1; n <= 5; n++) {
+        var lab = String(n);
+        var aria = n === 1 ? q.min : (n === 5 ? q.max : '');
+        h += '<label class="chip"><input type="radio" name="q:' + q.id + '" id="' + q.id + '-' + n + '" value="' + n + '"' + (String(v) === String(n) ? ' checked' : '') +
+          (aria ? ' aria-label="' + n + ', ' + esc(aria) + '"' : '') + '><span>' + lab + '</span></label>';
+      }
+      h += '</div><div class="scale__ends" aria-hidden="true"><span>1 · ' + esc(q.min) + '</span><span>5 · ' + esc(q.max) + '</span></div></fieldset>';
+      return h;
+    }
+
+    if (q.type === 'matrix') {
+      var rep = a.reparto || {};
+      h += '<div class="q" id="q-' + q.id + '" role="group" aria-labelledby="lab-' + q.id + '"><p class="q__label" id="lab-' + q.id + '">' + esc(q.label) + '</p>';
+      if (q.help) h += '<p class="q__help">' + esc(q.help) + '</p>';
+      h += '<div class="rows">';
+      MENSAJES.forEach(function (m) {
+        h += '<fieldset class="row"><legend><span class="row__n">' + m.id + '</span>' + esc(m.text) + '</legend><div class="seg">';
+        LANDINGS.forEach(function (l) {
+          h += chipHtml('radio', 'm:' + m.id, 'rep-' + m.id + '-' + l.id, l.id, l.name, rep[m.id] === l.id);
+        });
+        h += '</div></fieldset>';
+      });
+      h += '</div></div>';
+      return h;
+    }
+
+    var ctrlId = 'f-' + q.id;
+    h += '<div class="q" id="q-' + q.id + '"><label class="q__label" for="' + ctrlId + '">' + esc(q.label) + '</label>';
+    if (q.help) h += '<p class="q__help" id="' + helpId + '">' + esc(q.help) + '</p>';
+    var val = v == null ? '' : String(v);
+    if (q.type === 'long') {
+      h += '<textarea id="' + ctrlId + '" name="t:' + q.id + '" rows="4"' + described + ' placeholder="Escribe o dicta aquí">' + esc(val) + '</textarea>';
+    } else if (q.type === 'number') {
+      h += '<input type="number" inputmode="numeric" min="0" step="1" id="' + ctrlId + '" name="t:' + q.id + '"' + described + ' placeholder="' + esc(q.placeholder || '') + '" value="' + esc(val) + '">';
+    } else {
+      h += '<input type="text" id="' + ctrlId + '" name="t:' + q.id + '"' + described + ' placeholder="' + esc(q.placeholder || '') + '" value="' + esc(val) + '">';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  var form = document.getElementById('form');
+  var tabs = document.getElementById('tabs');
+
+  function renderTabs() {
+    tabs.innerHTML = STEPS.map(function (s, i) {
+      var n = String(i + 1).padStart(2, '0');
+      return '<a class="tab" href="#paso-' + (i + 1) + '" data-step="' + i + '"' + (i === current ? ' aria-current="step"' : '') + '>' +
+        '<span class="tab__n">' + n + '</span>' + esc(s.short) + '<span class="tab__dot" aria-hidden="true"></span></a>';
+    }).join('');
+    updateTabs();
+  }
+
+  function stepFill(s) {
+    var qs = s.qs.filter(function (q) { return q.type !== 'matrix' && !q.dyn; });
+    if (!qs.length) qs = s.qs;
+    var done = qs.filter(isAnswered).length;
+    return { done: done, total: qs.length };
+  }
+
+  function updateTabs() {
+    var nodes = tabs.querySelectorAll('.tab');
+    nodes.forEach(function (node, i) {
+      var f = stepFill(STEPS[i]);
+      node.setAttribute('data-fill', f.done === 0 ? 'none' : (f.done >= f.total ? 'all' : 'some'));
+      node.setAttribute('aria-label', 'Paso ' + (i + 1) + ', ' + STEPS[i].short + ': ' + f.done + ' de ' + f.total + ' respondidas');
+    });
+  }
+
+  function updateProgress() {
+    var done = 0, total = 0;
+    STEPS.forEach(function (s) { var f = stepFill(s); done += f.done; total += f.total; });
+    document.getElementById('progress').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+    var f = stepFill(STEPS[current]);
+    var count = document.getElementById('count');
+    count.textContent = (current + 1) + ' / ' + STEPS.length;
+    count.setAttribute('aria-label', 'Paso ' + (current + 1) + ' de ' + STEPS.length + ', ' + f.done + ' de ' + f.total + ' respondidas');
+  }
+
+  function renderStep() {
+    var s = STEPS[current];
+    var n = String(current + 1).padStart(2, '0');
+    var h = '<div class="step-head">';
+    h += '<p class="eyebrow">Paso ' + n + ' de ' + String(STEPS.length).padStart(2, '0') + (s.tag ? ' · <b>' + esc(s.tag) + '</b>' : '') + '</p>';
+    h += '<h2 class="step-title" id="step-title" tabindex="-1">' + titleHtml(s.title) + '</h2>';
+    h += '<p class="step-intro">' + esc(s.intro) + '</p>';
+    if (s.welcome) {
+      h += '<div class="welcome"><p><strong>Unos 15 minutos, casi todo con un toque.</strong> Ninguna pregunta es obligatoria: salta lo que no tengas claro.</p>' +
+        '<p>Se guarda solo mientras respondes, así que puedes dejarlo y volver otro rato, en el móvil o en el ordenador.</p>' +
+        '<p>En las preguntas abiertas, pulsa el micro del teclado y dicta. No hace falta que quede bonito.</p></div>';
+    }
+    h += '</div>';
+    s.qs.forEach(function (q) { h += questionHtml(q); });
+    if (s.finish) {
+      h += '<section class="finish" aria-labelledby="finish-title"><h3 id="finish-title">¿Terminado?</h3>' +
+        '<p>Márcalo y vuelve al chat. Leo tus respuestas directamente desde aquí, sin que tengas que copiar nada.</p>' +
+        '<div class="finish__actions"><button type="button" class="btn btn--primary" id="mark-done">Marcar como terminado</button>' +
+        '<button type="button" class="btn btn--secondary" id="copy">Copiar respuestas</button></div>' +
+        '<p class="finish__done" id="done-msg" role="status"' + (state.completed ? '' : ' hidden') + '>Marcado como terminado. Escríbeme «ya está» en el chat. Si cambias algo después, se guarda igual.</p>' +
+        '<div class="copybox" id="copybox" hidden><label class="visually-hidden" for="copy-text">Respuestas en texto</label><textarea id="copy-text" readonly></textarea></div>' +
+        '</section>';
+    }
+    form.innerHTML = h;
+    form.querySelectorAll('textarea').forEach(autosize);
+    var last = current === STEPS.length - 1;
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next-label').textContent = last ? 'Terminar' : 'Siguiente';
+    renderTabs();
+    updateProgress();
+    var active = tabs.querySelector('[aria-current="step"]');
+    if (active) tabs.scrollLeft = Math.max(0, active.offsetLeft - (tabs.clientWidth - active.offsetWidth) / 2);
+  }
+
+  function rerenderQuestion(id) {
+    var q = null;
+    STEPS[current].qs.forEach(function (x) { if (x.id === id) q = x; });
+    var node = document.getElementById('q-' + id);
+    if (!q || !node) return;
+    var tmp = document.createElement('div');
+    tmp.innerHTML = questionHtml(q);
+    node.replaceWith(tmp.firstChild);
+  }
+
+  function autosize(t) {
+    t.style.height = 'auto';
+    t.style.height = Math.max(112, t.scrollHeight + 2) + 'px';
+  }
+
+  function goTo(i, focus) {
+    current = Math.max(0, Math.min(STEPS.length - 1, i));
+    renderStep();
+    window.scrollTo(0, 0);
+    if (focus) {
+      var t = document.getElementById('step-title');
+      if (t) t.focus({ preventScroll: true });
+    }
+  }
+
+  function stepFromHash() {
+    var m = /^#paso-(\d+)$/.exec(window.location.hash || '');
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+  function setHash(i) {
+    try { history.replaceState(null, '', '#paso-' + (i + 1)); } catch (e) { /* marco sin historial */ }
+  }
+
+  /* ───────────── Entrada ───────────── */
+
+  function changed() {
+    state.updatedAt = new Date().toISOString();
+    saveLocal();
+    scheduleRemote(1200);
+    updateTabs();
+    updateProgress();
+  }
+
+  form.addEventListener('change', function (e) {
+    var el = e.target;
+    var name = el.name || '';
+    if (name.indexOf('q:') === 0) {
+      var id = name.slice(2);
+      var q = findQ(id);
+      if (!q) return;
+      if (q.type === 'multi') {
+        var checked = Array.prototype.slice.call(form.querySelectorAll('input[name="' + cssEsc(name) + '"]:checked')).map(function (x) { return x.value; });
+        if (q.max && checked.filter(function (x) { return x !== '__otro'; }).length > q.max && el.checked) {
+          el.checked = false;
+          var note = document.getElementById('note-' + id);
+          if (note) note.textContent = 'Como máximo ' + q.max + '. Quita una para elegir otra.';
+          return;
+        }
+        var note2 = document.getElementById('note-' + id);
+        if (note2) note2.textContent = '';
+        state.answers[id] = checked.filter(function (x) { return x !== '__otro'; }).concat(checked.indexOf('__otro') !== -1 ? ['__otro'] : []);
+      } else if (q.type === 'scale') {
+        state.answers[id] = parseInt(el.value, 10);
+      } else {
+        state.answers[id] = el.value;
+      }
+      if (q.other) {
+        var box = document.getElementById('other-' + id);
+        var on = (q.type === 'multi' ? state.answers[id] : [state.answers[id]]).indexOf('__otro') !== -1;
+        if (box) {
+          box.hidden = !on;
+          if (on && el.value === '__otro') { var inp = box.querySelector('input'); if (inp) inp.focus(); }
+        }
+      }
+      changed();
+      return;
+    }
+    if (name.indexOf('m:') === 0) {
+      var mid = name.slice(2);
+      state.answers.reparto = Object.assign({}, state.answers.reparto);
+      state.answers.reparto[mid] = el.value;
+      ['tiempo', 'decision', 'camino'].forEach(function (l) {
+        var key = 'hero_' + l;
+        var cur = state.answers[key];
+        if (cur && state.answers.reparto[cur] !== l) state.answers[key] = '';
+        if (!state.answers[key]) {
+          var first = MENSAJES.filter(function (m) { return state.answers.reparto[m.id] === l; })[0];
+          if (first) state.answers[key] = first.id;
+        }
+        rerenderQuestion(key);
+      });
+      changed();
+    }
+  });
+
+  form.addEventListener('input', function (e) {
+    var el = e.target;
+    var name = el.name || '';
+    if (name.indexOf('t:') === 0) {
+      var id = name.slice(2);
+      var q = findQ(id);
+      if (q && q.type === 'number') {
+        state.answers[id] = el.value === '' ? '' : Math.max(0, parseInt(el.value, 10) || 0);
+      } else {
+        state.answers[id] = el.value;
+      }
+      if (el.tagName === 'TEXTAREA') autosize(el);
+      changed();
+    } else if (name.indexOf('o:') === 0) {
+      state.answers[name.slice(2) + '__otro'] = el.value;
+      changed();
+    }
+  });
+
+  form.addEventListener('submit', function (e) { e.preventDefault(); });
+
+  form.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('button') : null;
+    if (!t) return;
+    if (t.id === 'mark-done') {
+      state.completed = true;
+      document.getElementById('done-msg').hidden = false;
+      changed();
+      flushNow();
+    }
+    if (t.id === 'copy') copyAnswers();
+  });
+
+  function findQ(id) {
+    var found = null;
+    STEPS.forEach(function (s) { s.qs.forEach(function (q) { if (q.id === id) found = q; }); });
+    return found;
+  }
+  function cssEsc(s) { return window.CSS && CSS.escape ? CSS.escape(s) : s.replace(/[:"\\]/g, '\\$&'); }
+
+  document.getElementById('prev').addEventListener('click', function () { setHash(current - 1); goTo(current - 1, true); });
+  document.getElementById('next').addEventListener('click', function () {
+    if (current === STEPS.length - 1) {
+      var fin = document.getElementById('finish-title');
+      if (fin) fin.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var btn = document.getElementById('mark-done');
+      if (btn) btn.focus({ preventScroll: true });
+      return;
+    }
+    setHash(current + 1);
+    goTo(current + 1, true);
+  });
+  tabs.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.tab') : null;
+    if (!a) return;
+    e.preventDefault();
+    var i = parseInt(a.getAttribute('data-step'), 10);
+    setHash(i);
+    goTo(i, true);
+  });
+  window.addEventListener('hashchange', function () { var i = stepFromHash(); if (i !== current) goTo(i, true); });
+
+  /* ───────────── Copiar en texto ───────────── */
+
+  function answerText(q) {
+    var a = state.answers;
+    var v = a[q.id];
+    if (q.type === 'matrix') {
+      return MENSAJES.map(function (m) {
+        var l = LANDINGS.filter(function (x) { return x.id === (a.reparto || {})[m.id]; })[0];
+        return '  ' + m.id + ' ' + m.text + ' → ' + (l ? l.name : '—');
+      }).join('\n');
+    }
+    if (q.dyn) {
+      var m = MENSAJES.filter(function (x) { return x.id === v; })[0];
+      return m ? m.id + ' ' + m.text : '—';
+    }
+    if (Array.isArray(v)) {
+      if (!v.length) return '—';
+      return v.map(function (x) { return x === '__otro' ? 'Otro: ' + (a[q.id + '__otro'] || '') : x; }).join(' · ');
+    }
+    if (v === '__otro') return 'Otro: ' + (a[q.id + '__otro'] || '');
+    if (q.type === 'scale' && v) return v + ' de 5 (1 = ' + q.min + ', 5 = ' + q.max + ')';
+    return v === undefined || v === null || String(v).trim() === '' ? '—' : String(v);
+  }
+
+  function summaryText() {
+    var out = ['Discovery Encaja · AUTOMATO', 'Actualizado: ' + (state.updatedAt || '—'), ''];
+    STEPS.forEach(function (s, i) {
+      out.push('## ' + (i + 1) + '. ' + s.title.join(''));
+      s.qs.forEach(function (q) {
+        var t = answerText(q);
+        out.push('- ' + q.label + (q.type === 'matrix' ? '\n' + t : ': ' + t));
+      });
+      out.push('');
+    });
+    return out.join('\n');
+  }
+
+  function copyAnswers() {
+    var text = summaryText();
+    var box = document.getElementById('copybox');
+    var area = document.getElementById('copy-text');
+    var btn = document.getElementById('copy');
+    function fallback() {
+      area.value = text;
+      box.hidden = false;
+      autosize(area);
+      area.focus();
+      area.select();
+      btn.textContent = 'Selecciona y copia el texto';
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copiado'; }, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  }
+
+  /* ───────────── Guardado en la nube (capacidad db) ───────────── */
+
+  var statusEl = document.getElementById('status');
+  var statusText = document.getElementById('status-text');
+  var notice = document.getElementById('notice');
+  var docRef = null, saveTimer = null, inFlight = false, pending = false, canWrite = true;
+
+  var LABELS = {
+    connecting: 'Conectando',
+    slow: 'Sin conexión aún',
+    pending: 'Guardando…',
+    saving: 'Guardando…',
+    saved: 'Guardado',
+    local: 'Solo en este dispositivo',
+    error: 'Sin guardar',
+    readonly: 'Solo lectura'
+  };
+  function setStatus(s) {
+    statusEl.setAttribute('data-state', s);
+    statusText.textContent = LABELS[s] || s;
+    if (s === 'local' || s === 'readonly') {
+      notice.hidden = false;
+      notice.textContent = s === 'local'
+        ? 'Desde aquí no puedo guardar en la nube: tus respuestas se quedan en este dispositivo. Al terminar, usa «Copiar respuestas» y pégalas en el chat.'
+        : 'Esta vista no puede guardar cambios. Ábrela con tu cuenta o usa «Copiar respuestas» al final.';
+    } else if (s === 'error') {
+      notice.hidden = false;
+      notice.textContent = 'No se ha podido guardar en la nube. Sigue respondiendo: se guarda en este dispositivo y lo reintento con tu próximo cambio.';
+    } else if (s === 'saved') {
+      notice.hidden = true;
+    }
+  }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function scheduleRemote(delay) {
+    if (!docRef || !canWrite) return;
+    clearTimeout(saveTimer);
+    setStatus('pending');
+    saveTimer = setTimeout(function () { saveTimer = null; flush(); }, delay);
+  }
+  function flushNow() {
+    if (!docRef || !canWrite) return;
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    flush();
+  }
+
+  function flush() {
+    if (!docRef || !canWrite) return Promise.resolve();
+    if (inFlight) { pending = true; return Promise.resolve(); }
+    inFlight = true;
+    setStatus('saving');
+    var body = clone({ answers: state.answers, updatedAt: state.updatedAt, completed: state.completed, schema: 1 });
+    return docRef.set(body).then(function () {
+      setStatus('saved');
+    }, function (err) {
+      var code = err && err.code;
+      if (code === 'unavailable' || !code) {
+        return sleep(700 + Math.random() * 900).then(function () { return docRef.set(body); }).then(function () { setStatus('saved'); }, function () { setStatus('error'); });
+      }
+      if (code === 'invalid_argument' || code === 'revoked' || code === 'not_granted' || code === 'capability_disabled' || code === 'capability_removed') {
+        canWrite = false;
+        setStatus(code === 'invalid_argument' ? 'readonly' : 'local');
+        return;
+      }
+      setStatus('error');
+    }).then(function () {
+      inFlight = false;
+      if (pending) { pending = false; flush(); }
+    });
+  }
+
+  function pull(initial) {
+    if (!docRef) return Promise.resolve();
+    var slow = setTimeout(function () { if (initial) setStatus('slow'); }, 10000);
+    return docRef.get().then(function (snap) {
+      clearTimeout(slow);
+      var d = snap.exists ? snap.data() : null;
+      var remoteAt = d && d.updatedAt ? String(d.updatedAt) : '';
+      if (d && d.answers && (!state.updatedAt || remoteAt > state.updatedAt)) {
+        state = { answers: Object.assign(DEFAULTS(), clone(d.answers)), updatedAt: remoteAt || null, completed: !!d.completed };
+        saveLocal();
+        renderStep();
+        setStatus('saved');
+      } else if (state.updatedAt && (!d || state.updatedAt > remoteAt)) {
+        scheduleRemote(0);
+      } else {
+        setStatus('saved');
+      }
+    }, function (err) {
+      clearTimeout(slow);
+      var code = err && err.code;
+      if (code === 'revoked' || code === 'not_granted' || code === 'capability_disabled' || code === 'capability_removed') { docRef = null; setStatus('local'); }
+      else setStatus('error');
+    });
+  }
+
+  function waitForClaude(ms) {
+    return new Promise(function (resolve) {
+      var start = Date.now();
+      (function check() {
+        if (window.claude && typeof window.claude.use === 'function') return resolve(window.claude);
+        if (Date.now() - start > ms) return resolve(null);
+        setTimeout(check, 100);
+      })();
+    });
+  }
+
+  function initDb() {
+    waitForClaude(4000).then(function (c) {
+      if (!c) { setStatus('local'); return null; }
+      var timeout = sleep(10000).then(function () { return '__timeout'; });
+      return Promise.race([c.use('db'), timeout]);
+    }).then(function (db) {
+      if (db === undefined) return;
+      if (!db || db === '__timeout') { setStatus('local'); return; }
+      try { docRef = db.doc(DOC_PATH); } catch (e) { setStatus('local'); return; }
+      return pull(true);
+    }).catch(function () { setStatus('local'); });
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      if (saveTimer) flushNow();
+    } else if (docRef && !saveTimer && !inFlight && !pending) {
+      var el = document.activeElement;
+      var typing = el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT');
+      if (!typing) pull(false);
+    }
+  });
+
+  /* ───────────── Arranque ───────────── */
+
+  readLocal();
+  current = Math.max(0, Math.min(STEPS.length - 1, stepFromHash()));
+  renderStep();
+  initDb();
+})();
+</script>
+</body>
+</html>
