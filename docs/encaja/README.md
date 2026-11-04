@@ -38,7 +38,7 @@ Las landings no se indexan en buscadores y no salen en el sitemap. Despliega Ver
 
 | Qué | Dónde | Nota |
 |---|---|---|
-| Anuncios en todos los formatos: 1:1, 4:5, 9:16 y 1,91:1, con y sin titular, más un ZIP | Mac del equipo: `Producto-Digital/.claude/worktrees/product-syndicate-promo-video-6099d4/assets/promo/ads/` | Sin guardar en git (23 MB). Conviene subirlo a una carpeta compartida |
+| Anuncios en todos los formatos: 1:1, 4:5, 9:16 y 1,91:1, con y sin titular, más un ZIP | Mac del equipo: `Producto-Digital/.claude/worktrees/product-syndicate-promo-video-6099d4/assets/promo/ads/` | Se quedan en el Mac, sin guardar en git (23 MB) |
 | Plantilla y generador de anuncios | Mismo worktree: `scripts/promo/ads/` | Sin guardar en git |
 | Vídeo «Encaja» de 25 s, con y sin voz, y guion de locución | Mismo worktree: `assets/promo/automato-empresas-25s*.mp4` · `scripts/promo/guiones-locucion.md` | Los vídeos pesan demasiado para git |
 | Respuestas del discovery | Página privada en Claude: https://claude.ai/artifact/RUCY6soSkjKmTP4XzbsQWa | Solo la ve su dueño |
