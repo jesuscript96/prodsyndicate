@@ -5,8 +5,8 @@
  * textos que enlaza docs/encaja/google-ads.md.
  *   npm run encaja:google-ads  → docs/encaja/google-ads/{textos.md, anuncios.csv, palabras-clave.csv, negativas.txt}
  *
- * Sin cifras inventadas: los números que aparecen (30 minutos, 2 a 4 semanas, 3.000 € por seis
- * meses) son los del negocio, los mismos de las landings (content/encaja.ts).
+ * Sin cifras inventadas: los números que aparecen (30 minutos, 2 a 4 semanas, desde 3.000 € en
+ * 6 meses) son los del negocio, los mismos de las landings (content/encaja.ts).
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -23,7 +23,7 @@ const COMMON_HEADLINES = [
   'Software a medida',
   'Llamada de 30 min gratis',
   'Resultados en 2 a 4 semanas',
-  'Desde 3.000 € por 6 meses',
+  'Desde 3.000 € en 6 meses',
   'Propuesta cerrada en días',
   'Agenda una llamada',
   'Software que encaja contigo',
@@ -128,7 +128,7 @@ export const AD_GROUPS = [
     descriptions: [
       'Ordenamos cómo trabaja tu equipo hoy, empezando por lo que más tiempo os quita.',
       'Tu equipo da abasto y tú no tienes que estar en todo. Primer resultado en 2 a 4 semanas.',
-      'Desde 3.000 € por seis meses de trabajo, con propuesta cerrada antes de empezar.',
+      'Desde 3.000 € en 6 meses, con propuesta cerrada antes de empezar.',
     ],
     images: ['18-empresa-ha-crecido', '25-software-que-encaja'],
   },
@@ -154,7 +154,7 @@ export const CALLOUTS = [
   'Llamada gratis de 30 min',
   'Propuesta cerrada en días',
   'Resultados en 2-4 semanas',
-  'Desde 3.000 € / 6 meses',
+  'Desde 3.000 € en 6 meses',
   'Con lo que ya usas',
   'Hecho a tu medida',
 ];

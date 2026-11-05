@@ -64,11 +64,8 @@ export const encajaCta = { label: 'Agenda una llamada', href: '#contacto' } as c
 
 export const encajaCallNote = '30 minutos por videollamada, gratis y sin compromiso.';
 
-/**
- * ⚠️ Precio dado por el negocio el 4/11/2026: «a partir de 3.000 € en 6 meses».
- * Interpretado como precio de partida por seis meses de trabajo; confirmar la redacción.
- */
-export const encajaPrice = 'Desde 3.000 € por seis meses de trabajo.';
+/** Precio con la redacción que confirmó el negocio el 5/11/2026. */
+export const encajaPrice = 'Desde 3.000 € en 6 meses.';
 
 /** Cuánto tiempo se ahorra no se promete en cifras: se calcula con cada cliente. */
 export const encajaTimeNote = 'Cuánto tiempo exactamente depende de tu empresa: lo calculamos contigo en la llamada.';
@@ -77,7 +74,8 @@ export const encajaOutcomesLabel = 'Lo que cambia';
 
 /**
  * Caso real descrito por el negocio en el discovery (en pasado: «lo que se hizo fue una
- * aplicación…»). Sin nombre, sector ni cifras. ⚠️ Confirmar que se puede publicar así.
+ * aplicación…»). Sin nombre, sector ni cifras; el negocio confirmó el 5/11/2026 que se puede
+ * publicar así.
  */
 export const encajaCase = {
   label: 'Un caso real',

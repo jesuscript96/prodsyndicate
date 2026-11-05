@@ -36,7 +36,7 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 | Software a medida | 17 |
 | Llamada de 30 min gratis | 24 |
 | Resultados en 2 a 4 semanas | 27 |
-| Desde 3.000 € por 6 meses | 25 |
+| Desde 3.000 € en 6 meses | 24 |
 | Propuesta cerrada en días | 25 |
 | Agenda una llamada | 18 |
 | Software que encaja contigo | 27 |
@@ -84,7 +84,7 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 | Software a medida | 17 |
 | Llamada de 30 min gratis | 24 |
 | Resultados en 2 a 4 semanas | 27 |
-| Desde 3.000 € por 6 meses | 25 |
+| Desde 3.000 € en 6 meses | 24 |
 | Propuesta cerrada en días | 25 |
 | Agenda una llamada | 18 |
 | Software que encaja contigo | 27 |
@@ -131,7 +131,7 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 | Software a medida | 17 |
 | Llamada de 30 min gratis | 24 |
 | Resultados en 2 a 4 semanas | 27 |
-| Desde 3.000 € por 6 meses | 25 |
+| Desde 3.000 € en 6 meses | 24 |
 | Propuesta cerrada en días | 25 |
 | Agenda una llamada | 18 |
 | Software que encaja contigo | 27 |
@@ -142,7 +142,7 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 |---|---|
 | Ordenamos cómo trabaja tu equipo hoy, empezando por lo que más tiempo os quita. | 79 |
 | Tu equipo da abasto y tú no tienes que estar en todo. Primer resultado en 2 a 4 semanas. | 88 |
-| Desde 3.000 € por seis meses de trabajo, con propuesta cerrada antes de empezar. | 80 |
+| Desde 3.000 € en 6 meses, con propuesta cerrada antes de empezar. | 65 |
 | Llamada de 30 minutos, gratis y sin compromiso. Sales con una idea de cómo quedaría. | 84 |
 
 ## Recursos de campaña
@@ -163,7 +163,7 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 | Llamada gratis de 30 min | 24 |
 | Propuesta cerrada en días | 25 |
 | Resultados en 2-4 semanas | 25 |
-| Desde 3.000 € / 6 meses | 23 |
+| Desde 3.000 € en 6 meses | 24 |
 | Con lo que ya usas | 18 |
 | Hecho a tu medida | 17 |
 
