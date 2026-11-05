@@ -6,7 +6,8 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 
 - [x] `{{MARCA}}` → **AUTOMATO** (`site.name`). Isotipo: tomate cortado por la mitad visto desde el corte (`components/layout/brand-mark.tsx`, `app/icon.svg`, `app/apple-icon.png`; se regeneran con `npm run brand:icons`).
 - [x] `{{DOMINIO}}` → **automatoagency.art** (canónica `https://www.automatoagency.art`, fijada en `site.config.ts`; `NEXT_PUBLIC_SITE_URL` solo hace falta para sobrescribirla). Email `hola@automatoagency.art` en `site.email`, legales y `.env.example`.
-- [ ] ⚠️ Confirmar que el buzón `hola@automatoagency.art` existe y recibe correo (y `no-reply@` en Resend) antes de activar el aviso por email del formulario.
+- [x] `hola@automatoagency.art` recibe correo desde el 5/11/2026 (alias en Google Workspace, con MX y SPF de Google en el DNS de Hostinger).
+- [ ] `no-reply@` en Resend antes de activar el aviso por email del formulario y de la agenda.
 - [x] `{{RAZÓN_SOCIAL}}` y jurisdicción → **Jesús Valenzuela Chuliá** (empresario individual, NIF 53759792Y, Torrent), legislación española y tribunales de Valencia, en `site.legalName` y páginas legales.
 - [ ] Herramienta de agenda: las landings `/encaja/*` usan la agenda propia con Google Calendar (`docs/agenda-google.md`). `/contacto` sigue esperando `NEXT_PUBLIC_CAL_URL` (Cal.com o Calendly) o pasar a la agenda propia.
 - [x] Analítica → GTM-K3ZHSP9S (GA4 G-MHXH3R4RX3 y píxel de Meta 1826034535373102, con Modo de consentimiento v2 y aviso propio), instalado desde Valme OS. Plausible/Umami ya no se usa.
@@ -30,13 +31,15 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 
 Antes de poner anuncios hacia las landings:
 
-- [ ] ⚠️ **Agenda con Google Calendar:** sin `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_REFRESH_TOKEN` en Vercel, la agenda no aparece y solo queda el email. Pasos en `docs/agenda-google.md`.
-- [ ] ⚠️ **Turnstile en producción** (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`): obligatorio para reservar y para `/contacto`. Comprobado el 4/11/2026: la web publicada no lleva clave de Turnstile, así que hoy el formulario de `/contacto` no puede entregar leads.
-- [ ] ⚠️ Horario de llamadas, margen entre llamadas y antelación mínima en `lib/agenda/config.ts` (por defecto: L-J 10-14 y 16-19, V 10-14, 15 min de margen, 12 h de antelación, 14 días).
-- [ ] ⚠️ Precio «Desde 3.000 € por seis meses de trabajo» (`content/encaja.ts`): redactado a partir de «a partir de 3.000 € en 6 meses»; confirmar.
-- [ ] ⚠️ Caso real del equipo comercial (`encajaCase`): publicado sin nombre ni cifras a partir del discovery; confirmar que se puede contar así.
-- [ ] ⚠️ «¿De quién es la herramienta?» responde «Tuya» con el texto de la FAQ global: confirmar que vale con el modelo de pago por meses.
-- [ ] Conversión «Llamada reservada» en Google Ads con el evento `generate_lead` de GTM, y campaña de búsqueda según `docs/encaja/google-ads.md`. Mapa de todos los assets: `docs/encaja/README.md`.
+- [x] **Agenda con Google Calendar** en producción desde el 5/11/2026: variables de Google en Vercel y reserva de prueba hecha (invitación con Meet, one pager y `generate_lead`). Pasos en `docs/agenda-google.md`.
+- [x] **Turnstile en producción** desde el 5/11/2026 (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`).
+- [x] Horario de llamadas confirmado el 5/11/2026: L-J 10-14 y 16-19, V 10-14, 15 min de margen, 12 h de antelación, 14 días (`lib/agenda/config.ts`).
+- [x] Precio confirmado el 5/11/2026: «Desde 3.000 € en 6 meses» (`content/encaja.ts` y textos de Google Ads).
+- [x] Caso real del equipo comercial (`encajaCase`) confirmado el 5/11/2026: se publica sin nombre, sector ni cifras.
+- [x] Plazos («primer resultado en 2 a 4 semanas», «propuesta cerrada en pocos días») y la FAQ de propiedad («Tuyo») confirmados el 5/11/2026.
+- [x] Conversión «Llamada reservada» en Google Ads con el evento `generate_lead` de GTM (5/11/2026). También llega a GA4.
+- [ ] Campaña de búsqueda según `docs/encaja/google-ads.md`. Mapa de todos los assets: `docs/encaja/README.md`.
+- [ ] Marcar `generate_lead` como evento clave en GA4 cuando aparezca en la lista de eventos (tarda hasta 24 h).
 
 ## Hero (§7)
 
