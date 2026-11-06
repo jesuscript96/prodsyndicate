@@ -73,6 +73,12 @@ En cada una:
 
 Sus ids van en Vercel (Production) como `VALME_OS_LANDINGS`, un JSON: `{"tiempo":"…","procesos":"…","crecer":"…","web":"…"}`. Sin esa variable, en producción la reserva sigue funcionando pero el lead no se registra (el log dice `valme_os_config_missing`), y el contacto responde con error y ofrece el email.
 
+## Aviso por correo de cada lead
+
+Cada reserva, cada «te escribimos nosotros» y cada envío de `/contacto` mandan además un correo de aviso (`lib/notify.ts`) con los datos del lead, la página, la campaña y, si es una reserva, la hora y el enlace de Meet. «Responder» le escribe directamente al cliente. Sale por Resend desde `automatoagency.art`, que está verificado en la cuenta de Resend de Valme.
+
+Variables en Vercel (Production): `RESEND_API_KEY` (clave con permiso de envío), `CONTACT_FROM_EMAIL` (remitente del dominio) y `CONTACT_TO_EMAIL` (a quién llega; varios, separados por comas). Sin ellas no se avisa, pero los leads siguen llegando a Valme OS.
+
 ## Horario
 El horario, la duración, el margen entre llamadas y la antelación mínima están en `lib/agenda/config.ts`. Los festivos y las ausencias se bloquean creando un evento ocupado en tu calendario.
 

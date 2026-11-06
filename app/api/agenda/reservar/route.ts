@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
 import { z } from 'zod';
 import { availableSlots, invalidateBusy } from '@/lib/agenda/availability';
 import { agendaConfig } from '@/lib/agenda/config';
@@ -11,15 +10,16 @@ import { verifyTurnstile } from '@/lib/agenda/turnstile';
 import { consentRecord } from '@/lib/agenda/consent';
 import { encajaPresentationPath, getEncajaLanding } from '@/content/encaja';
 import { absoluteUrl } from '@/lib/seo';
+import { notifyNewLead } from '@/lib/notify';
 import { destinationFor, sendLeadToValmeOs } from '@/lib/valme-os';
 import { site } from '@/site.config';
 
 /**
  * POST /api/agenda/reservar: honeypot → validación → Turnstile → comprobación del hueco con
  * free/busy al momento → evento en Google Calendar con Google Meet e invitación al cliente.
- * Después registra el lead en Valme OS (CRM, correo con el resumen en PDF y aviso al equipo) y,
- * si están configurados, en Supabase y con un aviso por email (Resend). Nada de eso tumba la
- * reserva: el evento ya está creado.
+ * Después registra el lead en Valme OS (CRM, correo con el resumen en PDF y aviso al equipo),
+ * avisa por correo (lib/notify.ts) y, si está configurado, lo guarda en Supabase. Nada de eso
+ * tumba la reserva: el evento ya está creado.
  *
  * Sin credenciales: en producción responde 503 'config'; en desarrollo simula la reserva
  * (no crea nada) y registra un resumen SIN datos personales. Nunca se escriben datos personales
@@ -87,35 +87,6 @@ async function saveLead(d: BookingInput, start: number) {
     utm: d.utm ?? null,
   });
   if (error) console.error('booking_lead_insert_failed', error.code);
-}
-
-async function notifyOwner(d: BookingInput, start: number) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.CONTACT_FROM_EMAIL;
-  const to = process.env.CONTACT_TO_EMAIL;
-  if (!apiKey || !from || !to) return;
-  await new Resend(apiKey).emails.send({
-    from,
-    to,
-    replyTo: d.email,
-    subject: `Llamada reservada: ${d.name} · ${when(start)}`,
-    text: [
-      `Cuándo: ${when(start)} (hora de ${agendaConfig.timeZone})`,
-      `Nombre: ${d.name}`,
-      `Email: ${d.email}`,
-      d.company ? `Empresa: ${d.company}` : '',
-      d.phone ? `Teléfono: ${d.phone}` : '',
-      d.source ? `Origen: ${d.source}` : '',
-      d.utm && Object.keys(d.utm).length
-        ? `UTM: ${Object.entries(d.utm)
-            .map(([k, v]) => `${k}=${v}`)
-            .join(' · ')}`
-        : '',
-      d.message ? `\n${d.message}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n'),
-  });
 }
 
 export async function POST(req: Request) {
@@ -219,11 +190,20 @@ export async function POST(req: Request) {
     } catch {
       console.error('booking_lead_insert_failed');
     }
-    try {
-      await notifyOwner(d, start);
-    } catch {
-      console.error('booking_email_failed');
-    }
+    await notifyNewLead({
+      kind: 'llamada',
+      name: d.name,
+      email: d.email,
+      phone: d.phone,
+      company: d.company,
+      message: d.message,
+      page: d.landing,
+      source: d.source,
+      utm: d.utm,
+      clicks: d.clicks,
+      when: when(start),
+      meetUrl: meeting.meetUrl,
+    });
 
     return json({ ok: true, ...iso, meetUrl: meeting.meetUrl, presentationUrl });
   } catch (e) {

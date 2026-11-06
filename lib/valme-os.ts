@@ -37,6 +37,9 @@ export type ValmeLead = {
 export type ValmeResult = 'ok' | 'skipped' | 'error';
 
 const DEFAULT_URL = 'https://www.valmesolutions.com/api/leads';
+
+/** CRM de AUTOMATO en Valme OS (para enlazarlo desde los avisos por correo). */
+export const VALME_OS_CRM_URL = 'https://www.valmesolutions.com/app/c/automato/leads';
 const TIMEOUT_MS = 8000;
 
 function landingIds(): Partial<Record<LeadDestination, string>> {
