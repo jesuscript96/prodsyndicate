@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import type { PostMeta } from '@/content/types';
-import { CalendarFacade } from './calendar-facade';
+import { Button } from '@/components/ui/button';
 
 type Props = {
   /** Dos artículos recomendados (getLatestPosts(2) desde el server component). */
@@ -30,7 +30,9 @@ export function ContactSuccess({ posts }: Props) {
         </p>
       </div>
 
-      <CalendarFacade from="contact-success" label="Agendar una llamada" />
+      <Button href="#agenda" variant="secondary" arrow analytics={{ location: 'contact-success', label: 'Elegir un hueco' }}>
+        Elegir un hueco
+      </Button>
 
       {posts.length > 0 && (
         <div className="success__posts">

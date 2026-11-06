@@ -6,6 +6,7 @@
   padding: clamp(1.25rem, 3vw, 2rem);
   min-width: 0;
 }
+.booking--bare { padding: 0; }
 .booking__head { display: grid; gap: 0.25rem; }
 .booking__title:focus { outline: none; }
 .booking__tz { margin: 0; color: var(--ink-3); font-size: 0.9375rem; }

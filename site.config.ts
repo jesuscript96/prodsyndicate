@@ -27,7 +27,6 @@ export const site = {
   url: siteUrl(),
   locale: 'es',
   email: `hola@${PRODUCTION_DOMAIN}`,
-  calendarUrl: process.env.NEXT_PUBLIC_CAL_URL ?? '',
   tagline: 'Productos digitales a medida, de la idea al lanzamiento.',
   description:
     'Diseñamos y construimos MVPs, software a medida y automatizaciones con IA. Te acompañamos de la idea al lanzamiento, con diseño cuidado y código que se puede heredar.',

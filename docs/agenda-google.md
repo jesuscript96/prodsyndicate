@@ -1,6 +1,6 @@
 # Agenda de la web con Google Calendar y Google Meet
 
-La web enseña los huecos libres de tu Google Calendar y, cuando alguien elige uno, crea el evento con enlace de Google Meet y le envía la invitación por email. La usan las landings de la campaña «Encaja».
+La web enseña los huecos libres de tu Google Calendar y, cuando alguien elige uno, crea el evento con enlace de Google Meet y le envía la invitación por email. La usan las landings de la campaña «Encaja» y el lateral de `/contacto` (`/contacto#agenda`, destino de «Agenda una llamada» en toda la web); allí sin el modo «te escribimos nosotros», porque la página ya es el formulario.
 
 - **Disponibilidad:** `GET /api/agenda/disponibilidad`. Cruza el horario de `lib/agenda/config.ts` con lo ocupado en tu calendario. Solo consulta ocupado o libre: nunca lee el contenido de tus eventos.
 - **Reserva:** `POST /api/agenda/reservar`. Vuelve a comprobar el hueco en ese momento, crea el evento con Meet e invita al cliente. Después registra el lead en Valme OS (ver abajo). Si Supabase y Resend están configurados, también lo guarda allí y te avisa por email.

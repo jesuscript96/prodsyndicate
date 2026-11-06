@@ -21,7 +21,7 @@ type Props = {
   id?: string;
 };
 
-const defaultSecondary: Cta = { label: 'Agenda una llamada de 15 min', href: '/contacto#agenda' };
+const defaultSecondary: Cta = { label: 'Agenda una llamada de 30 min', href: '/contacto#agenda' };
 
 /** Banda final (§6.9 sección 11): H2 enorme, botón primario y secundario, eco del último frame del hero. */
 export function CtaBand({

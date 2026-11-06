@@ -9,7 +9,7 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 - [x] `hola@automatoagency.art` recibe correo desde el 5/11/2026 (alias en Google Workspace, con MX y SPF de Google en el DNS de Hostinger).
 - [ ] `no-reply@` en Resend antes de activar el aviso por email del formulario y de la agenda.
 - [x] `{{RAZÓN_SOCIAL}}` y jurisdicción → **Jesús Valenzuela Chuliá** (empresario individual, NIF 53759792Y, Torrent), legislación española y tribunales de Valencia, en `site.legalName` y páginas legales.
-- [ ] Herramienta de agenda: las landings `/encaja/*` usan la agenda propia con Google Calendar (`docs/agenda-google.md`). `/contacto` sigue esperando `NEXT_PUBLIC_CAL_URL` (Cal.com o Calendly) o pasar a la agenda propia. Sus leads ya van a Valme OS (landing `web`).
+- [x] Herramienta de agenda: la agenda propia con Google Calendar (`docs/agenda-google.md`) está en las landings `/encaja/*` y, desde el 6/11/2026, en `/contacto#agenda` (destino de «Agenda una llamada» en toda la web). Los leads de `/contacto` van a Valme OS (landing `web`), probado el 6/11/2026.
 - [x] Analítica → GTM-K3ZHSP9S (GA4 G-MHXH3R4RX3 y píxel de Meta 1826034535373102, con Modo de consentimiento v2 y aviso propio), instalado desde Valme OS. Plausible/Umami ya no se usa.
 - [ ] ⚠️ `site.areaServed` en JSON-LD `Service` (hoy `ES`).
 - [ ] Redes sociales → `site.social`.
@@ -43,7 +43,7 @@ Antes de poner anuncios hacia las landings:
 - [x] Campaña de búsqueda publicada el 6/11/2026 según `docs/encaja/google-ads.md`: tres grupos (Tiempo, Procesos y Crecer), negativas a nivel de campaña y objetivos de llamada y contacto. Mapa de todos los assets: `docs/encaja/README.md`.
 - [x] `generate_lead` marcado como evento clave en GA4 (6/11/2026).
 - [ ] Revisar cada semana el reparto entre los tres grupos y los términos de búsqueda (añadir negativas). Al mes, concentrar en el grupo que convierta.
-- [ ] Probar en producción el formulario de `/contacto` (va a la landing «web» de Valme OS).
+- [x] Formulario de `/contacto` probado en producción el 6/11/2026: lead en Valme OS (landing «web»), correo y conversión «Contacto enviado».
 - [ ] El evento de Meta (CAPI) desde Valme OS falla con 400: revisar el token cuando se monte Meta.
 
 ## Hero (§7)
