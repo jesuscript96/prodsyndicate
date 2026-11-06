@@ -9,7 +9,7 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 - [x] `hola@automatoagency.art` recibe correo desde el 5/11/2026 (alias en Google Workspace, con MX y SPF de Google en el DNS de Hostinger).
 - [ ] `no-reply@` en Resend antes de activar el aviso por email del formulario y de la agenda.
 - [x] `{{RAZÓN_SOCIAL}}` y jurisdicción → **Jesús Valenzuela Chuliá** (empresario individual, NIF 53759792Y, Torrent), legislación española y tribunales de Valencia, en `site.legalName` y páginas legales.
-- [ ] Herramienta de agenda: las landings `/encaja/*` usan la agenda propia con Google Calendar (`docs/agenda-google.md`). `/contacto` sigue esperando `NEXT_PUBLIC_CAL_URL` (Cal.com o Calendly) o pasar a la agenda propia.
+- [ ] Herramienta de agenda: las landings `/encaja/*` usan la agenda propia con Google Calendar (`docs/agenda-google.md`). `/contacto` sigue esperando `NEXT_PUBLIC_CAL_URL` (Cal.com o Calendly) o pasar a la agenda propia. Sus leads ya van a Valme OS (landing `web`).
 - [x] Analítica → GTM-K3ZHSP9S (GA4 G-MHXH3R4RX3 y píxel de Meta 1826034535373102, con Modo de consentimiento v2 y aviso propio), instalado desde Valme OS. Plausible/Umami ya no se usa.
 - [ ] ⚠️ `site.areaServed` en JSON-LD `Service` (hoy `ES`).
 - [ ] Redes sociales → `site.social`.
@@ -38,6 +38,8 @@ Antes de poner anuncios hacia las landings:
 - [x] Caso real del equipo comercial (`encajaCase`) confirmado el 5/11/2026: se publica sin nombre, sector ni cifras.
 - [x] Plazos («primer resultado en 2 a 4 semanas», «propuesta cerrada en pocos días») y la FAQ de propiedad («Tuyo») confirmados el 5/11/2026.
 - [x] Conversión «Llamada reservada» en Google Ads con el evento `generate_lead` de GTM (5/11/2026). También llega a GA4.
+- [ ] **Leads en Valme OS**: la reserva, «te escribimos nosotros» y `/contacto` envían el lead a Valme OS (CRM y correo con el one pager). Falta crear las cuatro landings en Valme OS (cliente AUTOMATO), con los orígenes de la web, y poner sus ids en Vercel como `VALME_OS_LANDINGS` (`docs/agenda-google.md`, «Leads en Valme OS»).
+- [ ] Conversión «Contacto enviado» en Google Ads con `generate_lead` y `lead_type = contacto` (GTM, pendiente de publicar).
 - [ ] Campaña de búsqueda según `docs/encaja/google-ads.md`. Mapa de todos los assets: `docs/encaja/README.md`.
 - [ ] Marcar `generate_lead` como evento clave en GA4 cuando aparezca en la lista de eventos (tarda hasta 24 h).
 

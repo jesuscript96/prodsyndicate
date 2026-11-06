@@ -108,11 +108,19 @@ export const contactSchema = z.object({
     .refine((v) => v === true, { message: 'Debes aceptar la política de privacidad' }),
   website: z.string().max(0).optional(), // honeypot: debe llegar vacío
   turnstileToken: z.string().min(1),
-  utm: z.record(z.string(), z.string()).optional(),
+  // Origen de la visita (lib/attribution.ts): todo opcional y acotado.
+  utm: z.record(z.string().max(60), z.string().max(200)).optional(),
   source: z.string().max(200).optional(),
+  clicks: z.record(z.string().max(20), z.string().max(400)).optional(),
+  fbp: z.string().max(200).optional(),
+  fbc: z.string().max(400).optional(),
+  pixelConsent: z.boolean().nullable().optional(),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
+
+/** Campos de origen que el asistente añade al enviar (no son del formulario). */
+type ContactAttribution = Pick<ContactInput, 'utm' | 'source' | 'clicks' | 'fbp' | 'fbc' | 'pixelConsent'>;
 
 /* ───────────── Esquema del formulario (cliente) ───────────── */
 
@@ -132,11 +140,20 @@ const isUrl = (s: string) => z.url().safeParse(s).success;
 
 /**
  * Lo que guarda react-hook-form: igual que la API, pero los enlaces se escriben
- * en un solo campo de texto (`linksText`) y el token de Turnstile, `utm` y
- * `source` se añaden al enviar.
+ * en un solo campo de texto (`linksText`) y el token de Turnstile y el origen
+ * de la visita se añaden al enviar.
  */
 export const contactFormSchema = contactSchema
-  .omit({ links: true, turnstileToken: true, utm: true, source: true })
+  .omit({
+    links: true,
+    turnstileToken: true,
+    utm: true,
+    source: true,
+    clicks: true,
+    fbp: true,
+    fbc: true,
+    pixelConsent: true,
+  })
   .extend({
     // Un grupo de radio sin marcar llega como null desde react-hook-form: el presupuesto es opcional.
     budget: z.string().max(60).nullish(),
@@ -173,7 +190,7 @@ export function stepOfField(field: string): number {
 /** Construye el payload de `POST /api/contact` a partir de los valores del formulario. */
 export function toContactInput(
   values: ContactFormValues,
-  extra: { turnstileToken: string; utm?: Record<string, string>; source?: string },
+  extra: { turnstileToken: string } & ContactAttribution,
 ): ContactInput {
   const clean = (s: string | undefined) => {
     const t = s?.trim();
@@ -197,5 +214,9 @@ export function toContactInput(
     turnstileToken: extra.turnstileToken,
     utm: extra.utm,
     source: extra.source,
+    clicks: extra.clicks,
+    fbp: extra.fbp,
+    fbc: extra.fbc,
+    pixelConsent: extra.pixelConsent,
   };
 }

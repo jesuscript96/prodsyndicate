@@ -6,7 +6,8 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { FormProvider, useForm, type DefaultValues, type FieldErrors } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import type { PostMeta } from '@/content/types';
-import { track } from '@/lib/analytics';
+import { track, trackLead } from '@/lib/analytics';
+import { readAttribution } from '@/lib/attribution';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { clamp } from '@/lib/utils';
 import {
@@ -68,7 +69,7 @@ type ApiResponse = {
 
 type Draft = { v: 1; step: number; values: Partial<ContactFormValues> };
 
-/* ───────────── sessionStorage (autoguardado, utm y origen) ───────────── */
+/* ───────────── sessionStorage (autoguardado) ───────────── */
 
 function readDraft(): Draft | null {
   try {
@@ -98,28 +99,6 @@ function clearDraft() {
     sessionStorage.removeItem(DRAFT_KEY);
   } catch {
     /* nada */
-  }
-}
-
-function readAttribution(): { utm?: Record<string, string>; source?: string } {
-  try {
-    const out: { utm?: Record<string, string>; source?: string } = {};
-    const rawUtm = sessionStorage.getItem('utm');
-    if (rawUtm) {
-      const parsed: unknown = JSON.parse(rawUtm);
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        const utm: Record<string, string> = {};
-        for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
-          if (typeof v === 'string') utm[k.slice(0, 60)] = v.slice(0, 200);
-        }
-        if (Object.keys(utm).length) out.utm = utm;
-      }
-    }
-    const source = sessionStorage.getItem('source');
-    if (source) out.source = source.slice(0, 200);
-    return out;
-  } catch {
-    return {};
   }
 }
 
@@ -281,7 +260,8 @@ export function ContactWizard({ posts }: Props) {
 
       if (res.ok && data.ok) {
         clearDraft();
-        track('form_submit', { audience: values.audience });
+        track('form_submit', { audience: values.audience, lead_type: 'contacto' });
+        trackLead('contacto', 'contacto');
         setStatus('success');
         return;
       }

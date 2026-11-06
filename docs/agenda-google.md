@@ -3,8 +3,9 @@
 La web enseña los huecos libres de tu Google Calendar y, cuando alguien elige uno, crea el evento con enlace de Google Meet y le envía la invitación por email. La usan las landings de la campaña «Encaja».
 
 - **Disponibilidad:** `GET /api/agenda/disponibilidad`. Cruza el horario de `lib/agenda/config.ts` con lo ocupado en tu calendario. Solo consulta ocupado o libre: nunca lee el contenido de tus eventos.
-- **Reserva:** `POST /api/agenda/reservar`. Vuelve a comprobar el hueco en ese momento, crea el evento con Meet e invita al cliente. Si Supabase y Resend están configurados, también guarda el lead y te avisa por email.
-- **Sin credenciales:** en desarrollo se simula todo y no se crea nada. En producción la agenda no aparece y la landing ofrece el email.
+- **Reserva:** `POST /api/agenda/reservar`. Vuelve a comprobar el hueco en ese momento, crea el evento con Meet e invita al cliente. Después registra el lead en Valme OS (ver abajo). Si Supabase y Resend están configurados, también lo guarda allí y te avisa por email.
+- **«Te escribimos nosotros»:** `POST /api/encaja/contacto`. La misma tarjeta permite dejar los datos sin elegir hueco; el lead va a Valme OS y la pantalla final enseña el one pager.
+- **Sin credenciales:** en desarrollo se simula todo y no se crea nada. En producción, si la agenda no carga, la tarjeta pasa directamente al formulario de contacto.
 
 La invitación sale de la cuenta de Google dueña del calendario. Si quieres que salga de `hola@automatoagency.art`, esa dirección tiene que ser una cuenta de Google Workspace.
 
@@ -53,6 +54,25 @@ Opcionales:
 
 Después, vuelve a desplegar.
 
+## Leads en Valme OS
+
+Cada reserva y cada «te escribimos nosotros» se envían a Valme OS (`lib/valme-os.ts`), que guarda el lead en el CRM de AUTOMATO, manda el correo de respuesta con el enlace al one pager de la landing y avisa al equipo en la app. El formulario de `/contacto` también envía allí sus leads.
+
+En Valme OS, dentro del cliente AUTOMATO, hay una landing por destino:
+
+| Destino | Página de la web | One pager del correo |
+|---|---|---|
+| `tiempo` | `/encaja/tiempo` | `/encaja/presentacion-tiempo.pdf` |
+| `procesos` | `/encaja/procesos` | `/encaja/presentacion-procesos.pdf` |
+| `crecer` | `/encaja/crecer` | `/encaja/presentacion-crecer.pdf` |
+| `web` | `/contacto` | Ninguno |
+
+En cada una:
+- **Orígenes permitidos:** `https://www.automatoagency.art` y `https://automatoagency.art`. Valme OS rechaza los envíos de cualquier otro origen, también los de las previews de Vercel.
+- **Plantilla de correo:** el asunto, sin `{{nombre}}`, y el enlace al one pager en el texto.
+
+Sus ids van en Vercel (Production) como `VALME_OS_LANDINGS`, un JSON: `{"tiempo":"…","procesos":"…","crecer":"…","web":"…"}`. Sin esa variable, en producción la reserva sigue funcionando pero el lead no se registra (el log dice `valme_os_config_missing`), y el contacto responde con error y ofrece el email.
+
 ## Horario
 El horario, la duración, el margen entre llamadas y la antelación mínima están en `lib/agenda/config.ts`. Los festivos y las ausencias se bloquean creando un evento ocupado en tu calendario.
 
@@ -60,8 +80,11 @@ El horario, la duración, el margen entre llamadas y la antelación mínima est�
 1. Abre una landing, por ejemplo `/encaja/tiempo`, y reserva un hueco con otro email tuyo.
 2. A ese email llega la invitación con el enlace de Meet.
 3. El evento aparece en tu calendario y el hueco desaparece de la web.
+4. El lead aparece en Valme OS, en el CRM de AUTOMATO, y llega el correo con el one pager.
+5. Repite con «Déjanos tus datos y te escribimos»: lead en Valme OS, correo y botón «Ver el resumen».
 
 ## Si algo falla
 - **El log dice `token:invalid_grant`:** el permiso ha caducado o se ha revocado. Repite el paso 4 y actualiza `GOOGLE_REFRESH_TOKEN`.
 - **El log dice `freebusy:notFound`:** un calendario de `GOOGLE_BUSY_CALENDARS` no existe o la cuenta no tiene acceso.
 - **El evento se crea sin Meet:** comprueba que la cuenta tiene Google Meet activado.
+- **El log dice `valme_os_lead_failed 403`:** el origen no está permitido en la landing de Valme OS. Con `400` o `404`, revisa el id de `VALME_OS_LANDINGS`.

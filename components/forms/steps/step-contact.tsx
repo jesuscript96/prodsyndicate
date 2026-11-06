@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { CircleAlert } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
+import { consentCopy } from '@/lib/agenda/consent';
 import type { ContactFormValues } from '@/lib/validators';
 import { Field } from '../field';
 
@@ -45,7 +46,7 @@ export function StepContact() {
               política de privacidad
               <span className="sr-only"> (se abre en una pestaña nueva)</span>
             </Link>
-            . Usaremos tus datos solo para responder a esta solicitud.
+            . {consentCopy.formulario}
           </label>
         </div>
         {consentError && (

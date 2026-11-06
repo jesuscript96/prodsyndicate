@@ -11,16 +11,20 @@ import {
   contactSchema,
   type ContactInput,
 } from '@/lib/validators';
+import { consentRecord } from '@/lib/agenda/consent';
+import { sendLeadToValmeOs, valmeConfigured, type ValmeResult } from '@/lib/valme-os';
 
 /**
- * POST /api/contact (§9.3): verificación Turnstile → validación zod →
- * inserción en Supabase → aviso por email (Resend, best effort).
+ * POST /api/contact (§9.3): verificación Turnstile → validación zod → lead en
+ * Valme OS (landing «web» de VALME_OS_LANDINGS: CRM y aviso al equipo) y, si
+ * está configurado, en Supabase → aviso por email (Resend, best effort).
+ * Basta con que uno de los dos guarde el lead.
  *
  * Degradación en desarrollo (NODE_ENV !== 'production'):
  * - sin TURNSTILE_SECRET_KEY se omite la verificación;
- * - sin SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY se registra en consola un
- *   resumen SIN datos personales y se responde ok:true.
- * En producción, sin configuración se responde 500 'config'.
+ * - sin Valme OS ni Supabase se registra en consola un resumen SIN datos
+ *   personales y se responde ok:true.
+ * En producción, sin ninguno de los dos se responde 500 'config'.
  * Nunca se escriben datos personales en los logs.
  */
 
@@ -64,6 +68,32 @@ function safeSummary(d: ContactInput) {
     source: d.source ?? null,
     utmKeys: d.utm ? Object.keys(d.utm) : [],
   };
+}
+
+/** Lead en Valme OS con las respuestas del asistente en texto legible. */
+function sendToValme(d: ContactInput): Promise<ValmeResult> {
+  if (!valmeConfigured('web')) return Promise.resolve('skipped');
+  return sendLeadToValmeOs({
+    destination: 'web',
+    name: d.name,
+    email: d.email,
+    phone: d.phone,
+    answers: {
+      tipo: 'Formulario de contacto',
+      perfil: label(AUDIENCE_OPTIONS, d.audience),
+      necesita: d.needs.map((n) => label(NEED_OPTIONS, n)).join(', '),
+      etapa: label(STAGE_OPTIONS, d.stage),
+      plazo: label(TIMELINE_OPTIONS, d.timeline),
+      presupuesto: d.budget ? label(BUDGET_OPTIONS, d.budget) : undefined,
+      empresa: d.company,
+      mensaje: d.message,
+      enlaces: d.links?.join(' '),
+      pagina: '/contacto',
+      origen: d.source,
+    },
+    consentText: consentRecord('formulario'),
+    attribution: { utm: d.utm, clicks: d.clicks, fbp: d.fbp, fbc: d.fbc, pixelConsent: d.pixelConsent },
+  });
 }
 
 async function notifyByEmail(d: ContactInput) {
@@ -139,21 +169,26 @@ export async function POST(req: Request) {
   }
   if (verdict === 'fail') return json({ ok: false, error: 'captcha' }, 400);
 
-  // Persistencia
+  // Persistencia: Valme OS y, si está configurado, Supabase. Basta con uno.
+  const valme = await sendToValme(d);
+
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !supabaseKey) {
-    if (isProduction) {
-      console.error('contact_config_missing', 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY');
+    if (valme === 'ok' || (valme === 'skipped' && !isProduction)) {
+      if (valme === 'skipped') console.info('[contact] lead recibido (sin Valme OS ni Supabase, solo desarrollo)', safeSummary(d));
+      try {
+        await notifyByEmail(d);
+      } catch {
+        console.error('lead_email_failed');
+      }
+      return json({ ok: true });
+    }
+    if (valme === 'skipped') {
+      console.error('contact_config_missing', 'VALME_OS_LANDINGS / SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY');
       return json({ ok: false, error: 'config' }, 500);
     }
-    console.info('[contact] lead recibido (sin Supabase, solo desarrollo)', safeSummary(d));
-    try {
-      await notifyByEmail(d);
-    } catch {
-      console.error('lead_email_failed');
-    }
-    return json({ ok: true });
+    return json({ ok: false, error: 'server' }, 500);
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
@@ -176,7 +211,7 @@ export async function POST(req: Request) {
 
   if (error) {
     console.error('lead_insert_failed', error.code); // sin datos personales en logs
-    return json({ ok: false, error: 'server' }, 500);
+    if (valme !== 'ok') return json({ ok: false, error: 'server' }, 500);
   }
 
   // Aviso por email: best effort (el lead ya está guardado).

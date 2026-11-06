@@ -23,7 +23,8 @@ Las landings no se indexan en buscadores y no salen en el sitemap. Despliega Ver
 | Componentes y ruta de las landings | `components/encaja/` · `app/(campaign)/encaja/[slug]/page.tsx` | |
 | Imágenes del hero y vista previa para compartir | `public/encaja/hero-*.webp` · `public/encaja/og-*.png` | |
 | One pagers A4 en PDF | `public/encaja/presentacion-*.pdf` | `npm run encaja:presentaciones` |
-| Agenda con Google Calendar y Meet | `lib/agenda/` · `app/api/agenda/` · `components/agenda/` | Configuración: [agenda-google.md](../agenda-google.md) |
+| Agenda con Google Calendar y Meet, y «te escribimos nosotros» | `lib/agenda/` · `app/api/agenda/` · `app/api/encaja/contacto/` · `components/agenda/` | Configuración: [agenda-google.md](../agenda-google.md) |
+| Envío de leads a Valme OS (CRM y correo con el one pager) | `lib/valme-os.ts` · `lib/attribution.ts` | Landings y variable: [agenda-google.md](../agenda-google.md#leads-en-valme-os) |
 | **Campaña de Google Ads**: guía | [google-ads.md](google-ads.md) | |
 | Campaña de Google Ads: textos, palabras clave y CSV | [google-ads/](google-ads/) | `npm run encaja:google-ads` |
 | Imágenes de Google Ads sin logotipo y logotipos | `assets/encaja/google-ads/` | |
@@ -42,14 +43,15 @@ Las landings no se indexan en buscadores y no salen en el sitemap. Despliega Ver
 | Plantilla y generador de anuncios | Mismo worktree: `scripts/promo/ads/` | Sin guardar en git |
 | Vídeo «Encaja» de 25 s, con y sin voz, y guion de locución | Mismo worktree: `assets/promo/automato-empresas-25s*.mp4` · `scripts/promo/guiones-locucion.md` | Los vídeos pesan demasiado para git |
 | Respuestas del discovery | Página privada en Claude: https://claude.ai/artifact/RUCY6soSkjKmTP4XzbsQWa | Solo la ve su dueño |
-| Medición | Google Tag Manager GTM-K3ZHSP9S · GA4 G-MHXH3R4RX3 | La reserva envía el evento `generate_lead` |
+| Medición | Google Tag Manager GTM-K3ZHSP9S · GA4 G-MHXH3R4RX3 | La reserva y el contacto envían `generate_lead` con `lead_type` (`llamada` o `contacto`); de ahí salen las conversiones «Llamada reservada» y «Contacto enviado» de Google Ads |
+| Leads | Valme OS, cliente AUTOMATO | Una landing por destino; ids en `VALME_OS_LANDINGS` (Vercel) |
 
 ## Estado
 
 - **Hecho:** las landings, los one pagers y la estructura de la campaña de búsqueda.
+- **Hecho también:** agenda y Turnstile en producción; conversiones «Llamada reservada» y «Contacto enviado».
 - **Falta para lanzar:**
-  - las variables de Google Calendar y Turnstile en Vercel;
-  - la conversión «Llamada reservada» en Google Ads y Tag Manager;
-  - crear la campaña.
+  - las landings de Valme OS y `VALME_OS_LANDINGS` en Vercel;
+  - publicar la campaña con sus tres grupos de anuncios.
 
   Todo está detallado en [google-ads.md](google-ads.md), en el apartado «Antes de lanzar».
