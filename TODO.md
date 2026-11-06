@@ -38,10 +38,13 @@ Antes de poner anuncios hacia las landings:
 - [x] Caso real del equipo comercial (`encajaCase`) confirmado el 5/11/2026: se publica sin nombre, sector ni cifras.
 - [x] Plazos («primer resultado en 2 a 4 semanas», «propuesta cerrada en pocos días») y la FAQ de propiedad («Tuyo») confirmados el 5/11/2026.
 - [x] Conversión «Llamada reservada» en Google Ads con el evento `generate_lead` de GTM (5/11/2026). También llega a GA4.
-- [ ] **Leads en Valme OS**: la reserva, «te escribimos nosotros» y `/contacto` envían el lead a Valme OS (CRM y correo con el one pager). Falta crear las cuatro landings en Valme OS (cliente AUTOMATO), con los orígenes de la web, y poner sus ids en Vercel como `VALME_OS_LANDINGS` (`docs/agenda-google.md`, «Leads en Valme OS»).
-- [ ] Conversión «Contacto enviado» en Google Ads con `generate_lead` y `lead_type = contacto` (GTM, pendiente de publicar).
-- [ ] Campaña de búsqueda según `docs/encaja/google-ads.md`. Mapa de todos los assets: `docs/encaja/README.md`.
-- [ ] Marcar `generate_lead` como evento clave en GA4 cuando aparezca en la lista de eventos (tarda hasta 24 h).
+- [x] **Leads en Valme OS** desde el 6/11/2026: la reserva, «te escribimos nosotros» y `/contacto` envían el lead a Valme OS (CRM y correo con el one pager desde hola@automatoagency.art). Cuatro landings en Valme OS (cliente AUTOMATO) y `VALME_OS_LANDINGS` en Vercel (`docs/agenda-google.md`, «Leads en Valme OS»). Probado de punta a punta con una reserva y un contacto.
+- [x] Conversión «Contacto enviado» en Google Ads con `generate_lead` y `lead_type = contacto` (GTM publicado el 6/11/2026).
+- [x] Campaña de búsqueda publicada el 6/11/2026 según `docs/encaja/google-ads.md`: tres grupos (Tiempo, Procesos y Crecer), negativas a nivel de campaña y objetivos de llamada y contacto. Mapa de todos los assets: `docs/encaja/README.md`.
+- [x] `generate_lead` marcado como evento clave en GA4 (6/11/2026).
+- [ ] Revisar cada semana el reparto entre los tres grupos y los términos de búsqueda (añadir negativas). Al mes, concentrar en el grupo que convierta.
+- [ ] Probar en producción el formulario de `/contacto` (va a la landing «web» de Valme OS).
+- [ ] El evento de Meta (CAPI) desde Valme OS falla con 400: revisar el token cuando se monte Meta.
 
 ## Hero (§7)
 
