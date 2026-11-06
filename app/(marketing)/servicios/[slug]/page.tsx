@@ -71,7 +71,7 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
 
   const path = `/servicios/${detail.slug}`;
   const isAgenda = detail.cta.href.includes('#agenda');
-  const bandSecondary: Cta = isAgenda ? contactCta : { label: 'Agenda una llamada de 15 min', href: '/contacto#agenda' };
+  const bandSecondary: Cta = isAgenda ? contactCta : { label: 'Agenda una llamada de 30 min', href: '/contacto#agenda' };
 
   // Los MDX de proyectos y blog los crea otro módulo: estas secciones se renderizan solo si hay contenido.
   const projects = getProjectsForService(detail.slug, 2);

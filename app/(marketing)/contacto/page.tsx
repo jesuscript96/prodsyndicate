@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CalendarFacade } from '@/components/forms/calendar-facade';
+import { Booking } from '@/components/agenda/booking';
 import { ContactWizard } from '@/components/forms/contact-wizard';
 import { LinkArrow } from '@/components/ui/link-arrow';
 import { PageHero } from '@/components/ui/page-hero';
@@ -26,8 +26,9 @@ const AFTER_STEPS = [
 
 /**
  * /contacto (§8.10): izquierda, el asistente de 6 pasos; derecha (sticky),
- * "¿Prefieres hablar?" con la agenda (id="agenda", destino de /contacto#agenda),
- * email directo y "Qué pasa después". Sin CtaBand: la página es la conversión.
+ * "¿Prefieres hablar?" con la agenda propia de Google Calendar (id="agenda", destino de
+ * /contacto#agenda; docs/agenda-google.md), email directo y "Qué pasa después".
+ * Sin CtaBand: la página es la conversión.
  */
 export default function ContactPage() {
   const posts = getLatestPosts(2);
@@ -54,8 +55,8 @@ export default function ContactPage() {
                 <h2 id="agenda-title" className="h3">
                   ¿Prefieres hablar?
                 </h2>
-                <p className="body text-ink-2">Elige un hueco y lo vemos en una llamada corta.</p>
-                <CalendarFacade from="contact-aside" />
+                <p className="body text-ink-2">Una llamada de 30 minutos por videollamada, gratis y sin compromiso.</p>
+                <Booking landing="contacto" location="contact-aside" withContact={false} bare />
               </div>
 
               <div className="contact-aside__block">

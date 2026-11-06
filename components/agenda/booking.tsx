@@ -31,6 +31,13 @@ type Props = {
   landing: string;
   /** Ubicación para analítica */
   location: string;
+  /**
+   * Ofrecer «te escribimos nosotros» (por defecto, sí). En /contacto no hace falta: la página ya
+   * es el formulario, y si la agenda no carga se ofrece el email.
+   */
+  withContact?: boolean;
+  /** Sin marco de tarjeta, para meterla dentro de otra tarjeta. */
+  bare?: boolean;
   className?: string;
 };
 
@@ -56,7 +63,7 @@ function validate(v: Values): Partial<Record<FieldName, string>> {
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export function Booking({ landing, location, className }: Props) {
+export function Booking({ landing, location, withContact = true, bare = false, className }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const doneRef = useRef<HTMLHeadingElement>(null);
@@ -117,7 +124,7 @@ export function Booking({ landing, location, className }: Props) {
   const agendaOk = status === 'ready' && days.length > 0;
   /** Sin agenda (no carga o no hay huecos) solo queda dejar los datos. */
   const noAgenda = status === 'unavailable' || (status === 'ready' && days.length === 0);
-  const kind: LeadType = noAgenda ? 'contacto' : mode;
+  const kind: LeadType = withContact && noAgenda ? 'contacto' : mode;
   const isCall = kind === 'llamada';
 
   const load = useCallback(async () => {
@@ -298,7 +305,7 @@ export function Booking({ landing, location, className }: Props) {
   if (done) {
     const firstName = values.name.trim().split(/\s+/)[0];
     return (
-      <div className={cn('booking card', className)} ref={root}>
+      <div className={cn('booking', bare ? 'booking--bare' : 'card', className)} ref={root}>
         <div className="booking__done" role="status">
           <span className="booking__done-icon" aria-hidden="true">
             <Check />
@@ -349,7 +356,7 @@ export function Booking({ landing, location, className }: Props) {
   const showForm = !isCall || Boolean(slot);
 
   return (
-    <div className={cn('booking card', className)} ref={root} aria-busy={status === 'loading' || undefined}>
+    <div className={cn('booking', bare ? 'booking--bare' : 'card', className)} ref={root} aria-busy={status === 'loading' || undefined}>
       <div className="booking__head">
         <h3 ref={headRef} tabIndex={-1} className="h4 booking__title">
           {isCall ? 'Elige un hueco' : 'Te escribimos nosotros'}
@@ -365,6 +372,19 @@ export function Booking({ landing, location, className }: Props) {
         </div>
       )}
       {isCall && status === 'loading' && <p className="sr-only">Cargando la agenda…</p>}
+
+      {isCall && noAgenda && (
+        <div className="booking__fallback">
+          <p>
+            {status === 'unavailable'
+              ? 'Ahora mismo no podemos enseñarte la agenda. Escríbenos y te proponemos un hueco.'
+              : 'No quedan huecos libres en los próximos días. Escríbenos y buscamos uno.'}
+          </p>
+          <Button href={`mailto:${site.email}?subject=${encodeURIComponent('Llamada de 30 minutos')}`} arrow>
+            {site.email}
+          </Button>
+        </div>
+      )}
 
       {isCall && agendaOk && activeDay && (
         <>
@@ -501,7 +521,7 @@ export function Booking({ landing, location, className }: Props) {
       )}
 
       {/* Cambio de vía: escribir en vez de reservar, o volver a la agenda si tiene huecos */}
-      {isCall && status !== 'unavailable' && (
+      {withContact && isCall && status !== 'unavailable' && (
         <p className="booking__switch">
           ¿Ninguna hora te va bien?{' '}
           <button type="button" onClick={() => switchMode('contacto')}>
@@ -509,7 +529,7 @@ export function Booking({ landing, location, className }: Props) {
           </button>
         </p>
       )}
-      {!isCall && agendaOk && (
+      {withContact && !isCall && agendaOk && (
         <p className="booking__switch">
           ¿Prefieres hablar ya?{' '}
           <button type="button" onClick={() => switchMode('llamada')}>
