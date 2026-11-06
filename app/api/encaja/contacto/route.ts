@@ -5,13 +5,15 @@ import { contactLeadSchema, type ContactLeadResponse } from '@/lib/agenda/schema
 import { verifyTurnstile } from '@/lib/agenda/turnstile';
 import { encajaPresentationPath, getEncajaLanding } from '@/content/encaja';
 import { absoluteUrl } from '@/lib/seo';
+import { notifyNewLead } from '@/lib/notify';
 import { destinationFor, sendLeadToValmeOs, valmeConfigured } from '@/lib/valme-os';
 
 /**
  * POST /api/encaja/contacto: «prefiero que me escribáis» en las landings de Encaja.
  * Honeypot → validación → Turnstile → lead en Valme OS, que lo guarda en el CRM, manda el correo
- * con el resumen en PDF de la landing y avisa al equipo. Devuelve el enlace al PDF para la
- * pantalla de confirmación.
+ * con el resumen en PDF de la landing y avisa al equipo, y aviso por correo (lib/notify.ts).
+ * Basta con que llegue por una de las dos vías. Devuelve el enlace al PDF para la pantalla de
+ * confirmación.
  *
  * Sin Valme OS configurado: en producción responde 503 'config' (el formulario ofrece el email);
  * en desarrollo simula el envío. Nunca se escriben datos personales en los logs.
@@ -73,22 +75,37 @@ export async function POST(req: Request) {
     return json({ ok: true, presentationUrl, mock: true });
   }
 
-  const result = await sendLeadToValmeOs({
-    destination,
-    name: d.name,
-    email: d.email,
-    phone: d.phone,
-    answers: {
-      tipo: 'Quiere que le escribamos',
-      empresa: d.company,
-      mensaje: d.message,
-      pagina: d.landing,
-      origen: d.source,
-    },
-    consentText: consentRecord('contacto'),
-    attribution: { utm: d.utm, clicks: d.clicks, fbp: d.fbp, fbc: d.fbc, pixelConsent: d.pixelConsent },
-  });
-  if (result !== 'ok') return json({ ok: false, error: 'server' }, 502);
+  const [result, notice] = await Promise.all([
+    sendLeadToValmeOs({
+      destination,
+      name: d.name,
+      email: d.email,
+      phone: d.phone,
+      answers: {
+        tipo: 'Quiere que le escribamos',
+        empresa: d.company,
+        mensaje: d.message,
+        pagina: d.landing,
+        origen: d.source,
+      },
+      consentText: consentRecord('contacto'),
+      attribution: { utm: d.utm, clicks: d.clicks, fbp: d.fbp, fbc: d.fbc, pixelConsent: d.pixelConsent },
+    }),
+    notifyNewLead({
+      kind: 'contacto',
+      name: d.name,
+      email: d.email,
+      phone: d.phone,
+      company: d.company,
+      message: d.message,
+      page: d.landing,
+      source: d.source,
+      utm: d.utm,
+      clicks: d.clicks,
+    }),
+  ]);
+  // Si Valme OS falla pero el aviso ha salido, el lead no se pierde.
+  if (result !== 'ok' && notice !== 'ok') return json({ ok: false, error: 'server' }, 502);
 
   return json({ ok: true, presentationUrl });
 }

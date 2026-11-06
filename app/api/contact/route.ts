@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
 import { z } from 'zod';
 import {
   AUDIENCE_OPTIONS,
@@ -12,19 +11,20 @@ import {
   type ContactInput,
 } from '@/lib/validators';
 import { consentRecord } from '@/lib/agenda/consent';
+import { notifyNewLead, type NoticeResult } from '@/lib/notify';
 import { sendLeadToValmeOs, valmeConfigured, type ValmeResult } from '@/lib/valme-os';
 
 /**
  * POST /api/contact (§9.3): verificación Turnstile → validación zod → lead en
- * Valme OS (landing «web» de VALME_OS_LANDINGS: CRM y aviso al equipo) y, si
- * está configurado, en Supabase → aviso por email (Resend, best effort).
- * Basta con que uno de los dos guarde el lead.
+ * Valme OS (landing «web» de VALME_OS_LANDINGS: CRM y aviso al equipo), aviso
+ * por correo (lib/notify.ts) y, si está configurado, copia en Supabase. Basta
+ * con que llegue por una de las tres vías.
  *
  * Degradación en desarrollo (NODE_ENV !== 'production'):
  * - sin TURNSTILE_SECRET_KEY se omite la verificación;
- * - sin Valme OS ni Supabase se registra en consola un resumen SIN datos
+ * - sin ninguna de las tres vías se registra en consola un resumen SIN datos
  *   personales y se responde ok:true.
- * En producción, sin ninguno de los dos se responde 500 'config'.
+ * En producción, sin ninguna se responde 500 'config'.
  * Nunca se escriben datos personales en los logs.
  */
 
@@ -96,41 +96,57 @@ function sendToValme(d: ContactInput): Promise<ValmeResult> {
   });
 }
 
-async function notifyByEmail(d: ContactInput) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.CONTACT_FROM_EMAIL;
-  const to = process.env.CONTACT_TO_EMAIL;
-  if (!apiKey || !from || !to) return;
-
-  const resend = new Resend(apiKey);
-  const lines = [
-    `Nombre: ${d.name}`,
-    `Email: ${d.email}`,
-    d.company ? `Empresa: ${d.company}` : '',
-    d.phone ? `Teléfono: ${d.phone}` : '',
-    `Perfil: ${label(AUDIENCE_OPTIONS, d.audience)}`,
-    `Necesita: ${d.needs.map((n) => label(NEED_OPTIONS, n)).join(', ')}`,
-    `Etapa: ${label(STAGE_OPTIONS, d.stage)}`,
-    `Plazo: ${label(TIMELINE_OPTIONS, d.timeline)}`,
-    d.budget ? `Presupuesto: ${label(BUDGET_OPTIONS, d.budget)}` : '',
-    d.source ? `Origen: ${d.source}` : '',
-    d.utm && Object.keys(d.utm).length
-      ? `UTM: ${Object.entries(d.utm)
-          .map(([k, v]) => `${k}=${v}`)
-          .join(' · ')}`
-      : '',
-    '',
-    d.message ?? '',
-    d.links?.length ? `\nEnlaces:\n${d.links.join('\n')}` : '',
-  ];
-
-  await resend.emails.send({
-    from,
-    to,
-    replyTo: d.email,
-    subject: `Nuevo lead: ${d.name} (${label(AUDIENCE_OPTIONS, d.audience)})`,
-    text: lines.filter(Boolean).join('\n'),
+/** Aviso por correo (lib/notify.ts) con las respuestas del asistente en texto legible. */
+function notify(d: ContactInput): Promise<NoticeResult> {
+  return notifyNewLead({
+    kind: 'formulario',
+    name: d.name,
+    email: d.email,
+    phone: d.phone,
+    company: d.company,
+    message: d.message,
+    page: '/contacto',
+    source: d.source,
+    utm: d.utm,
+    clicks: d.clicks,
+    details: [
+      ['Perfil', label(AUDIENCE_OPTIONS, d.audience)],
+      ['Necesita', d.needs.map((n) => label(NEED_OPTIONS, n)).join(', ')],
+      ['Etapa', label(STAGE_OPTIONS, d.stage)],
+      ['Plazo', label(TIMELINE_OPTIONS, d.timeline)],
+      ['Presupuesto', d.budget ? label(BUDGET_OPTIONS, d.budget) : undefined],
+      ['Enlaces', d.links?.join(' ')],
+    ],
   });
+}
+
+/** Copia en Supabase (tabla public.leads), si está configurado. */
+async function saveToSupabase(d: ContactInput): Promise<'ok' | 'skipped' | 'error'> {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return 'skipped';
+  const supabase = createClient(url, key, { auth: { persistSession: false } });
+  const { error } = await supabase.from('leads').insert({
+    audience: d.audience,
+    needs: d.needs,
+    stage: d.stage,
+    timeline: d.timeline,
+    budget: d.budget ?? null,
+    message: d.message ?? null,
+    links: d.links ?? null,
+    name: d.name,
+    email: d.email,
+    company: d.company ?? null,
+    phone: d.phone ?? null,
+    consent: d.consent,
+    source: d.source ?? null,
+    utm: d.utm ?? null,
+  });
+  if (error) {
+    console.error('lead_insert_failed', error.code); // sin datos personales en logs
+    return 'error';
+  }
+  return 'ok';
 }
 
 export async function POST(req: Request) {
@@ -169,57 +185,17 @@ export async function POST(req: Request) {
   }
   if (verdict === 'fail') return json({ ok: false, error: 'captcha' }, 400);
 
-  // Persistencia: Valme OS y, si está configurado, Supabase. Basta con uno.
-  const valme = await sendToValme(d);
+  // Valme OS, aviso por correo y, si está configurado, Supabase. Basta con que llegue por una vía.
+  const [valme, notice, stored] = await Promise.all([sendToValme(d), notify(d), saveToSupabase(d)]);
+  if (valme === 'ok' || notice === 'ok' || stored === 'ok') return json({ ok: true });
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseKey) {
-    if (valme === 'ok' || (valme === 'skipped' && !isProduction)) {
-      if (valme === 'skipped') console.info('[contact] lead recibido (sin Valme OS ni Supabase, solo desarrollo)', safeSummary(d));
-      try {
-        await notifyByEmail(d);
-      } catch {
-        console.error('lead_email_failed');
-      }
+  if (valme === 'skipped' && notice === 'skipped' && stored === 'skipped') {
+    if (!isProduction) {
+      console.info('[contact] lead recibido (sin Valme OS, aviso ni Supabase, solo desarrollo)', safeSummary(d));
       return json({ ok: true });
     }
-    if (valme === 'skipped') {
-      console.error('contact_config_missing', 'VALME_OS_LANDINGS / SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY');
-      return json({ ok: false, error: 'config' }, 500);
-    }
-    return json({ ok: false, error: 'server' }, 500);
+    console.error('contact_config_missing', 'VALME_OS_LANDINGS / RESEND_API_KEY / SUPABASE_URL');
+    return json({ ok: false, error: 'config' }, 500);
   }
-
-  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
-  const { error } = await supabase.from('leads').insert({
-    audience: d.audience,
-    needs: d.needs,
-    stage: d.stage,
-    timeline: d.timeline,
-    budget: d.budget ?? null,
-    message: d.message ?? null,
-    links: d.links ?? null,
-    name: d.name,
-    email: d.email,
-    company: d.company ?? null,
-    phone: d.phone ?? null,
-    consent: d.consent,
-    source: d.source ?? null,
-    utm: d.utm ?? null,
-  });
-
-  if (error) {
-    console.error('lead_insert_failed', error.code); // sin datos personales en logs
-    if (valme !== 'ok') return json({ ok: false, error: 'server' }, 500);
-  }
-
-  // Aviso por email: best effort (el lead ya está guardado).
-  try {
-    await notifyByEmail(d);
-  } catch {
-    console.error('lead_email_failed');
-  }
-
-  return json({ ok: true });
+  return json({ ok: false, error: 'server' }, 500);
 }
