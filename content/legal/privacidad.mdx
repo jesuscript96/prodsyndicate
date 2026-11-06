@@ -1,7 +1,7 @@
 ---
 title: Política de privacidad
 description: Quién es responsable de tus datos cuando nos escribes, con qué finalidad los tratamos, quién nos ayuda a hacerlo y cómo ejercer tus derechos.
-updated: '2026-11-02'
+updated: '2026-11-05'
 ---
 
 ## 1. Responsable del tratamiento
@@ -17,9 +17,10 @@ updated: '2026-11-02'
 Tratamos los datos que tú nos facilitas, los estrictamente necesarios para que la web funcione y, solo si lo aceptas, los de analítica y publicidad:
 
 - **Formulario de contacto:** nombre, email, empresa y teléfono (estos dos últimos son opcionales), el mensaje y los enlaces de referencia que decidas incluir, y tus respuestas sobre el proyecto (perfil, necesidad, punto de partida, plazos y presupuesto).
-- **Origen de la visita:** si llegas desde una campaña, guardamos en tu navegador los parámetros `utm_*` de la URL y el dominio de procedencia durante la sesión, para saber por dónde nos has encontrado. No permiten identificarte.
+- **Reserva de llamada y contacto en las páginas de Encaja** (`/encaja/…`): nombre, email, empresa y teléfono (estos dos últimos son opcionales), lo que quieras contarnos y, si reservas, el día y la hora de la llamada.
+- **Origen de la visita:** si llegas desde una campaña, guardamos en tu navegador durante la sesión los parámetros `utm_*` de la URL, el identificador de clic del anuncio (`gclid`, `gbraid`, `wbraid` o `fbclid`) y el dominio de procedencia, para saber por dónde nos has encontrado. Por sí solos no permiten identificarte; si nos escribes o reservas una llamada, se guardan junto a tu solicitud.
 - **Protección antispam:** al enviar el formulario, Cloudflare Turnstile verifica que no eres un robot. Para esa verificación se transmite a Cloudflare información técnica de tu navegador y tu dirección IP. No la guardamos en nuestra base de datos.
-- **Formularios de las páginas de campaña** (`/lp/…`): los mismos datos de contacto que escribas en ellos, junto con la página y la campaña de la que vienes. Se registran en Valme OS, la herramienta con la que gestionamos nuestras campañas.
+- **Dónde se registran:** las solicitudes del formulario de contacto, de las páginas de Encaja y de las páginas de campaña (`/lp/…`) se registran, junto con la página y la campaña de la que vienes, en Valme OS, la herramienta con la que gestionamos nuestras campañas y contactos. Desde ahí te enviamos el email de respuesta con el resumen que corresponda.
 - **Analítica y publicidad, solo si las aceptas:** con tu consentimiento en el aviso de cookies, Google Analytics y el píxel de Meta registran cómo navegas por la web y si llegas desde un anuncio. Si no aceptas, no se instalan sus cookies (más detalle en la [Política de cookies](/legal/cookies)).
 
 No tratamos categorías especiales de datos ni tomamos decisiones automatizadas que produzcan efectos jurídicos sobre ti.
@@ -46,12 +47,13 @@ Puedes retirar tu consentimiento en cualquier momento, sin que ello afecte a la 
 
 No vendemos ni cedemos tus datos a terceros. Para prestar el servicio nos apoyamos en proveedores que actúan como encargados del tratamiento, bajo contrato y siguiendo nuestras instrucciones:
 
-- **Vercel** — alojamiento de la web y de los servidores que procesan el formulario.
+- **Vercel** — alojamiento de la web y de los servidores que procesan los formularios.
 - **Supabase** — base de datos donde se guardan las solicitudes de contacto.
 - **Resend** — envío de los emails transaccionales relacionados con tu solicitud (por ejemplo, el aviso interno de que has escrito).
 - **Cloudflare Turnstile** — protección antispam del formulario.
-- **Valme OS** — gestión de nuestras campañas y de los contactos que llegan por las páginas de campaña (alojado también en Vercel y Supabase).
-- **Google** (Tag Manager y Analytics), solo si aceptas las cookies — estadísticas de uso y medición de campañas.
+- **Valme OS** — gestión de nuestras campañas y de los contactos que llegan por la web, y envío del email de respuesta (alojado también en Vercel y Supabase).
+- **Google** (Workspace: Calendar, Meet y Gmail) — agenda de las llamadas que reservas: creamos el evento con tu nombre y tu email y te enviamos la invitación de Google Meet.
+- **Google** (Tag Manager, Analytics y Ads), solo si aceptas las cookies — estadísticas de uso y medición de campañas.
 - **Meta Platforms** (píxel y API de conversiones), solo si aceptas las cookies — medición de las campañas en Facebook e Instagram. Cuando nos escribes desde una página de campaña habiendo aceptado las cookies, se le comunica a Meta que ha habido un contacto, con tu email y tu teléfono cifrados (en forma de hash), tu IP y tu navegador, para que pueda relacionarlo con el anuncio. Nunca el contenido de tu mensaje.
 
 Además, podremos comunicar datos a las administraciones públicas o a las autoridades cuando una norma nos obligue a ello.
@@ -66,7 +68,7 @@ Procuramos que los datos se traten en la Unión Europea (por ejemplo, alojando l
 - **Cookies de analítica y publicidad:** lo que dura cada cookie, según la [Política de cookies](/legal/cookies).
 - **Datos de clientes:** mientras dure la relación contractual y, después, durante los plazos de prescripción de las obligaciones legales (fiscales, contables y contractuales) que resulten de aplicación.
 - **Suscripción al boletín:** hasta que te des de baja.
-- **Origen de la visita** (`utm_*` y procedencia): solo durante la sesión de navegación; se borra al cerrar el navegador.
+- **Origen de la visita** (`utm_*`, identificador de clic y procedencia): en tu navegador, solo durante la sesión; se borra al cerrar el navegador. Si nos escribes, se conserva con tu solicitud durante el mismo plazo que ella.
 
 Cumplido el plazo, los datos se eliminan o se anonimizan de forma segura.
 

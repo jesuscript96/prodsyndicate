@@ -8,14 +8,18 @@ import { createMeeting, googleConfigured } from '@/lib/agenda/google';
 import { bookingSchema, type BookingInput, type BookingResponse } from '@/lib/agenda/schema';
 import { computeSlots } from '@/lib/agenda/slots';
 import { verifyTurnstile } from '@/lib/agenda/turnstile';
+import { consentRecord } from '@/lib/agenda/consent';
 import { encajaPresentationPath, getEncajaLanding } from '@/content/encaja';
 import { absoluteUrl } from '@/lib/seo';
+import { destinationFor, sendLeadToValmeOs } from '@/lib/valme-os';
 import { site } from '@/site.config';
 
 /**
  * POST /api/agenda/reservar: honeypot → validación → Turnstile → comprobación del hueco con
  * free/busy al momento → evento en Google Calendar con Google Meet e invitación al cliente.
- * Después, en el mejor de los casos, guarda el lead en Supabase y avisa por email (Resend).
+ * Después registra el lead en Valme OS (CRM, correo con el resumen en PDF y aviso al equipo) y,
+ * si están configurados, en Supabase y con un aviso por email (Resend). Nada de eso tumba la
+ * reserva: el evento ya está creado.
  *
  * Sin credenciales: en producción responde 503 'config'; en desarrollo simula la reserva
  * (no crea nada) y registra un resumen SIN datos personales. Nunca se escriben datos personales
@@ -191,6 +195,24 @@ export async function POST(req: Request) {
       },
     });
     invalidateBusy();
+
+    const valme = await sendLeadToValmeOs({
+      destination: destinationFor(d.landing),
+      name: d.name,
+      email: d.email,
+      phone: d.phone,
+      answers: {
+        tipo: 'Llamada reservada',
+        llamada: `${when(start)} (hora peninsular)`,
+        empresa: d.company,
+        mensaje: d.message,
+        pagina: d.landing,
+        origen: d.source,
+      },
+      consentText: consentRecord('llamada'),
+      attribution: { utm: d.utm, clicks: d.clicks, fbp: d.fbp, fbc: d.fbc, pixelConsent: d.pixelConsent },
+    });
+    if (valme === 'skipped' && isProduction) console.error('valme_os_config_missing', 'VALME_OS_LANDINGS');
 
     try {
       await saveLead(d, start);

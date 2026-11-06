@@ -1,5 +1,15 @@
 import { z } from 'zod';
 
+/** Origen de la visita que adjunta el navegador (lib/attribution.ts). Todo opcional y acotado. */
+const attributionFields = {
+  source: z.string().max(200).optional(),
+  utm: z.record(z.string().max(60), z.string().max(200)).optional(),
+  clicks: z.record(z.string().max(20), z.string().max(400)).optional(),
+  fbp: z.string().max(200).optional(),
+  fbc: z.string().max(400).optional(),
+  pixelConsent: z.boolean().nullable().optional(),
+};
+
 /** Reserva de llamada desde la web. Mensajes de error en español: se muestran en el formulario. */
 export const bookingSchema = z.object({
   start: z.iso.datetime({ error: 'Elige un hueco' }),
@@ -18,11 +28,23 @@ export const bookingSchema = z.object({
   website: z.string().max(0).optional(), // honeypot: debe llegar vacío
   turnstileToken: z.string().min(1),
   landing: z.string().max(40).optional(),
-  source: z.string().max(200).optional(),
-  utm: z.record(z.string(), z.string()).optional(),
+  ...attributionFields,
 });
 
 export type BookingInput = z.infer<typeof bookingSchema>;
+
+/**
+ * «Prefiero que me escribáis»: alternativa a la reserva en las landings. Mismos datos que la
+ * reserva, sin hueco. Va a Valme OS (lib/valme-os.ts), que manda el resumen en PDF por email.
+ */
+export const contactLeadSchema = bookingSchema.omit({ start: true });
+
+export type ContactLeadInput = z.infer<typeof contactLeadSchema>;
+
+/** Respuesta de /api/encaja/contacto */
+export type ContactLeadResponse =
+  | { ok: true; presentationUrl?: string; mock?: boolean }
+  | { ok: false; error: 'invalid_json' | 'validation' | 'captcha' | 'config' | 'server' };
 
 /** Respuesta de /api/agenda/disponibilidad */
 export type AvailabilityResponse =
