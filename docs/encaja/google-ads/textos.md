@@ -169,9 +169,9 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 
 **Fragmento estructurado** · Servicios: Automatizaciones · Integraciones · Herramientas internas · Paneles de gestión · Asistentes de IA
 
-**Palabras negativas** (`negativas.txt`, concordancia amplia, a nivel de campaña)
+**Palabras negativas** (`negativas.txt`, a nivel de campaña; las de varias palabras, en concordancia de frase)
 
-`gratis` · `gratuito` · `curso` · `cursos` · `formacion` · `master` · `tutorial` · `aprender` · `como hacer` · `plantilla` · `plantillas` · `descargar` · `pdf` · `empleo` · `trabajo de` · `ofertas de trabajo` · `sueldo` · `salario` · `practicas` · `oposiciones` · `que es` · `definicion` · `ejemplos` · `login` · `iniciar sesion` · `soporte` · `telefono` · `certificacion` · `universidad` · `grado` · `chatgpt` · `wordpress` · `tienda online` · `juegos` · `open source` · `github`
+`gratis` · `gratuito` · `curso` · `cursos` · `formacion` · `master` · `tutorial` · `aprender` · `"como hacer"` · `plantilla` · `plantillas` · `descargar` · `pdf` · `empleo` · `"trabajo de"` · `"ofertas de trabajo"` · `sueldo` · `salario` · `practicas` · `oposiciones` · `"que es"` · `definicion` · `ejemplos` · `login` · `"iniciar sesion"` · `soporte` · `telefono` · `certificacion` · `universidad` · `grado` · `chatgpt` · `wordpress` · `"tienda online"` · `juegos` · `"open source"` · `github`
 
 **Sufijo de URL final** (a nivel de campaña)
 

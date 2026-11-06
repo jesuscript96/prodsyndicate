@@ -49,9 +49,7 @@ Las landings no se indexan en buscadores y no salen en el sitemap. Despliega Ver
 ## Estado
 
 - **Hecho:** las landings, los one pagers y la estructura de la campaña de búsqueda.
-- **Hecho también:** agenda y Turnstile en producción; conversiones «Llamada reservada» y «Contacto enviado».
-- **Falta para lanzar:**
-  - las landings de Valme OS y `VALME_OS_LANDINGS` en Vercel;
-  - publicar la campaña con sus tres grupos de anuncios.
+- **Hecho también:** agenda y Turnstile en producción; leads en Valme OS con el correo del one pager; conversiones «Llamada reservada» y «Contacto enviado».
+- **En marcha desde el 6/11/2026:** la campaña de búsqueda con sus tres grupos de anuncios. Seguimiento semanal en `TODO.md`.
 
   Todo está detallado en [google-ads.md](google-ads.md), en el apartado «Antes de lanzar».

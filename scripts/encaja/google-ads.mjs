@@ -134,13 +134,17 @@ export const AD_GROUPS = [
   },
 ];
 
-/** Palabras negativas de campaña (concordancia amplia): búsquedas de quien no va a contratar. */
+/**
+ * Palabras negativas de campaña: búsquedas de quien no va a contratar. Las de una palabra van en
+ * concordancia amplia; las de varias, entre comillas (frase), para no bloquear búsquedas como
+ * «automatizar trabajo de oficina» por llevar «trabajo» y «de» sueltas.
+ */
 export const NEGATIVES = [
-  'gratis', 'gratuito', 'curso', 'cursos', 'formacion', 'master', 'tutorial', 'aprender', 'como hacer',
-  'plantilla', 'plantillas', 'descargar', 'pdf', 'empleo', 'trabajo de', 'ofertas de trabajo', 'sueldo',
-  'salario', 'practicas', 'oposiciones', 'que es', 'definicion', 'ejemplos', 'login', 'iniciar sesion',
-  'soporte', 'telefono', 'certificacion', 'universidad', 'grado', 'chatgpt', 'wordpress', 'tienda online',
-  'juegos', 'open source', 'github',
+  'gratis', 'gratuito', 'curso', 'cursos', 'formacion', 'master', 'tutorial', 'aprender', '"como hacer"',
+  'plantilla', 'plantillas', 'descargar', 'pdf', 'empleo', '"trabajo de"', '"ofertas de trabajo"', 'sueldo',
+  'salario', 'practicas', 'oposiciones', '"que es"', 'definicion', 'ejemplos', 'login', '"iniciar sesion"',
+  'soporte', 'telefono', 'certificacion', 'universidad', 'grado', 'chatgpt', 'wordpress', '"tienda online"',
+  'juegos', '"open source"', 'github',
 ];
 
 export const SITELINKS = [
@@ -275,7 +279,7 @@ ${table(CALLOUTS)}
 
 **Fragmento estructurado** · ${SNIPPET.header}: ${SNIPPET.values.join(' · ')}
 
-**Palabras negativas** (\`negativas.txt\`, concordancia amplia, a nivel de campaña)
+**Palabras negativas** (\`negativas.txt\`, a nivel de campaña; las de varias palabras, en concordancia de frase)
 
 ${NEGATIVES.map((n) => `\`${n}\``).join(' · ')}
 
