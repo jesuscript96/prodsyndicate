@@ -31,15 +31,15 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 | Automatiza el trabajo manual | 28 |
 | Copiar y pegar no escala | 24 |
 | Pedidos y stock sin Excel | 25 |
-| Todo en un solo sitio | 21 |
-| Sabes cómo va todo | 18 |
+| Automatizar trabajo repetitivo | 30 |
+| Menos tareas administrativas | 28 |
+| Alternativa a Excel para pymes | 30 |
+| Sustituir Excel por software | 28 |
 | Software a medida | 17 |
 | Llamada de 30 min gratis | 24 |
 | Resultados en 2 a 4 semanas | 27 |
 | Desde 3.000 € en 6 meses | 24 |
 | Propuesta cerrada en días | 25 |
-| Agenda una llamada | 18 |
-| Software que encaja contigo | 27 |
 
 **Descripciones**
 
@@ -155,6 +155,8 @@ Generado con `npm run encaja:google-ads` desde `scripts/encaja/google-ads.mjs`. 
 | Software a medida | https://www.automatoagency.art/servicios/software-a-medida | Hecho a tu forma de trabajar | Con lo que ya usas |
 | Automatización e IA | https://www.automatoagency.art/servicios/automatizacion-ia | Lo repetitivo, que vaya solo | IA solo donde aporta |
 | Quiénes somos | https://www.automatoagency.art/nosotros | Quién está detrás | Cerca, rápido y claro |
+| Para empresas | https://www.automatoagency.art/empresas | Portales, paneles e integraciones | Herramientas que tu equipo usa |
+| Agenda una llamada | https://www.automatoagency.art/contacto | 30 minutos, gratis | Elige hueco en la agenda |
 
 **Textos destacados**
 

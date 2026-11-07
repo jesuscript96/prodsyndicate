@@ -54,9 +54,15 @@ export const AD_GROUPS = [
       'Automatiza el trabajo manual',
       'Copiar y pegar no escala',
       'Pedidos y stock sin Excel',
-      'Todo en un solo sitio',
-      'Sabes cómo va todo',
+      // Con las palabras clave del grupo: sin ellas Google dejaba la eficacia del anuncio en «Baja»
+      // y lo limitaba a menos formatos (7-nov). «alternativa a excel para empresas» no cabe en 30.
+      'Automatizar trabajo repetitivo',
+      'Menos tareas administrativas',
+      'Alternativa a Excel para pymes',
+      'Sustituir Excel por software',
     ],
+    /** Comunes que este grupo no lleva, para dejar sitio a los títulos con palabras clave. */
+    dropCommon: ['Agenda una llamada', 'Software que encaja contigo'],
     pinned: ['Tu negocio no cabe en un Excel', 'Deja de ser el administrativo', 'Recupera tus horas'],
     descriptions: [
       'Nos llevamos la operativa que hoy te come el día para que vuelvas a dirigir tu empresa.',
@@ -152,6 +158,8 @@ export const SITELINKS = [
   { text: 'Software a medida', url: '/servicios/software-a-medida', d1: 'Hecho a tu forma de trabajar', d2: 'Con lo que ya usas' },
   { text: 'Automatización e IA', url: '/servicios/automatizacion-ia', d1: 'Lo repetitivo, que vaya solo', d2: 'IA solo donde aporta' },
   { text: 'Quiénes somos', url: '/nosotros', d1: 'Quién está detrás', d2: 'Cerca, rápido y claro' },
+  { text: 'Para empresas', url: '/empresas', d1: 'Portales, paneles e integraciones', d2: 'Herramientas que tu equipo usa' },
+  { text: 'Agenda una llamada', url: '/contacto', d1: '30 minutos, gratis', d2: 'Elige hueco en la agenda' },
 ];
 
 export const CALLOUTS = [
@@ -185,12 +193,14 @@ const check = (kind, s) => {
 };
 
 for (const g of AD_GROUPS) {
-  g.allHeadlines = [...g.headlines, ...COMMON_HEADLINES];
+  const drop = g.dropCommon ?? [];
+  g.allHeadlines = [...g.headlines, ...COMMON_HEADLINES.filter((h) => !drop.includes(h))];
   g.allDescriptions = [...g.descriptions, COMMON_DESCRIPTION];
   const fail = (msg) => {
     errors++;
     console.error(`[google-ads] ${g.name}: ${msg}`);
   };
+  drop.filter((h) => !COMMON_HEADLINES.includes(h)).forEach((h) => fail(`título común que no existe: ${h}`));
   if (g.allHeadlines.length > 15) fail('más de 15 títulos');
   if (g.allDescriptions.length > 4) fail('más de 4 descripciones');
   if (new Set(g.allHeadlines).size !== g.allHeadlines.length) fail('títulos repetidos');
