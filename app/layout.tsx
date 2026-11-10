@@ -23,7 +23,7 @@ const instrument = Instrument_Serif({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} · Productos digitales a medida para emprendedores y empresas`,
+    default: `Productos digitales a medida: MVPs, software e IA | ${site.name}`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
