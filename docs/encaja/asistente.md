@@ -1,6 +1,6 @@
 # Mr. Tomate, el asistente con IA de las landings de Encaja
 
-**Mr. Tomate** es el chat de `/encaja/tiempo`, `/encaja/procesos` y `/encaja/crecer`. Resuelve dudas, ayuda a quien visita a concretar qué necesita y, cuando tiene sentido, le propone huecos reales de la agenda. Responde con la API de DeepSeek.
+**Mr. Tomate** es el chat de `/encaja/tiempo`, `/encaja/procesos` y `/encaja/crecer`. Se presenta como lo que es: AUTOMATO hace productos digitales a medida y Mr. Tomate es uno de ellos (lo dicen el pop-up, la cabecera del chat y su saludo: «Si tú también quieres tener tu producto digital, cuéntame de qué se trata»). Resuelve dudas, ayuda a quien visita a concretar qué necesita y, cuando tiene sentido, le propone huecos reales de la agenda. Responde con la API de DeepSeek.
 
 ## Dónde aparece
 
@@ -10,7 +10,7 @@
 
 ## Modo oferta: requisitos para el prototipo
 
-Si el chat se abre desde el pop-up, Mr. Tomate sabe que viene de la oferta (`entry: 'promo'`) y cambia de papel. Saluda con «Para preparar tu prototipo necesito entender bien qué quieres construir…» y pregunta de una en una:
+Si el chat se abre desde el pop-up, Mr. Tomate sabe que viene de la oferta (`entry: 'promo'`) y cambia de papel. Saluda diciendo que preparará el prototipo con unas preguntas cortas y pregunta de una en una:
 
 1. Qué problema quiere resolver y para quién.
 2. Cómo lo hace hoy y qué falla.
@@ -22,6 +22,7 @@ Si el chat se abre desde el pop-up, Mr. Tomate sabe que viene de la oferta (`ent
 Con los puntos 1 a 4 ya basta, y no alarga más de 6 u 8 preguntas. Cuando tiene suficiente, le resume lo entendido para que lo confirme y le propone huecos.
 
 - **Qué se promete** (confirmado por el negocio el 10/11/2026): pantallas navegables preparadas antes de la llamada con lo que cuente, y enseñadas en una videollamada de 30 minutos, gratis y sin compromiso. No es un programa funcionando con sus datos ni incluye el desarrollo.
+- **Sin llamada reservada no hay prototipo.** Mr. Tomate lo dice al proponer los huecos y si preguntan por recibirlo sin llamada, y en el chat sale siempre bajo los huecos: «Solo preparamos tu prototipo si reservas la llamada». Si prefiere que le escriban, se le escribe para buscar la llamada.
 - **Agenda:** como el prototipo se prepara antes, la llamada de la oferta es como pronto a **3 días laborables** (`lib/agenda/promo.ts`). Lo cumplen los huecos que propone el chat, la agenda de la landing (que lo explica) y el servidor al reservar.
 - **Al equipo:** el lead llega marcado «prototipo gratis» (asunto del aviso, tipo en Valme OS y título del evento) con una **ficha de requisitos**: problema, para quién, cómo lo hacen hoy, usuarios, imprescindibles, datos e integraciones, plazo y dudas abiertas. En Valme OS va en la respuesta `requisitos`.
 

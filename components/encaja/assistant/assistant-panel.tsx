@@ -252,6 +252,8 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
             <span>{s.form === 'contacto' ? 'Dejar mis datos' : 'Ver la agenda'}</span>
           </button>
         )}
+        {/* Oferta del prototipo: siempre a la vista junto a la agenda, no solo si el modelo lo dice */}
+        {chat.entry === 'promo' && (s.slots?.length || s.form) && <p className="assistant__condition">{copy.promoCondition}</p>}
       </>
     );
   };
