@@ -51,6 +51,8 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
   const list = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
   const abort = useRef<AbortController | null>(null);
+  /** Mensaje enviado antes de pasar Turnstile: sale solo en cuanto llega el token. */
+  const waiting = useRef<string | null>(null);
 
   const userTurns = chat.messages.filter((m) => m.role === 'user').length;
   const limitReached = userTurns >= MAX_TURNS;
@@ -106,14 +108,16 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
     }
   };
 
-  const send = async (raw: string) => {
+  const send = async (raw: string, freshToken?: string) => {
     const text = raw.trim().slice(0, MAX_CHARS);
     if (!text || busy || limitReached) return;
-    const turnstileToken = session ? undefined : turnstileEnabled ? token : TURNSTILE_DEV_TOKEN;
+    const turnstileToken = session ? undefined : turnstileEnabled ? freshToken || token : TURNSTILE_DEV_TOKEN;
     if (!session && !turnstileToken) {
-      setNotice('Un segundo: estamos comprobando que no eres un robot. Vuelve a enviar enseguida.');
+      waiting.current = text;
+      setNotice('Estamos comprobando que no eres un robot. Si aparece una casilla debajo, márcala: tu mensaje se envía solo en cuanto termine.');
       return;
     }
+    waiting.current = null;
 
     const before = chat.messages;
     const messages: StoredMessage[] = [...before, { role: 'user', content: text }];
@@ -195,6 +199,16 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
     const answer: StoredMessage = { role: 'assistant', content, ...(shown.slots || shown.form ? { shown } : {}) };
     update({ ...chat, messages: [...messages, answer] });
     setAnnounce(content);
+  };
+
+  // Turnstile listo: si había un mensaje esperando, sale ya.
+  const onToken = (t: string) => {
+    setToken(t);
+    const pending = waiting.current;
+    if (pending) {
+      waiting.current = null;
+      void send(pending, t);
+    }
   };
 
   const submit = (e: FormEvent) => {
@@ -326,7 +340,7 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
             key={turnstileKey}
             className="assistant__turnstile"
             appearance="interaction-only"
-            onToken={setToken}
+            onToken={onToken}
             onExpire={() => setToken('')}
           />
         )}
