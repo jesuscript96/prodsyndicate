@@ -6,7 +6,7 @@ import { absoluteUrl } from '@/lib/seo';
 type Entry = MetadataRoute.Sitemap[number];
 
 /** Rutas fijas (§10.3). Los artículos, proyectos y legales salen de lib/content. */
-const FIXED = ['/', '/servicios', '/proyectos', '/proceso', '/emprendedores', '/empresas', '/nosotros', '/blog', '/contacto'];
+const FIXED = ['/', '/servicios', '/servicios/automatizacion-n8n-make', '/proyectos', '/proceso', '/emprendedores', '/empresas', '/nosotros', '/blog', '/contacto'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
