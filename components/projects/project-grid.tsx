@@ -3,9 +3,13 @@
 import { useId, useRef, useState } from 'react';
 import { categoryLabels } from '@/content/services';
 import type { ProjectCategory, ProjectMeta } from '@/content/types';
-import { Flip, gsap, ScrollTrigger, useGSAP } from '@/lib/gsap';
+import { Flip } from 'gsap/Flip';
+import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap';
 import { ProjectCard } from '@/components/ui/project-card';
 import './projects.css';
+
+// Flip solo se usa aquí: se registra en este módulo para no cargarlo en el resto de páginas.
+if (typeof window !== 'undefined') gsap.registerPlugin(Flip);
 
 type Props = {
   /** Ordenados por `order` (getAllProjects) */
