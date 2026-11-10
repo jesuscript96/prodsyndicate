@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
   // estático (SSG + generateStaticParams) y el modelo clásico evita envolver la
   // lectura de MDX en 'use cache' / <Suspense>. Reactivar si aparecen datos dinámicos.
   reactStrictMode: true,
+  // CSS (Tailwind, pequeño) incrustado en el <head> en producción: quita la hoja que
+  // bloqueaba el primer pintado en móvil (Lighthouse: «Render-blocking requests»).
+  experimental: {
+    inlineCss: true,
+  },
   turbopack: {
     rules: {
       '*.css': {
