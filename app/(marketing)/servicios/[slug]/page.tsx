@@ -179,8 +179,11 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
                 </Reveal>
               ))}
             </ol>
-            <Reveal className="pt-8">
+            <Reveal className="flex flex-wrap gap-x-8 gap-y-3 pt-8">
               <LinkArrow href="/proceso">Ver el proceso completo</LinkArrow>
+              {detail.slug === 'automatizacion-ia' && (
+                <LinkArrow href="/servicios/automatizacion-n8n-make">Automatización con n8n y Make</LinkArrow>
+              )}
             </Reveal>
           </div>
         </section>
