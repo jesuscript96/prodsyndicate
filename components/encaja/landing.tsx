@@ -13,6 +13,7 @@ import { SectionLabel } from '@/components/ui/section-label';
 import { SplitReveal } from '@/components/ui/split-reveal';
 import {
   encajaCallNote,
+  encajaAssistant,
   encajaCase,
   encajaClosing,
   encajaCta,
@@ -25,7 +26,10 @@ import {
   type EncajaBlock,
   type EncajaLanding,
 } from '@/content/encaja';
+import { assistantEnabled } from '@/lib/assistant/config';
 import { site } from '@/site.config';
+import { AssistantLauncher } from './assistant/assistant-launcher';
+import { PromoPopup } from './assistant/promo-popup';
 import { FlowVisual } from './flow-visual';
 import './encaja.css';
 
@@ -39,6 +43,7 @@ export function EncajaLandingPage({ landing }: { landing: EncajaLanding }) {
   let n = 0;
   const next = () => String(++n).padStart(2, '0');
   const { hero, pains } = landing;
+  const assistantOn = assistantEnabled();
 
   const visual =
     hero.visual.type === 'image' ? (
@@ -65,6 +70,7 @@ export function EncajaLandingPage({ landing }: { landing: EncajaLanding }) {
         title={<AccentTitle parts={hero.title} />}
         intro={hero.intro}
         cta={encajaCta}
+        secondary={assistantOn ? encajaAssistant.heroCta : undefined}
         visual={visual}
         analyticsLocation={`${location}-hero`}
       >
@@ -215,6 +221,14 @@ export function EncajaLandingPage({ landing }: { landing: EncajaLanding }) {
           </div>
         </div>
       </section>
+
+      {/* Mr. Tomate y la oferta del prototipo (docs/encaja/asistente.md): solo si hay clave de DeepSeek */}
+      {assistantOn && (
+        <>
+          <AssistantLauncher landing={landing.slug} location={location} />
+          <PromoPopup landing={landing.slug} location={location} />
+        </>
+      )}
     </>
   );
 }

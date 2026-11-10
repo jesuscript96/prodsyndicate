@@ -29,6 +29,10 @@ export type LeadNotice = {
   meetUrl?: string;
   /** Respuestas sueltas del formulario, en el orden en que se enseñan */
   details?: ReadonlyArray<readonly [string, string | undefined]>;
+  /** Resumen de la conversación con el asistente de la landing (lib/assistant/summary.ts) */
+  chatSummary?: string;
+  /** Viene de la oferta del prototipo gratis: el resumen es la ficha de requisitos */
+  promo?: boolean;
 };
 
 export type NoticeResult = 'ok' | 'skipped' | 'error';
@@ -41,7 +45,8 @@ const KIND_LABEL: Record<LeadKind, string> = {
 
 function subject(n: LeadNotice) {
   const who = n.company ? `${n.name} (${n.company})` : n.name;
-  return n.kind === 'llamada' && n.when ? `Llamada reservada: ${who} · ${n.when}` : `${KIND_LABEL[n.kind]}: ${who}`;
+  const base = n.kind === 'llamada' && n.when ? `Llamada reservada: ${who} · ${n.when}` : `${KIND_LABEL[n.kind]}: ${who}`;
+  return n.promo ? `Prototipo gratis · ${base}` : base;
 }
 
 function body(n: LeadNotice) {
@@ -63,6 +68,12 @@ function body(n: LeadNotice) {
       ...(n.details ?? []).map(([label, value]) => line(label, value)),
     ],
     [n.message ? `Mensaje:\n${n.message}` : ''],
+    [
+      n.promo ? 'Oferta: prototipo gratis. Hay que prepararlo antes de la llamada.' : '',
+      n.chatSummary
+        ? `${n.promo ? 'Requisitos del prototipo (chat con Mr. Tomate)' : 'Conversación con Mr. Tomate'}:\n${n.chatSummary}`
+        : '',
+    ],
     [
       line('Página', n.page),
       line('Origen', n.source),

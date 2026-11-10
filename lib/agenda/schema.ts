@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { leadChatSchema } from '@/lib/assistant/schema';
 
 /** Origen de la visita que adjunta el navegador (lib/attribution.ts). Todo opcional y acotado. */
 const attributionFields = {
@@ -28,6 +29,10 @@ export const bookingSchema = z.object({
   website: z.string().max(0).optional(), // honeypot: debe llegar vacío
   turnstileToken: z.string().min(1),
   landing: z.string().max(40).optional(),
+  /** Conversación con el asistente de la landing, si la hubo (se resume para el equipo) */
+  chat: leadChatSchema.optional(),
+  /** Viene de la oferta «Llévate tu prototipo GRATIS» (lib/agenda/promo.ts) */
+  promo: z.boolean().optional(),
   ...attributionFields,
 });
 

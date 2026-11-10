@@ -44,10 +44,12 @@ type Props = {
   onToken: (token: string) => void;
   /** El token ha caducado o el widget ha fallado: hay que volver a verificar. */
   onExpire?: () => void;
+  /** «interaction-only»: invisible salvo que Cloudflare necesite que la persona interactúe. */
+  appearance?: 'always' | 'interaction-only';
   className?: string;
 };
 
-export function Turnstile({ onToken, onExpire, className }: Props) {
+export function Turnstile({ onToken, onExpire, appearance = 'always', className }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | undefined>(undefined);
   const onTokenRef = useRef(onToken);
@@ -71,9 +73,10 @@ export function Turnstile({ onToken, onExpire, className }: Props) {
       theme: 'light',
       language: 'es',
       size: 'flexible',
+      appearance,
       'response-field': false,
     });
-  }, []);
+  }, [appearance]);
 
   useEffect(() => {
     if (!turnstileEnabled) return;

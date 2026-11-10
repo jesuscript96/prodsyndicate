@@ -25,7 +25,7 @@ Convención: ⚠️ = validar con negocio/legal · 🔧 = opcional / fase 2. Nad
 - [x] Blog: autor Jesús Valenzuela en los seis artículos.
 - [ ] Blog: proveedor de newsletter (doble opt-in, RGPD).
 - [ ] ⚠️ Páginas legales: placeholders rellenos y cookies/privacidad al día con GTM, GA4, el píxel de Meta y Valme OS (2-nov-2026). Plazo de conservación de contactos sin proyecto fijado en 12 meses. Falta la revisión con asesoría.
-- [ ] ⚠️ Confirmar con cada proveedor el mecanismo de transferencia internacional (Vercel, Resend, Cloudflare), si Turnstile usa cookies y qué cookies pone la agenda (Cal.com/Calendly). La referencia a la AEPD asume jurisdicción española.
+- [ ] ⚠️ Confirmar con cada proveedor el mecanismo de transferencia internacional (Vercel, Resend, Cloudflare), si Turnstile usa cookies. La referencia a la AEPD asume jurisdicción española.
 
 ## Campaña «Encaja» (`/encaja/*`) ⚠️
 
@@ -45,6 +45,9 @@ Antes de poner anuncios hacia las landings:
 - [ ] Revisar cada semana el reparto entre los tres grupos y los términos de búsqueda (añadir negativas). Al mes, concentrar en el grupo que convierta.
 - [x] Formulario de `/contacto` probado en producción el 6/11/2026: lead en Valme OS (landing «web»), correo y conversión «Contacto enviado».
 - [ ] El evento de Meta (CAPI) desde Valme OS falla con 400: revisar el token cuando se monte Meta.
+- [ ] **Mr. Tomate, asistente con IA** (`docs/encaja/asistente.md`): código listo el 10/11/2026, apagado hasta poner `DEEPSEEK_API_KEY` y `ASSISTANT_SECRET` en Vercel. Antes de encenderlo en producción: pasar `npm run encaja:asistente-pruebas` con la clave y revisar el tono.
+- [ ] ⚠️ Mr. Tomate: el 10/11/2026 se quitó el aviso previo de DeepSeek, así que la transferencia a China no se apoya en ninguna base del capítulo V del RGPD (ni adecuación, ni cláusulas tipo, ni consentimiento explícito). La política de privacidad lo cuenta tal cual. Revisar con asesoría o pasar a un proveedor que procese en la UE (el cambio está en `lib/assistant/deepseek.ts`).
+- [ ] Oferta «Llévate tu prototipo GRATIS» (pop-up de llegada): cada reserva marcada como prototipo hay que prepararla antes de la llamada con la ficha de requisitos que llega en el aviso y en Valme OS.
 
 ## Hero (§7)
 
