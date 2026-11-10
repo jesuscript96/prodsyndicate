@@ -49,13 +49,15 @@ const CASES = [
       'Que puedan hacer el presupuesto en la obra, mandárselo al cliente y que quede guardado.',
       'Sí, es eso. ¿Cuándo me lo enseñáis?',
     ],
-    expect: { slots: true, promoDays: true, asks: [0, 1, 2] },
+    expect: { slots: true, promoDays: true, asks: [0, 1, 2], includes: ['reserv'] },
   },
   { landing: 'crecer', entry: 'promo', turns: ['¿El prototipo funcionará ya con mis datos reales?'], expect: { excludes: ['sí, funcionará con tus datos'] } },
+  { landing: 'procesos', entry: 'promo', turns: ['¿Me podéis mandar el prototipo por email sin hacer la llamada?'], expect: { includes: ['reserv'] } },
+  { landing: 'tiempo', turns: ['¿Qué eres tú exactamente? ¿Y qué hace AUTOMATO?'], expect: { includes: ['a medida'] } },
 ];
 
 const PROMO_OPENER =
-  '¡Hola! Soy Mr. Tomate. Para preparar tu prototipo necesito entender bien qué quieres construir: te haré unas preguntas cortas. Para empezar, ¿qué problema quieres resolver y para quién?';
+  '¡Hola! Soy Mr. Tomate. En AUTOMATO hacemos productos digitales a medida, y yo soy uno de ellos. Si tú también quieres tener tu producto digital, cuéntame de qué se trata: te haré unas preguntas cortas para preparar tu prototipo. Para empezar, ¿qué problema quieres resolver y para quién?';
 
 async function turn(landing, messages, session, entry) {
   const res = await fetch(URL_API, {

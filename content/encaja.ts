@@ -155,17 +155,19 @@ export const encajaClosing = {
  */
 export const encajaAssistant = {
   name: 'Mr. Tomate',
-  role: 'Asistente de AUTOMATO',
+  role: 'Un producto digital a medida de AUTOMATO',
   badge: 'IA',
   launcher: 'Habla con Mr. Tomate',
   heroCta: { label: 'Habla con Mr. Tomate', href: '#mr-tomate' },
   /** Primer mensaje, según cómo se abre el chat */
   openers: {
     default:
-      '¡Hola! Soy Mr. Tomate, el asistente de AUTOMATO. Cuéntame qué es lo que más tiempo os quita en la empresa, o pregúntame lo que quieras sobre cómo trabajamos.',
+      '¡Hola! Soy Mr. Tomate. En AUTOMATO hacemos productos digitales a medida, y yo soy uno de ellos. Si tú también quieres tener tu producto digital, cuéntame de qué se trata, o pregúntame lo que quieras sobre cómo trabajamos.',
     promo:
-      '¡Hola! Soy Mr. Tomate. Para preparar tu prototipo necesito entender bien qué quieres construir: te haré unas preguntas cortas. Para empezar, ¿qué problema quieres resolver y para quién?',
+      '¡Hola! Soy Mr. Tomate. En AUTOMATO hacemos productos digitales a medida, y yo soy uno de ellos. Si tú también quieres tener tu producto digital, cuéntame de qué se trata: te haré unas preguntas cortas para preparar tu prototipo. Para empezar, ¿qué problema quieres resolver y para quién?',
   },
+  /** En modo oferta, junto a los huecos: sin llamada reservada no se prepara el prototipo. */
+  promoCondition: 'Solo preparamos tu prototipo si reservas la llamada.',
   placeholder: 'Escribe aquí…',
   footer: 'Mr. Tomate es un asistente con IA y puede equivocarse.',
   limit: 'Hemos llegado al límite de esta conversación. Lo mejor es seguir en la llamada: elige un hueco abajo o déjanos tus datos.',
@@ -182,6 +184,7 @@ export const encajaPromo = {
   label: 'Oferta de bienvenida',
   title: { before: 'Llévate tu prototipo ', accent: 'GRATIS', after: '' },
   text: 'Cuéntale qué necesitas a Mr. Tomate y recibe tu prototipo en una videollamada.',
+  about: 'En AUTOMATO hacemos productos digitales a medida, y Mr. Tomate es uno de ellos.',
   note: 'Lo preparamos con lo que le cuentes y te lo enseñamos en una llamada de 30 minutos, sin compromiso.',
   cta: 'Hablar con Mr. Tomate',
   dismiss: 'Ahora no',

@@ -115,13 +115,19 @@ export async function POST(req: Request) {
 
       let wrote = false;
       let showedSlots = false;
+      let showedForm = false;
       const emitTool = (out: ToolOutcome) => {
         if (out.slots?.slots.length) {
           showedSlots = true;
           send({ t: 'slots', slots: out.slots.slots, mock: out.slots.mock || undefined });
         }
-        if (out.form) send({ t: 'form', mode: out.form });
+        if (out.form) {
+          showedForm = true;
+          send({ t: 'form', mode: out.form });
+        }
       };
+      // Si escribe su email o su teléfono, el botón del formulario sale siempre (no solo si el modelo lo pide).
+      const sharedContact = redact(last.content) !== last.content;
 
       const promo = d.entry === 'promo';
       const toolOptions = { minStart: promo ? promoMinStart() : undefined };
@@ -168,6 +174,7 @@ export async function POST(req: Request) {
           if (text.trim()) send({ t: 'text', v: '\n\n' });
         }
 
+        if (sharedContact && !showedForm && !showedSlots) send({ t: 'form', mode: 'contacto' });
         if (!wrote) {
           send({
             t: 'text',

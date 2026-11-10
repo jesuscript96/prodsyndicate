@@ -139,6 +139,7 @@ export function PromoPopup({ landing, location }: { landing: EncajaSlug; locatio
         <p id="promo-text" className="promo__text">
           {encajaPromo.text}
         </p>
+        <p className="promo__about">{encajaPromo.about}</p>
         <p className="promo__note">{encajaPromo.note}</p>
         <div className="promo__actions">
           <button ref={cta} type="button" className="promo__cta" onClick={() => close('cta')}>

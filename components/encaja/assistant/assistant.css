@@ -161,6 +161,7 @@
 .assistant__slot:hover, .assistant__cta:hover { background: var(--accent-soft); }
 .assistant__slot svg, .assistant__cta svg { width: 16px; height: 16px; flex: none; }
 .assistant__cta { justify-self: start; }
+.assistant__condition { margin: 0; color: var(--ink-2); font-size: 0.8125rem; line-height: 1.4; }
 .assistant__more {
   padding: 0.5rem 0.25rem;
   border: 0;
@@ -271,6 +272,7 @@
 .promo__title { margin: 0; font-size: clamp(1.75rem, 6vw, 2.25rem); line-height: 1.1; letter-spacing: -0.02em; }
 .promo__title em { font-style: normal; color: var(--signal); }
 .promo__text { margin: 0; color: var(--ink); font-size: 1.0625rem; line-height: 1.5; max-width: 32ch; }
+.promo__about { margin: 0; color: var(--ink-2); font-size: 0.9375rem; line-height: 1.5; max-width: 34ch; }
 .promo__note { margin: 0; color: var(--ink-3); font-size: 0.875rem; line-height: 1.5; max-width: 36ch; }
 .promo__actions { display: grid; gap: 0.5rem; width: 100%; padding-top: 0.25rem; }
 .promo__cta {
