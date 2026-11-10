@@ -10,13 +10,18 @@ import './assistant.css';
 
 /**
  * Pop-up de llegada con la oferta «Llévate tu prototipo GRATIS» (docs/encaja/asistente.md).
- * Sale una vez por sesión, poco después de llegar y nunca encima del aviso de cookies: espera a
- * que se haya decidido. No sale si ya se ha hablado con Mr. Tomate o si se llega directo a la
- * agenda. El botón abre el chat en modo oferta: Mr. Tomate empieza a pedir los requisitos.
+ * Sale una vez por sesión, poco después de llegar. Si el aviso de cookies está a la vista, le da
+ * unos segundos para contestarlo; si no lo contesta, sale igual por encima (el aviso sigue ahí al
+ * cerrarlo): quien ignora las cookies también ve la oferta. No sale si ya se ha hablado con
+ * Mr. Tomate o si se llega directo a la agenda. El botón abre el chat en modo oferta: Mr. Tomate
+ * empieza a pedir los requisitos.
  */
 
 const SEEN_KEY = 'encaja_promo_visto';
+/** Respiro tras llegar (o tras contestar a las cookies) antes de enseñarse */
 const DELAY_MS = 1500;
+/** Si no contestan al aviso de cookies, sale igual pasado este tiempo desde la llegada */
+const MAX_WAIT_MS = 5000;
 
 function cookieDecided(): boolean {
   try {
@@ -43,35 +48,41 @@ export function PromoPopup({ landing, location }: { landing: EncajaSlug; locatio
   const card = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
 
-  // Llegada: espera a la decisión de cookies y a un respiro antes de enseñarse.
+  // Llegada: un respiro, o hasta que contesten a las cookies con un máximo de MAX_WAIT_MS.
   useEffect(() => {
     if (!shouldShow(landing)) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const reveal = () => {
-      timer = setTimeout(() => {
-        if (!shouldShow(landing)) return;
-        try {
-          sessionStorage.setItem(SEEN_KEY, '1');
-        } catch {
-          /* sin almacenamiento: puede volver a salir al recargar */
-        }
-        returnFocus.current = document.activeElement as HTMLElement | null;
-        setOpen(true);
-        track('promo_view', { location });
-      }, DELAY_MS);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let shown = false;
+    const show = () => {
+      if (shown) return;
+      shown = true;
+      clearInterval(poll);
+      if (!shouldShow(landing)) return;
+      try {
+        sessionStorage.setItem(SEEN_KEY, '1');
+      } catch {
+        /* sin almacenamiento: puede volver a salir al recargar */
+      }
+      returnFocus.current = document.activeElement as HTMLElement | null;
+      setOpen(true);
+      track('promo_view', { location, cookies: cookieDecided() ? 'contestadas' : 'sin_contestar' });
     };
-    if (cookieDecided()) {
-      reveal();
-      return () => clearTimeout(timer);
-    }
+    const decided = cookieDecided();
+    // Sin aviso de cookies a la vista, un respiro; con él, se espera a que lo contesten (o al máximo).
     const poll = setInterval(() => {
       if (!cookieDecided()) return;
       clearInterval(poll);
-      reveal();
+      timers.push(setTimeout(show, DELAY_MS));
     }, 500);
+    if (decided) {
+      clearInterval(poll);
+      timers.push(setTimeout(show, DELAY_MS));
+    } else {
+      timers.push(setTimeout(show, MAX_WAIT_MS));
+    }
     return () => {
       clearInterval(poll);
-      clearTimeout(timer);
+      timers.forEach(clearTimeout);
     };
   }, [landing, location]);
 

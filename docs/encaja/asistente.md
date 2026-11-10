@@ -4,7 +4,7 @@
 
 ## Dónde aparece
 
-- **Pop-up de llegada** con la oferta «Llévate tu prototipo GRATIS»: «Cuéntale qué necesitas a Mr. Tomate y recibe tu prototipo en una videollamada». Su botón abre el chat en **modo oferta**. Sale una vez por sesión, 1,5 segundos después de decidir las cookies (nunca encima del aviso). No sale si ya se ha hablado con Mr. Tomate ni si se llega a `#contacto`. En móvil es una tarjeta abajo, no una pantalla completa. Textos en `encajaPromo` (`content/encaja.ts`).
+- **Pop-up de llegada** con la oferta «Llévate tu prototipo GRATIS»: «Cuéntale qué necesitas a Mr. Tomate y recibe tu prototipo en una videollamada». Su botón abre el chat en **modo oferta**. Sale una vez por sesión, 1,5 segundos después de contestar a las cookies; si no las contestan, sale igual a los 5 segundos, por encima del aviso (que sigue ahí al cerrarlo). No sale si ya se ha hablado con Mr. Tomate ni si se llega a `#contacto`. En móvil es una tarjeta abajo, no una pantalla completa. Textos en `encajaPromo` (`content/encaja.ts`).
 - **Botón del hero** «Habla con Mr. Tomate» (cualquier enlace a `#mr-tomate` abre el chat).
 - **Botón flotante** con el tomate, abajo a la derecha.
 
