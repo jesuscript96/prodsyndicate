@@ -20,7 +20,7 @@ import { DepthField } from '@/components/props/depth-field';
 
 /** SEO de la home (§6). El título ya incluye la marca: buildMetadata no añade sufijo. */
 export const metadata: Metadata = buildMetadata({
-  title: `${site.name} · Productos digitales a medida para emprendedores y empresas`,
+  title: `Productos digitales a medida: MVPs, software e IA | ${site.name}`,
   description: site.description,
   path: '/',
   image: '/og/poster-last.png',
