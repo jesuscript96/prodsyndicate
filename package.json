@@ -21,7 +21,8 @@
     "brand:icons": "node scripts/make-brand-icons.mjs",
     "agenda:token": "node scripts/google-calendar-token.mjs",
     "encaja:presentaciones": "node scripts/encaja/build-presentations.mjs",
-    "encaja:google-ads": "node scripts/encaja/google-ads.mjs"
+    "encaja:google-ads": "node scripts/encaja/google-ads.mjs",
+    "encaja:asistente-pruebas": "node scripts/encaja/asistente-pruebas.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

@@ -29,6 +29,8 @@ export type LeadNotice = {
   meetUrl?: string;
   /** Respuestas sueltas del formulario, en el orden en que se enseñan */
   details?: ReadonlyArray<readonly [string, string | undefined]>;
+  /** Resumen de la conversación con el asistente de la landing (lib/assistant/summary.ts) */
+  chatSummary?: string;
 };
 
 export type NoticeResult = 'ok' | 'skipped' | 'error';
@@ -63,6 +65,7 @@ function body(n: LeadNotice) {
       ...(n.details ?? []).map(([label, value]) => line(label, value)),
     ],
     [n.message ? `Mensaje:\n${n.message}` : ''],
+    [n.chatSummary ? `Conversación con el asistente de la web:\n${n.chatSummary}` : ''],
     [
       line('Página', n.page),
       line('Origen', n.source),

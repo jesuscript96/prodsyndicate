@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { track, trackLead, type LeadType } from '@/lib/analytics';
 import { consentCopy } from '@/lib/agenda/consent';
 import type { AvailabilityResponse, BookingResponse, ContactLeadResponse } from '@/lib/agenda/schema';
+import { AGENDA_EVENT, readChatForLead, type AgendaRequest } from '@/lib/assistant/client';
 import { readAttribution } from '@/lib/attribution';
 import { cn } from '@/lib/utils';
 import { site } from '@/site.config';
@@ -24,6 +25,9 @@ import './booking.css';
  * (/api/encaja/contacto); también es la salida cuando la agenda no carga o no tiene huecos.
  * Turnstile solo se carga al llegar al formulario.
  * Eventos: form_start, form_submit y form_error con `lead_type`; en GTM, `generate_lead`.
+ *
+ * Asistente (docs/encaja/asistente.md): escucha `encaja:agenda` para abrirse con el hueco o el modo
+ * que se eligió en el chat, y si hubo conversación la adjunta al lead para que el equipo la vea.
  */
 
 type Props = {
@@ -85,6 +89,10 @@ export function Booking({ landing, location, withContact = true, bare = false, c
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
+  /** Hueco elegido en el chat del asistente, pendiente de que cargue la agenda */
+  const pending = useRef<string | null>(null);
+  /** Últimos huecos cargados (para aplicar al momento un hueco elegido en el chat) */
+  const loaded = useRef<string[] | null>(null);
 
   // Zona horaria de quien visita (solo se usa una vez cargada la agenda, ya en el navegador)
   const [tz] = useState(() =>
@@ -127,6 +135,24 @@ export function Booking({ landing, location, withContact = true, bare = false, c
   const kind: LeadType = withContact && noAgenda ? 'contacto' : mode;
   const isCall = kind === 'llamada';
 
+  /** Deja elegido el hueco que se escogió en el chat, si sigue libre. */
+  const applyWanted = useCallback(
+    (wanted: string, list: string[]) => {
+      const s = new Date(wanted).toISOString();
+      if (!list.includes(s)) {
+        setNotice('Ese hueco ya no está libre. Elige otro, por favor.');
+        return;
+      }
+      setDay(fmt.key.format(new Date(s)));
+      setSlot(s);
+      if (!tracked.current) {
+        tracked.current = true;
+        track('form_start', { location, lead_type: 'llamada' });
+      }
+    },
+    [fmt, location],
+  );
+
   const load = useCallback(async () => {
     setStatus('loading');
     try {
@@ -136,10 +162,15 @@ export function Booking({ landing, location, withContact = true, bare = false, c
       setSlots(data.slots);
       setMock(Boolean(data.mock));
       setStatus('ready');
+      loaded.current = data.slots;
+      if (pending.current) {
+        applyWanted(pending.current, data.slots);
+        pending.current = null;
+      }
     } catch {
       setStatus('unavailable');
     }
-  }, []);
+  }, [applyWanted]);
 
   // Pide la agenda al acercarse (o al llegar por el ancla), no en cada visita que rebota arriba.
   useEffect(() => {
@@ -166,6 +197,33 @@ export function Booking({ landing, location, withContact = true, bare = false, c
     io.observe(el);
     return () => io.disconnect();
   }, [load]);
+
+  // Del chat a la agenda: modo (llamada o contacto) y, si lo hay, el hueco ya elegido.
+  useEffect(() => {
+    const onAgenda = (e: Event) => {
+      const detail = (e as CustomEvent<AgendaRequest>).detail;
+      if (!detail) return;
+      setMode(detail.mode === 'contacto' && withContact ? 'contacto' : 'llamada');
+      setNotice(null);
+      setErrors({});
+      const wanted = detail.mode === 'llamada' && detail.slot ? detail.slot : null;
+      if (wanted && loaded.current) applyWanted(wanted, loaded.current);
+      else pending.current = wanted;
+      if (!started.current) {
+        started.current = true;
+        void load();
+      }
+      const target = root.current?.closest('section') ?? root.current;
+      if (target) {
+        const lenis = window.__lenis;
+        if (lenis) lenis.scrollTo(target, { offset: -96 });
+        else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      requestAnimationFrame(() => headRef.current?.focus({ preventScroll: true }));
+    };
+    window.addEventListener(AGENDA_EVENT, onAgenda);
+    return () => window.removeEventListener(AGENDA_EVENT, onAgenda);
+  }, [load, applyWanted, withContact]);
 
   const tzNote =
     tz === AGENDA_TZ ? 'Horas en hora peninsular española.' : `Horas en tu zona horaria (${tz.replace(/_/g, ' ')}).`;
@@ -244,6 +302,7 @@ export function Booking({ landing, location, withContact = true, bare = false, c
       fbp: attribution.fbp,
       fbc: attribution.fbc,
       pixelConsent: attribution.pixelConsent,
+      chat: readChatForLead(landing),
     };
     try {
       const res = await fetch(isCall ? '/api/agenda/reservar' : '/api/encaja/contacto', {

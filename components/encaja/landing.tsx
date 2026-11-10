@@ -25,7 +25,9 @@ import {
   type EncajaBlock,
   type EncajaLanding,
 } from '@/content/encaja';
+import { assistantEnabled } from '@/lib/assistant/config';
 import { site } from '@/site.config';
+import { AssistantLauncher } from './assistant/assistant-launcher';
 import { FlowVisual } from './flow-visual';
 import './encaja.css';
 
@@ -215,6 +217,9 @@ export function EncajaLandingPage({ landing }: { landing: EncajaLanding }) {
           </div>
         </div>
       </section>
+
+      {/* Asistente con IA (docs/encaja/asistente.md): solo si hay clave de DeepSeek */}
+      {assistantEnabled() && <AssistantLauncher landing={landing.slug} location={location} />}
     </>
   );
 }

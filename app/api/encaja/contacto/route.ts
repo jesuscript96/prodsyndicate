@@ -5,6 +5,7 @@ import { contactLeadSchema, type ContactLeadResponse } from '@/lib/agenda/schema
 import { verifyTurnstile } from '@/lib/agenda/turnstile';
 import { encajaPresentationPath, getEncajaLanding } from '@/content/encaja';
 import { absoluteUrl } from '@/lib/seo';
+import { summarizeChat } from '@/lib/assistant/summary';
 import { notifyNewLead } from '@/lib/notify';
 import { destinationFor, sendLeadToValmeOs, valmeConfigured } from '@/lib/valme-os';
 
@@ -60,6 +61,8 @@ export async function POST(req: Request) {
 
   const presentationUrl = presentationFor(d.landing);
   const destination = destinationFor(d.landing);
+  // Si habló con el asistente, el equipo recibe un resumen (como mucho unos segundos de espera).
+  const chatSummary = await summarizeChat(d.chat);
 
   if (!valmeConfigured(destination)) {
     if (isProduction) {
@@ -71,6 +74,7 @@ export async function POST(req: Request) {
       hasCompany: Boolean(d.company),
       hasPhone: Boolean(d.phone),
       messageLength: d.message?.length ?? 0,
+      chatSummaryLength: chatSummary?.length ?? 0,
     });
     return json({ ok: true, presentationUrl, mock: true });
   }
@@ -85,6 +89,7 @@ export async function POST(req: Request) {
         tipo: 'Quiere que le escribamos',
         empresa: d.company,
         mensaje: d.message,
+        asistente: chatSummary,
         pagina: d.landing,
         origen: d.source,
       },
@@ -102,6 +107,7 @@ export async function POST(req: Request) {
       source: d.source,
       utm: d.utm,
       clicks: d.clicks,
+      chatSummary,
     }),
   ]);
   // Si Valme OS falla pero el aviso ha salido, el lead no se pierde.

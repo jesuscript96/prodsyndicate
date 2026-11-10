@@ -7,7 +7,13 @@ export type EventName =
   | 'form_submit'
   | 'form_error'
   | 'calendar_open'
-  | 'scroll_depth';
+  | 'scroll_depth'
+  // Asistente de las landings de Encaja: nunca el texto de la conversación
+  | 'chat_open'
+  | 'chat_message'
+  | 'chat_slots'
+  | 'chat_handoff'
+  | 'chat_error';
 
 type Props = Record<string, string | number | boolean>;
 

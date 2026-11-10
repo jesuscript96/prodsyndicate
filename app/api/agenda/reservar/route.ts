@@ -10,6 +10,7 @@ import { verifyTurnstile } from '@/lib/agenda/turnstile';
 import { consentRecord } from '@/lib/agenda/consent';
 import { encajaPresentationPath, getEncajaLanding } from '@/content/encaja';
 import { absoluteUrl } from '@/lib/seo';
+import { summarizeChat } from '@/lib/assistant/summary';
 import { notifyNewLead } from '@/lib/notify';
 import { destinationFor, sendLeadToValmeOs } from '@/lib/valme-os';
 import { site } from '@/site.config';
@@ -127,6 +128,8 @@ export async function POST(req: Request) {
   const end = start + agendaConfig.slotMinutes * 60000;
   const iso = { start: new Date(start).toISOString(), end: new Date(end).toISOString() };
   const presentationUrl = presentationFor(d.landing);
+  // Resumen de la conversación con el asistente, si la hubo: en paralelo con el calendario.
+  const chatSummaryP = summarizeChat(d.chat);
 
   if (!googleConfigured()) {
     if (isProduction) {
@@ -143,6 +146,7 @@ export async function POST(req: Request) {
       hasCompany: Boolean(d.company),
       hasPhone: Boolean(d.phone),
       messageLength: d.message?.length ?? 0,
+      chatSummaryLength: (await chatSummaryP)?.length ?? 0,
     });
     return json({ ok: true, ...iso, presentationUrl, mock: true });
   }
@@ -166,6 +170,7 @@ export async function POST(req: Request) {
       },
     });
     invalidateBusy();
+    const chatSummary = await chatSummaryP;
 
     const valme = await sendLeadToValmeOs({
       destination: destinationFor(d.landing),
@@ -177,6 +182,7 @@ export async function POST(req: Request) {
         llamada: `${when(start)} (hora peninsular)`,
         empresa: d.company,
         mensaje: d.message,
+        asistente: chatSummary,
         pagina: d.landing,
         origen: d.source,
       },
@@ -203,6 +209,7 @@ export async function POST(req: Request) {
       clicks: d.clicks,
       when: when(start),
       meetUrl: meeting.meetUrl,
+      chatSummary,
     });
 
     return json({ ok: true, ...iso, meetUrl: meeting.meetUrl, presentationUrl });

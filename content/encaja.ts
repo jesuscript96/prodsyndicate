@@ -148,6 +148,31 @@ export const encajaClosing = {
   text: 'Elige un hueco y te llega la invitación con el enlace de Google Meet.',
 } as const;
 
+/**
+ * Asistente con IA de las landings (components/encaja/assistant, docs/encaja/asistente.md).
+ * El aviso de DeepSeek es la información previa al consentimiento para la transferencia
+ * internacional (política de privacidad, §6): no quitarlo ni suavizarlo.
+ */
+export const encajaAssistant = {
+  launcher: '¿Tienes dudas?',
+  title: 'Asistente de AUTOMATO',
+  badge: 'IA',
+  intro:
+    'Soy un asistente con inteligencia artificial. Te ayudo a ver si lo que necesitas encaja con lo que hacemos y, si quieres, te propongo un hueco para la llamada.',
+  notice:
+    'Lo que escribas se envía a DeepSeek, un proveedor con servidores en China, para generar las respuestas. No incluyas datos personales ni confidenciales.',
+  start: 'Entendido, empezar',
+  greeting: 'Cuéntame qué es lo que más tiempo os quita en la empresa, o pregúntame lo que quieras sobre cómo trabajamos.',
+  placeholder: 'Escribe tu pregunta…',
+  footer: 'Asistente con IA: puede equivocarse. Lo que cuenta es lo que hablemos en la llamada.',
+  limit: 'Hemos llegado al límite de esta conversación. Lo mejor es seguir en la llamada: elige un hueco abajo o déjanos tus datos.',
+  starters: {
+    tiempo: ['¿Cuánto cuesta?', '¿Funciona con mis Excel?', 'Hago de administrativo, ¿por dónde empezaríais?'],
+    crecer: ['¿Cuánto cuesta?', 'No sé por dónde empezar', '¿Y si mi equipo no lo usa?'],
+    procesos: ['¿Cuánto cuesta?', '¿Conectáis Odoo o HubSpot?', '¿Dónde usáis la IA?'],
+  } satisfies Record<EncajaSlug, readonly string[]>,
+} as const;
+
 const faqPrice: FaqItem = {
   q: '¿Cuánto cuesta?',
   a: `${encajaPrice} Tras la llamada te enviamos una propuesta cerrada con lo que haremos, los plazos y el presupuesto. Si hay que ajustar algo, lo hablamos antes, no después.`,
