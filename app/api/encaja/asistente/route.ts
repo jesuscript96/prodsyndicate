@@ -155,10 +155,14 @@ export async function POST(req: Request) {
           );
           if (!toolCalls.length) break;
           messages.push({ role: 'assistant', content: text || null, tool_calls: toolCalls });
+          // Lo que ya escribió antes de la herramienta ya está en pantalla: que no lo repita.
+          const already = text.trim()
+            ? ` Antes de usar la herramienta ya le has escrito: «${text.trim().slice(0, 600)}». No lo repitas: añade como mucho una frase corta si hace falta, o nada.`
+            : '';
           for (const call of toolCalls) {
             const out = await runTool(call.function.name, call.function.arguments, toolOptions);
             emitTool(out);
-            messages.push({ role: 'tool', tool_call_id: call.id, content: out.result });
+            messages.push({ role: 'tool', tool_call_id: call.id, content: `${out.result}${already}` });
           }
           // Separación entre lo escrito antes y después de usar la herramienta.
           if (text.trim()) send({ t: 'text', v: '\n\n' });
