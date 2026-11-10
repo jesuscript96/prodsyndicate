@@ -29,7 +29,7 @@ export const site = {
   email: `hola@${PRODUCTION_DOMAIN}`,
   tagline: 'Productos digitales a medida, de la idea al lanzamiento.',
   description:
-    'Diseñamos y construimos MVPs, software a medida y automatizaciones con IA. Te acompañamos de la idea al lanzamiento, con diseño cuidado y código que se puede heredar.',
+    'Diseñamos y construimos MVPs, software a medida y automatizaciones con IA. De la idea al lanzamiento, con diseño cuidado y código que se puede heredar.',
   /** ⚠️ Zona geográfica declarada en JSON-LD `Service.areaServed`. */
   areaServed: 'ES',
   social: { linkedin: '', x: '', github: '' },
