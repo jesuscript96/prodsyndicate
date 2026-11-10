@@ -14,6 +14,7 @@ export type EventName =
   | 'chat_slots'
   | 'chat_handoff'
   | 'chat_error'
+  | 'chat_verify'
   // Pop-up de llegada con la oferta del prototipo
   | 'promo_view'
   | 'promo_click'
