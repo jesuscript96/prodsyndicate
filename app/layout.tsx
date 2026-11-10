@@ -23,7 +23,7 @@ const instrument = Instrument_Serif({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `Productos digitales a medida: MVPs, software e IA | ${site.name}`,
+    default: `${site.name} · Productos digitales a medida para emprendedores y empresas`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -64,11 +64,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
-        {/* beforeInteractive: Next los inyecta en el <head>, en este orden */}
+        {/* El consentimiento por defecto va en el <head> (beforeInteractive), antes que nada de Google.
+            GTM se carga tras la hidratación (afterInteractive) para no competir con el JS de la página. */}
         <Script id="valme-consent-default" strategy="beforeInteractive">
           {consentDefault}
         </Script>
-        <Script id="valme-gtm" strategy="beforeInteractive">
+        <Script id="valme-gtm" strategy="afterInteractive">
           {gtmSnippet}
         </Script>
         <a href="#contenido" className="skip-link">
