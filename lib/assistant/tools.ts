@@ -108,7 +108,13 @@ export type ToolOutcome = {
   form?: 'llamada' | 'contacto';
 };
 
-export async function runTool(name: string, rawArgs: string, now = Date.now()): Promise<ToolOutcome> {
+type RunOptions = {
+  now?: number;
+  /** Primer instante reservable (la oferta del prototipo empieza a 3 días laborables) */
+  minStart?: number;
+};
+
+export async function runTool(name: string, rawArgs: string, { now = Date.now(), minStart }: RunOptions = {}): Promise<ToolOutcome> {
   let args: Record<string, unknown> = {};
   try {
     args = rawArgs ? (JSON.parse(rawArgs) as Record<string, unknown>) : {};
@@ -120,7 +126,9 @@ export async function runTool(name: string, rawArgs: string, now = Date.now()): 
     const franja = typeof args.franja === 'string' ? args.franja : 'cualquiera';
     const dia = typeof args.dia === 'string' ? args.dia : undefined;
     try {
-      const { slots, mock } = await allSlots(now);
+      const all = await allSlots(now);
+      const slots = minStart ? all.slots.filter((s) => s >= minStart) : all.slots;
+      const mock = all.mock;
       let picked = pickSlots(slots, franja, dia);
       let note = '';
       if (!picked.length && (franja !== 'cualquiera' || dia)) {

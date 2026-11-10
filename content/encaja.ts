@@ -149,28 +149,42 @@ export const encajaClosing = {
 } as const;
 
 /**
- * Asistente con IA de las landings (components/encaja/assistant, docs/encaja/asistente.md).
- * El aviso de DeepSeek es la información previa al consentimiento para la transferencia
- * internacional (política de privacidad, §6): no quitarlo ni suavizarlo.
+ * Mr. Tomate, el asistente con IA de las landings (components/encaja/assistant,
+ * docs/encaja/asistente.md). «IA» y la línea del pie dicen que es una IA (reglamento europeo de
+ * IA): no quitarlas.
  */
 export const encajaAssistant = {
-  launcher: '¿Tienes dudas?',
-  title: 'Asistente de AUTOMATO',
+  name: 'Mr. Tomate',
+  role: 'Asistente de AUTOMATO',
   badge: 'IA',
-  intro:
-    'Soy un asistente con inteligencia artificial. Te ayudo a ver si lo que necesitas encaja con lo que hacemos y, si quieres, te propongo un hueco para la llamada.',
-  notice:
-    'Lo que escribas se envía a DeepSeek, un proveedor con servidores en China, para generar las respuestas. No incluyas datos personales ni confidenciales.',
-  start: 'Entendido, empezar',
-  greeting: 'Cuéntame qué es lo que más tiempo os quita en la empresa, o pregúntame lo que quieras sobre cómo trabajamos.',
-  placeholder: 'Escribe tu pregunta…',
-  footer: 'Asistente con IA: puede equivocarse. Lo que cuenta es lo que hablemos en la llamada.',
+  launcher: 'Habla con Mr. Tomate',
+  heroCta: { label: 'Habla con Mr. Tomate', href: '#mr-tomate' },
+  /** Primer mensaje, según cómo se abre el chat */
+  openers: {
+    default:
+      '¡Hola! Soy Mr. Tomate, el asistente de AUTOMATO. Cuéntame qué es lo que más tiempo os quita en la empresa, o pregúntame lo que quieras sobre cómo trabajamos.',
+    promo:
+      '¡Hola! Soy Mr. Tomate. Para preparar tu prototipo necesito entender bien qué quieres construir: te haré unas preguntas cortas. Para empezar, ¿qué problema quieres resolver y para quién?',
+  },
+  placeholder: 'Escribe aquí…',
+  footer: 'Mr. Tomate es un asistente con IA y puede equivocarse.',
   limit: 'Hemos llegado al límite de esta conversación. Lo mejor es seguir en la llamada: elige un hueco abajo o déjanos tus datos.',
   starters: {
     tiempo: ['¿Cuánto cuesta?', '¿Funciona con mis Excel?', 'Hago de administrativo, ¿por dónde empezaríais?'],
     crecer: ['¿Cuánto cuesta?', 'No sé por dónde empezar', '¿Y si mi equipo no lo usa?'],
     procesos: ['¿Cuánto cuesta?', '¿Conectáis Odoo o HubSpot?', '¿Dónde usáis la IA?'],
   } satisfies Record<EncajaSlug, readonly string[]>,
+  promoStarters: ['Una herramienta para mi equipo', 'Un portal para mis clientes', 'Aún no lo tengo claro'],
+} as const;
+
+/** Pop-up de llegada a las landings con la promoción del prototipo. */
+export const encajaPromo = {
+  label: 'Oferta de bienvenida',
+  title: { before: 'Llévate tu prototipo ', accent: 'GRATIS', after: '' },
+  text: 'Cuéntale qué necesitas a Mr. Tomate y recibe tu prototipo en una videollamada.',
+  note: 'Lo preparamos con lo que le cuentes y te lo enseñamos en una llamada de 30 minutos, sin compromiso.',
+  cta: 'Hablar con Mr. Tomate',
+  dismiss: 'Ahora no',
 } as const;
 
 const faqPrice: FaqItem = {

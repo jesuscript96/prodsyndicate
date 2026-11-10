@@ -13,7 +13,11 @@ export type EventName =
   | 'chat_message'
   | 'chat_slots'
   | 'chat_handoff'
-  | 'chat_error';
+  | 'chat_error'
+  // Pop-up de llegada con la oferta del prototipo
+  | 'promo_view'
+  | 'promo_click'
+  | 'promo_close';
 
 type Props = Record<string, string | number | boolean>;
 

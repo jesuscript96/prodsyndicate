@@ -1,3 +1,4 @@
+import { promoMinStart } from '@/lib/agenda/promo';
 import { verifyTurnstile } from '@/lib/agenda/turnstile';
 import { assistantConfig, assistantEnabled, assistantMock } from '@/lib/assistant/config';
 import { streamChat, UpstreamError, type ApiMessage } from '@/lib/assistant/deepseek';
@@ -10,9 +11,10 @@ import { createSession, readSession } from '@/lib/assistant/session';
 import { describeSlots, runTool, TOOLS, type ToolOutcome } from '@/lib/assistant/tools';
 
 /**
- * POST /api/encaja/asistente: un turno del asistente de las landings de Encaja
+ * POST /api/encaja/asistente: un turno de Mr. Tomate, el asistente de las landings de Encaja
  * (docs/encaja/asistente.md). Recibe la conversación entera y responde en streaming (NDJSON,
- * lib/assistant/schema.ts).
+ * lib/assistant/schema.ts). Con `entry: 'promo'` (oferta del prototipo gratis) reúne requisitos
+ * y solo propone huecos a partir de 3 días laborables.
  *
  * Validación → límite por IP → sesión firmada (el primer mensaje pasa Turnstile) → DeepSeek con
  * las instrucciones y el contenido de la landing montados aquí → herramientas (huecos de la
@@ -38,15 +40,27 @@ const headers = {
 const fail = (error: AssistantError, status: number) =>
   new Response(line({ t: 'error', error }), { status, headers });
 
-/** Historial para el modelo: lo del visitante, sin datos personales evidentes; lo que vio en pantalla, como nota. */
-function toApiMessages(messages: ChatMessage[]): ApiMessage[] {
-  return messages.map((m) => {
+/**
+ * Historial para el modelo: lo del visitante, sin datos personales evidentes; lo que vio en
+ * pantalla, como nota. El saludo de la página (mensajes del asistente antes del primero del
+ * visitante) va como contexto en las instrucciones: la API espera que la conversación empiece
+ * por el usuario.
+ */
+function toApiMessages(messages: ChatMessage[]): { opener?: string; history: ApiMessage[] } {
+  const first = messages.findIndex((m) => m.role === 'user');
+  const opener = messages
+    .slice(0, Math.max(first, 0))
+    .map((m) => m.content)
+    .join(' ')
+    .trim();
+  const history = messages.slice(Math.max(first, 0)).map((m): ApiMessage => {
     if (m.role === 'user') return { role: 'user', content: redact(m.content) };
     const notes: string[] = [];
     if (m.shown?.slots?.length) notes.push(`(Se le mostraron en pantalla estos huecos: ${describeSlots(m.shown.slots)}.)`);
     if (m.shown?.form) notes.push(`(Se le mostró el botón del formulario: ${m.shown.form}.)`);
     return { role: 'assistant', content: [m.content, ...notes].filter(Boolean).join('\n\n') };
   });
+  return { opener: opener ? opener.slice(0, 600) : undefined, history };
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -109,21 +123,25 @@ export async function POST(req: Request) {
         if (out.form) send({ t: 'form', mode: out.form });
       };
 
+      const promo = d.entry === 'promo';
+      const toolOptions = { minStart: promo ? promoMinStart() : undefined };
+
       try {
         if (assistantMock()) {
-          const turn = mockTurn(last.content);
+          const turn = mockTurn(last.content, promo);
           for (const word of turn.text.split(/(?<=\s)/)) {
             send({ t: 'text', v: word });
             await sleep(25);
           }
-          if (turn.tool) emitTool(await runTool(turn.tool.name, turn.tool.args));
+          if (turn.tool) emitTool(await runTool(turn.tool.name, turn.tool.args, toolOptions));
           send({ t: 'done' });
           return;
         }
 
+        const { opener, history } = toApiMessages(d.messages);
         const messages: ApiMessage[] = [
-          { role: 'system', content: systemPrompt(d.landing, { term: d.term }) },
-          ...toApiMessages(d.messages),
+          { role: 'system', content: systemPrompt(d.landing, { term: d.term, entry: d.entry, opener }) },
+          ...history,
         ];
 
         for (let round = 0; round <= assistantConfig.maxToolRounds; round++) {
@@ -138,7 +156,7 @@ export async function POST(req: Request) {
           if (!toolCalls.length) break;
           messages.push({ role: 'assistant', content: text || null, tool_calls: toolCalls });
           for (const call of toolCalls) {
-            const out = await runTool(call.function.name, call.function.arguments);
+            const out = await runTool(call.function.name, call.function.arguments, toolOptions);
             emitTool(out);
             messages.push({ role: 'tool', tool_call_id: call.id, content: out.result });
           }

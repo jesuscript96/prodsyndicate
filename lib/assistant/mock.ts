@@ -5,11 +5,18 @@
 
 export type MockTurn = { text: string; tool?: { name: string; args: string } };
 
-export function mockTurn(lastUserMessage: string): MockTurn {
+export function mockTurn(lastUserMessage: string, promo = false): MockTurn {
   const m = lastUserMessage.toLowerCase();
-  if (/hueco|llamada|reuni|cita|agenda|hablar|cuándo|cuando/.test(m)) {
+  if (promo && !/hueco|llamada|reuni|cita|agenda|hablar|cuándo|cuando|vale|sí|si,|correcto/.test(m)) {
     return {
-      text: '(Modo de prueba) Te dejo algunos huecos para la llamada de 30 minutos: elige uno y lo confirmas abajo con tu nombre y tu email.',
+      text: '(Modo de prueba, oferta del prototipo) Entendido. ¿Quién lo usaría y desde dónde: tu equipo desde el ordenador, desde el móvil, o tus clientes?',
+    };
+  }
+  if (/hueco|llamada|reuni|cita|agenda|hablar|cuándo|cuando/.test(m) || (promo && /vale|sí|si,|correcto/.test(m))) {
+    return {
+      text: promo
+        ? '(Modo de prueba, oferta del prototipo) Perfecto. Elige cuándo te enseñamos el prototipo: al reservar dejas tu nombre y tu email, y lo preparamos con lo que hemos hablado.'
+        : '(Modo de prueba) Te dejo algunos huecos para la llamada de 30 minutos: elige uno y lo confirmas abajo con tu nombre y tu email.',
       tool: { name: 'proponer_huecos', args: JSON.stringify({ franja: /tarde/.test(m) ? 'tarde' : 'cualquiera' }) },
     };
   }

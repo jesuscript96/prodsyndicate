@@ -10,6 +10,7 @@ import { verifyTurnstile } from '@/lib/agenda/turnstile';
 import { consentRecord } from '@/lib/agenda/consent';
 import { encajaPresentationPath, getEncajaLanding } from '@/content/encaja';
 import { absoluteUrl } from '@/lib/seo';
+import { promoMinStart } from '@/lib/agenda/promo';
 import { summarizeChat } from '@/lib/assistant/summary';
 import { notifyNewLead } from '@/lib/notify';
 import { destinationFor, sendLeadToValmeOs } from '@/lib/valme-os';
@@ -53,7 +54,9 @@ function presentationFor(landing?: string) {
 
 function description(d: BookingInput, presentationUrl?: string) {
   return [
-    `Llamada de ${agendaConfig.slotMinutes} minutos con AUTOMATO para hablar del proceso que más tiempo te quita.`,
+    d.promo
+      ? `Llamada de ${agendaConfig.slotMinutes} minutos con AUTOMATO para enseñarte tu prototipo, preparado con lo que le contaste a Mr. Tomate.`
+      : `Llamada de ${agendaConfig.slotMinutes} minutos con AUTOMATO para hablar del proceso que más tiempo te quita.`,
     'Entra desde el enlace de Google Meet de esta invitación.',
     presentationUrl
       ? `\nAntes de la llamada, aquí tienes un resumen de una página con lo que puedes esperar y cómo trabajamos:\n${presentationUrl}\n`
@@ -129,7 +132,10 @@ export async function POST(req: Request) {
   const iso = { start: new Date(start).toISOString(), end: new Date(end).toISOString() };
   const presentationUrl = presentationFor(d.landing);
   // Resumen de la conversación con el asistente, si la hubo: en paralelo con el calendario.
-  const chatSummaryP = summarizeChat(d.chat);
+  const chatSummaryP = summarizeChat(d.chat, { promo: d.promo });
+
+  // Oferta del prototipo: hay que prepararlo antes, así que la llamada es a 3 días laborables o más.
+  if (d.promo && start < promoMinStart()) return json({ ok: false, error: 'slot_taken' }, 409);
 
   if (!googleConfigured()) {
     if (isProduction) {
@@ -160,7 +166,7 @@ export async function POST(req: Request) {
       start,
       end,
       timeZone: agendaConfig.timeZone,
-      summary: `Llamada con AUTOMATO · ${d.company || d.name}`,
+      summary: `${d.promo ? 'Tu prototipo con AUTOMATO' : 'Llamada con AUTOMATO'} · ${d.company || d.name}`,
       description: description(d, presentationUrl),
       attendee: { email: d.email, name: d.name },
       privateProps: {
@@ -178,11 +184,11 @@ export async function POST(req: Request) {
       email: d.email,
       phone: d.phone,
       answers: {
-        tipo: 'Llamada reservada',
+        tipo: d.promo ? 'Llamada reservada · prototipo gratis' : 'Llamada reservada',
         llamada: `${when(start)} (hora peninsular)`,
         empresa: d.company,
         mensaje: d.message,
-        asistente: chatSummary,
+        [d.promo ? 'requisitos' : 'asistente']: chatSummary,
         pagina: d.landing,
         origen: d.source,
       },
@@ -210,6 +216,7 @@ export async function POST(req: Request) {
       when: when(start),
       meetUrl: meeting.meetUrl,
       chatSummary,
+      promo: d.promo,
     });
 
     return json({ ok: true, ...iso, meetUrl: meeting.meetUrl, presentationUrl });

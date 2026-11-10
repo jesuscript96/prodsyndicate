@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { track, trackLead, type LeadType } from '@/lib/analytics';
 import { consentCopy } from '@/lib/agenda/consent';
 import type { AvailabilityResponse, BookingResponse, ContactLeadResponse } from '@/lib/agenda/schema';
-import { AGENDA_EVENT, readChatForLead, type AgendaRequest } from '@/lib/assistant/client';
+import { PROMO_BUSINESS_DAYS, promoMinStart } from '@/lib/agenda/promo';
+import { AGENDA_EVENT, isPromoChat, readChatForLead, type AgendaRequest } from '@/lib/assistant/client';
 import { readAttribution } from '@/lib/attribution';
 import { cn } from '@/lib/utils';
 import { site } from '@/site.config';
@@ -28,6 +29,8 @@ import './booking.css';
  *
  * Asistente (docs/encaja/asistente.md): escucha `encaja:agenda` para abrirse con el hueco o el modo
  * que se eligió en el chat, y si hubo conversación la adjunta al lead para que el equipo la vea.
+ * Si la conversación viene de la oferta del prototipo, solo enseña huecos a partir de 3 días
+ * laborables (hay que prepararlo antes) y marca el lead como `promo`.
  */
 
 type Props = {
@@ -91,8 +94,8 @@ export function Booking({ landing, location, withContact = true, bare = false, c
   const [done, setDone] = useState<Done | null>(null);
   /** Hueco elegido en el chat del asistente, pendiente de que cargue la agenda */
   const pending = useRef<string | null>(null);
-  /** Últimos huecos cargados (para aplicar al momento un hueco elegido en el chat) */
-  const loaded = useRef<string[] | null>(null);
+  /** La conversación con Mr. Tomate viene de la oferta del prototipo */
+  const [promo, setPromo] = useState(false);
 
   // Zona horaria de quien visita (solo se usa una vez cargada la agenda, ya en el navegador)
   const [tz] = useState(() =>
@@ -159,18 +162,21 @@ export function Booking({ landing, location, withContact = true, bare = false, c
       const res = await fetch('/api/agenda/disponibilidad', { cache: 'no-store' });
       const data = (await res.json()) as AvailabilityResponse;
       if (!res.ok || !data.ok) throw new Error(data.ok ? 'http' : data.error);
-      setSlots(data.slots);
+      const isPromo = isPromoChat(landing);
+      const min = isPromo ? promoMinStart() : 0;
+      const list = min ? data.slots.filter((s) => Date.parse(s) >= min) : data.slots;
+      setPromo(isPromo);
+      setSlots(list);
       setMock(Boolean(data.mock));
       setStatus('ready');
-      loaded.current = data.slots;
       if (pending.current) {
-        applyWanted(pending.current, data.slots);
+        applyWanted(pending.current, list);
         pending.current = null;
       }
     } catch {
       setStatus('unavailable');
     }
-  }, [applyWanted]);
+  }, [applyWanted, landing]);
 
   // Pide la agenda al acercarse (o al llegar por el ancla), no en cada visita que rebota arriba.
   useEffect(() => {
@@ -206,13 +212,10 @@ export function Booking({ landing, location, withContact = true, bare = false, c
       setMode(detail.mode === 'contacto' && withContact ? 'contacto' : 'llamada');
       setNotice(null);
       setErrors({});
-      const wanted = detail.mode === 'llamada' && detail.slot ? detail.slot : null;
-      if (wanted && loaded.current) applyWanted(wanted, loaded.current);
-      else pending.current = wanted;
-      if (!started.current) {
-        started.current = true;
-        void load();
-      }
+      // Se recarga siempre: la agenda puede haber cambiado y, si viene de la oferta, se filtra.
+      pending.current = detail.mode === 'llamada' && detail.slot ? detail.slot : null;
+      started.current = true;
+      void load();
       const target = root.current?.closest('section') ?? root.current;
       if (target) {
         const lenis = window.__lenis;
@@ -223,10 +226,14 @@ export function Booking({ landing, location, withContact = true, bare = false, c
     };
     window.addEventListener(AGENDA_EVENT, onAgenda);
     return () => window.removeEventListener(AGENDA_EVENT, onAgenda);
-  }, [load, applyWanted, withContact]);
+  }, [load, withContact]);
 
-  const tzNote =
-    tz === AGENDA_TZ ? 'Horas en hora peninsular española.' : `Horas en tu zona horaria (${tz.replace(/_/g, ' ')}).`;
+  const tzNote = [
+    tz === AGENDA_TZ ? 'Horas en hora peninsular española.' : `Horas en tu zona horaria (${tz.replace(/_/g, ' ')}).`,
+    promo ? `Los huecos empiezan a ${PROMO_BUSINESS_DAYS} días laborables: así nos da tiempo a preparar tu prototipo.` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const contactIntro =
     status === 'unavailable'
@@ -303,6 +310,7 @@ export function Booking({ landing, location, withContact = true, bare = false, c
       fbc: attribution.fbc,
       pixelConsent: attribution.pixelConsent,
       chat: readChatForLead(landing),
+      promo: isPromoChat(landing) || undefined,
     };
     try {
       const res = await fetch(isCall ? '/api/agenda/reservar' : '/api/encaja/contacto', {

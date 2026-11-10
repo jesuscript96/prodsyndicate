@@ -7,6 +7,9 @@ import { z } from 'zod';
 
 export const assistantLandings = ['tiempo', 'procesos', 'crecer'] as const;
 
+/** Cómo se abrió el chat: «promo» = desde la oferta del prototipo gratis (pop-up de llegada). */
+export type AssistantEntry = 'default' | 'promo';
+
 /** Lo que la página enseñó junto a una respuesta (botones de huecos o del formulario). */
 export const shownSchema = z.object({
   slots: z.array(z.iso.datetime()).max(6).optional(),
@@ -20,8 +23,10 @@ export const chatMessageSchema = z.discriminatedUnion('role', [
 
 export const assistantRequestSchema = z.object({
   landing: z.enum(assistantLandings),
-  /** Conversación entera, en orden. La última es del visitante. */
-  messages: z.array(chatMessageSchema).min(1).max(41),
+  /** Conversación entera, en orden (puede empezar con el saludo de Mr. Tomate). La última es del visitante. */
+  messages: z.array(chatMessageSchema).min(1).max(43),
+  /** Si se abrió desde la oferta del prototipo: Mr. Tomate pasa a reunir requisitos */
+  entry: z.enum(['default', 'promo']).optional(),
   /** Sesión firmada que devolvió el servidor en el primer mensaje */
   session: z.string().max(400).optional(),
   /** Turnstile, solo para abrir sesión */
@@ -37,7 +42,7 @@ export type AssistantRequest = z.infer<typeof assistantRequestSchema>;
 /** Conversación que viaja con la reserva o el contacto (solo texto). */
 export const leadChatSchema = z
   .array(z.object({ role: z.enum(['user', 'assistant']), content: z.string().max(2000) }))
-  .max(41);
+  .max(43);
 
 export type LeadChat = z.infer<typeof leadChatSchema>;
 

@@ -31,6 +31,8 @@ export const bookingSchema = z.object({
   landing: z.string().max(40).optional(),
   /** Conversación con el asistente de la landing, si la hubo (se resume para el equipo) */
   chat: leadChatSchema.optional(),
+  /** Viene de la oferta «Llévate tu prototipo GRATIS» (lib/agenda/promo.ts) */
+  promo: z.boolean().optional(),
   ...attributionFields,
 });
 

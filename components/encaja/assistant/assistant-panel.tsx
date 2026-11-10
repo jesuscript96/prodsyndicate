@@ -6,16 +6,17 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type
 import { TURNSTILE_DEV_TOKEN, Turnstile, turnstileEnabled } from '@/components/forms/turnstile';
 import { encajaAssistant, type EncajaSlug } from '@/content/encaja';
 import { track } from '@/lib/analytics';
-import { loadChat, loadSession, openAgenda, saveChat, saveSession, type StoredChat, type StoredMessage } from '@/lib/assistant/client';
+import { loadChat, loadSession, openAgenda, saveChat, saveSession, withOpener, type StoredChat, type StoredMessage } from '@/lib/assistant/client';
 import type { AssistantError, AssistantEvent, Shown } from '@/lib/assistant/schema';
 import { cn } from '@/lib/utils';
 import { site } from '@/site.config';
+import { TomatoAvatar } from './tomato-avatar';
 
 /**
- * Chat del asistente (docs/encaja/asistente.md). Antes del primer mensaje enseña qué es y el
- * aviso de DeepSeek; «Empezar» es el consentimiento. La conversación se manda entera en cada
- * turno a /api/encaja/asistente y la respuesta llega en streaming. Los huecos que propone salen
- * como botones que abren la agenda de la landing con ese hueco ya elegido.
+ * Chat de Mr. Tomate (docs/encaja/asistente.md). Empieza con su saludo (distinto si llega desde la
+ * oferta del prototipo). La conversación se manda entera en cada turno a /api/encaja/asistente y
+ * la respuesta llega en streaming. Los huecos que propone salen como botones que abren la agenda
+ * de la landing con ese hueco ya elegido. Turnstile va invisible salvo que Cloudflare dude.
  */
 
 type Props = { open: boolean; onClose: () => void; landing: EncajaSlug; location: string };
@@ -37,7 +38,7 @@ function readTerm(): string | undefined {
 }
 
 export function AssistantPanel({ open, onClose, landing, location }: Props) {
-  const [chat, setChat] = useState<StoredChat>(() => loadChat(landing));
+  const [chat, setChat] = useState<StoredChat>(() => withOpener(loadChat(landing)));
   const [session, setSession] = useState<string | undefined>(() => loadSession(landing));
   const [token, setToken] = useState('');
   const [turnstileKey, setTurnstileKey] = useState(0);
@@ -110,7 +111,7 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
     if (!text || busy || limitReached) return;
     const turnstileToken = session ? undefined : turnstileEnabled ? token : TURNSTILE_DEV_TOKEN;
     if (!session && !turnstileToken) {
-      setNotice('Espera un momento a que termine la verificación antispam y vuelve a enviar.');
+      setNotice('Un segundo: estamos comprobando que no eres un robot. Vuelve a enviar enseguida.');
       return;
     }
 
@@ -140,7 +141,7 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
       const res = await fetch('/api/encaja/asistente', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ landing, messages, session, turnstileToken, term: readTerm() }),
+        body: JSON.stringify({ landing, messages, session, turnstileToken, term: readTerm(), entry: chat.entry }),
         signal: controller.signal,
       });
       if (!res.body) throw new Error('no_body');
@@ -214,11 +215,6 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
     onClose();
   };
 
-  const start = () => {
-    update({ ...chat, consent: true });
-    requestAnimationFrame(() => field.current?.focus());
-  };
-
   const renderShown = (s: Shown | undefined) => {
     if (!s) return null;
     return (
@@ -246,7 +242,8 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
     );
   };
 
-  const showStarters = chat.consent && userTurns === 0 && !busy;
+  const showStarters = userTurns === 0 && !busy;
+  const starters = chat.entry === 'promo' ? copy.promoStarters : copy.starters[landing];
 
   return (
     <div
@@ -259,74 +256,56 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
     >
       <header className="assistant__head">
         <div className="assistant__heading">
-          <h2 id="assistant-title" className="assistant__title">
-            {copy.title}
-          </h2>
-          <span className="assistant__badge">{copy.badge}</span>
+          <TomatoAvatar className="assistant__avatar" />
+          <div className="assistant__who">
+            <h2 id="assistant-title" className="assistant__title">
+              {copy.name} <span className="assistant__badge">{copy.badge}</span>
+            </h2>
+            <p className="assistant__role">{copy.role}</p>
+          </div>
         </div>
-        <button type="button" className="assistant__close" onClick={onClose} aria-label="Cerrar el asistente">
+        <button type="button" className="assistant__close" onClick={onClose} aria-label="Cerrar el chat">
           <X aria-hidden="true" />
         </button>
       </header>
 
       <div className="assistant__body" ref={list}>
-        <p className="assistant__msg assistant__msg--bot">{copy.intro}</p>
-
-        {!chat.consent ? (
-          <div className="assistant__consent">
-            <p className="assistant__notice">
-              {copy.notice}{' '}
-              <Link href="/legal/privacidad" target="_blank" rel="noopener noreferrer">
-                Política de privacidad
-                <span className="sr-only"> (se abre en una pestaña nueva)</span>
-              </Link>
-              .
+        {chat.messages.map((m, i) => (
+          <div key={i} className="assistant__turn">
+            <p className={cn('assistant__msg', m.role === 'user' ? 'assistant__msg--user' : 'assistant__msg--bot')}>
+              {m.content}
             </p>
-            <button type="button" className="btn btn--primary btn--sm assistant__start" onClick={start}>
-              {copy.start}
-            </button>
+            {m.role === 'assistant' && renderShown(m.shown)}
           </div>
-        ) : (
-          <>
-            <p className="assistant__msg assistant__msg--bot">{copy.greeting}</p>
-            {chat.messages.map((m, i) => (
-              <div key={i} className="assistant__turn">
-                <p className={cn('assistant__msg', m.role === 'user' ? 'assistant__msg--user' : 'assistant__msg--bot')}>
-                  {m.content}
-                </p>
-                {m.role === 'assistant' && renderShown(m.shown)}
-              </div>
+        ))}
+        {partial && (
+          <div className="assistant__turn">
+            {partial.text ? (
+              <p className="assistant__msg assistant__msg--bot">{plain(partial.text)}</p>
+            ) : (
+              <p className="assistant__msg assistant__msg--bot assistant__typing" aria-label="Escribiendo">
+                <span />
+                <span />
+                <span />
+              </p>
+            )}
+            {renderShown(partial.shown)}
+          </div>
+        )}
+        {showStarters && (
+          <div className="assistant__starters" role="group" aria-label="Respuestas rápidas">
+            {starters.map((s) => (
+              <button key={s} type="button" className="assistant__starter" onClick={() => void send(s)}>
+                {s}
+              </button>
             ))}
-            {partial && (
-              <div className="assistant__turn">
-                {partial.text ? (
-                  <p className="assistant__msg assistant__msg--bot">{plain(partial.text)}</p>
-                ) : (
-                  <p className="assistant__msg assistant__msg--bot assistant__typing" aria-label="Escribiendo">
-                    <span />
-                    <span />
-                    <span />
-                  </p>
-                )}
-                {renderShown(partial.shown)}
-              </div>
-            )}
-            {showStarters && (
-              <div className="assistant__starters" role="group" aria-label="Preguntas frecuentes">
-                {copy.starters[landing].map((s) => (
-                  <button key={s} type="button" className="assistant__starter" onClick={() => void send(s)}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-            {limitReached && !busy && (
-              <div className="assistant__turn">
-                <p className="assistant__msg assistant__msg--bot">{copy.limit}</p>
-                {renderShown({ form: 'llamada' })}
-              </div>
-            )}
-          </>
+          </div>
+        )}
+        {limitReached && !busy && (
+          <div className="assistant__turn">
+            <p className="assistant__msg assistant__msg--bot">{copy.limit}</p>
+            {renderShown({ form: 'llamada' })}
+          </div>
         )}
 
         {notice && (
@@ -341,33 +320,43 @@ export function AssistantPanel({ open, onClose, landing, location }: Props) {
         {announce}
       </p>
 
-      {chat.consent && (
-        <form className="assistant__composer" onSubmit={submit}>
-          {needsVerify && (
-            <Turnstile key={turnstileKey} className="assistant__turnstile" onToken={setToken} onExpire={() => setToken('')} />
-          )}
-          <div className="assistant__field">
-            <label htmlFor="assistant-input" className="sr-only">
-              Tu mensaje
-            </label>
-            <textarea
-              id="assistant-input"
-              ref={field}
-              rows={1}
-              maxLength={MAX_CHARS}
-              placeholder={copy.placeholder}
-              value={input}
-              disabled={limitReached}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-            />
-            <button type="submit" className="assistant__send" disabled={busy || !input.trim() || limitReached} aria-label="Enviar">
-              <ArrowUp aria-hidden="true" />
-            </button>
-          </div>
-          <p className="assistant__foot">{copy.footer}</p>
-        </form>
-      )}
+      <form className="assistant__composer" onSubmit={submit}>
+        {needsVerify && (
+          <Turnstile
+            key={turnstileKey}
+            className="assistant__turnstile"
+            appearance="interaction-only"
+            onToken={setToken}
+            onExpire={() => setToken('')}
+          />
+        )}
+        <div className="assistant__field">
+          <label htmlFor="assistant-input" className="sr-only">
+            Tu mensaje
+          </label>
+          <textarea
+            id="assistant-input"
+            ref={field}
+            rows={1}
+            maxLength={MAX_CHARS}
+            placeholder={copy.placeholder}
+            value={input}
+            disabled={limitReached}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={onKeyDown}
+          />
+          <button type="submit" className="assistant__send" disabled={busy || !input.trim() || limitReached} aria-label="Enviar">
+            <ArrowUp aria-hidden="true" />
+          </button>
+        </div>
+        <p className="assistant__foot">
+          {copy.footer}{' '}
+          <Link href="/legal/privacidad" target="_blank" rel="noopener noreferrer">
+            Privacidad
+            <span className="sr-only"> (se abre en una pestaña nueva)</span>
+          </Link>
+        </p>
+      </form>
     </div>
   );
 }

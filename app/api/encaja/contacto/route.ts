@@ -62,7 +62,7 @@ export async function POST(req: Request) {
   const presentationUrl = presentationFor(d.landing);
   const destination = destinationFor(d.landing);
   // Si habló con el asistente, el equipo recibe un resumen (como mucho unos segundos de espera).
-  const chatSummary = await summarizeChat(d.chat);
+  const chatSummary = await summarizeChat(d.chat, { promo: d.promo });
 
   if (!valmeConfigured(destination)) {
     if (isProduction) {
@@ -86,10 +86,10 @@ export async function POST(req: Request) {
       email: d.email,
       phone: d.phone,
       answers: {
-        tipo: 'Quiere que le escribamos',
+        tipo: d.promo ? 'Quiere que le escribamos · prototipo gratis' : 'Quiere que le escribamos',
         empresa: d.company,
         mensaje: d.message,
-        asistente: chatSummary,
+        [d.promo ? 'requisitos' : 'asistente']: chatSummary,
         pagina: d.landing,
         origen: d.source,
       },
@@ -108,6 +108,7 @@ export async function POST(req: Request) {
       utm: d.utm,
       clicks: d.clicks,
       chatSummary,
+      promo: d.promo,
     }),
   ]);
   // Si Valme OS falla pero el aviso ha salido, el lead no se pierde.
